@@ -19,24 +19,21 @@ package vendalenger.kondion;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
+import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.port.Command;
+import vendalenger.port.FileShortcuts;
+import vendalenger.port.VD_FlConsole;
 import argo.jdom.JdomParser;
 import argo.jdom.JsonNode;
 import argo.jdom.JsonNodeType;
 import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
-import vendalenger.kondion.lwjgl.FlatDrawing;
-import vendalenger.kondion.lwjgl.Window;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.port.Command;
-import vendalenger.port.FileShortcuts;
-import vendalenger.port.VD_FlConsole;
 
 public class KHacker {
 

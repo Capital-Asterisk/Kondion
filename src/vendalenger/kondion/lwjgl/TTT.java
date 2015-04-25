@@ -16,34 +16,29 @@
 
 package vendalenger.kondion.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_ALPHA_TEST;
-import static org.lwjgl.opengl.GL11.GL_BACK;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
-import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
-import static org.lwjgl.opengl.GL11.GL_GREATER;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
 import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.GL_POINT_SMOOTH;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glAlphaFunc;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
-import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glClearDepth;
-import static org.lwjgl.opengl.GL11.glCullFace;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
-import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glViewport;
+
+import java.nio.FloatBuffer;
+import java.util.List;
 
 import javax.swing.JOptionPane;
 
 import org.lwjgl.util.glu.GLU;
+import org.lwjgl.util.vector.Vector3f;
 
 /*
  * TTT, the same class used in my first 3d lwjgl game. (with modifications) TTT
@@ -67,9 +62,7 @@ import org.lwjgl.util.glu.GLU;
  */
 public class TTT {
 
-	public static boolean dark = false;
 	public static float fov = 50;
-	// public static FloatBuffer fogcolor = BufferUtils.createFloatBuffer(4);
 	public static boolean fs = false;
 
 	public static int Decide(String message, String objective, int type) {
@@ -82,24 +75,22 @@ public class TTT {
 		} else {
 			return 2;
 		}
-
 	}
 
 	public static void Error(String message) {
 		JOptionPane.showMessageDialog(null, message, "Error Message",
 				JOptionPane.ERROR_MESSAGE);
-
 	}
 
 	public static void Inform(String message) {
 		JOptionPane.showMessageDialog(null, message, "Information",
 				JOptionPane.INFORMATION_MESSAGE);
-
 	}
 
-	/** 3D mode (1/2) */
-	public static void Three() {// not mine. (A bunch of code snippets bunched
-		// up together :3)
+	/**
+	 * Set to 3d mode
+	 */
+	public static void three() {
 		glViewport(0, 0, Window.getWidth(), Window.getHeight());
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -108,14 +99,80 @@ public class TTT {
 				0.1f, 200.0f);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		glCullFace(GL_BACK);
+		// glCullFace(GL_BACK);
 		glEnable(GL_BLEND);
-		glEnable(GL_CULL_FACE);
+		// glEnable(GL_CULL_FACE);
 		glEnable(GL_DEPTH_TEST);
 		glEnable(GL_POINT_SMOOTH);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glDepthFunc(GL_LEQUAL);
 		glClearDepth(10.0f);
+	}
+
+	/**
+	 * Quad shortcut for a triangle vertex or normal array.
+	 * <p>
+	 * (0, 1) a-------b (1, 1)
+	 * </p>
+	 * <p>
+	 * (0, 0) c-------d (1, 0)
+	 * </p>
+	 * 
+	 * @param list
+	 * @param a
+	 *            point a
+	 * @param b
+	 *            point b
+	 * @param c
+	 *            point c
+	 * @param d
+	 *            point d
+	 */
+	public static void quad(List<Float> list, Vector3f a, Vector3f b,
+			Vector3f c, Vector3f d) {
+		list.add(a.x);
+		list.add(a.y);
+		list.add(a.z);
+
+		list.add(b.x);
+		list.add(b.y);
+		list.add(b.z);
+
+		list.add(c.x);
+		list.add(c.y);
+		list.add(c.z);
+
+		list.add(c.x);
+		list.add(c.y);
+		list.add(c.z);
+
+		list.add(b.x);
+		list.add(b.y);
+		list.add(b.z);
+
+		list.add(d.x);
+		list.add(d.y);
+		list.add(d.z);
+	}
+
+	public static void addVect(List<Float> list, Vector3f v) {
+		list.add(v.x);
+		list.add(v.y);
+		list.add(v.z);
+	}
+
+	/**
+	 * Put elements from a float list into a float buffer
+	 * 
+	 * @param list
+	 *            The Float List
+	 * @param buffer
+	 *            The FloatBuffer
+	 */
+	public static void listPutFloatBuffer(List<Float> list, FloatBuffer buffer) {
+		for (Float float1 : list) {
+			buffer.put(float1.floatValue());
+		}
 	}
 
 	/** 2D mode */

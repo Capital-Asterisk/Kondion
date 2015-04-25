@@ -19,8 +19,6 @@ package vendalenger.kondion.lwjgl.resource;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
-import org.lwjgl.opengl.GL11;
-
 public class KondionTexture {
 
 	private boolean mipmapped;

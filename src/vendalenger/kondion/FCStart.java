@@ -18,8 +18,8 @@ package vendalenger.kondion;
 
 import java.io.File;
 
-import vendalenger.port.VD_FlConsole;
 import vendalenger.port.Command;
+import vendalenger.port.VD_FlConsole;
 
 public class FCStart {
 

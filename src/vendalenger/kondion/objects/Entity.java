@@ -16,9 +16,6 @@
 
 package vendalenger.kondion.objects;
 
-import java.util.Arrays;
-import java.util.List;
-
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import org.lwjgl.opengl.GL11;
@@ -27,8 +24,6 @@ import org.lwjgl.util.vector.Vector3f;
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
-
-import com.sun.javafx.geom.Vec3f;
 
 public class Entity {
 

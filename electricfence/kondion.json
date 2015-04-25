@@ -28,7 +28,8 @@
 		"right": ["Right button", "key", "d"]
 	},
 	"Graphics": {
-		"human": ["living/human.png", "nearest"]
+		"human": ["living/human.png", "nearest"],
+		"noah": ["maps/noah.png", "nearest"]
 	},
 	"Audio": {
 		"monkey0": ["weapons/monkey0.wav", "asis"],

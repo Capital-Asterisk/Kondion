@@ -18,13 +18,10 @@ package vendalenger.kondion.lwjgl;
 
 import org.lwjgl.util.glu.GLU;
 import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.ReadableVector4f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import vendalenger.kondion.KInput;
-
-import com.sun.javafx.geom.Matrix3f;
 
 /*
  * Camera_ is a traditional name... my first 3d game had a class called Camera_.
@@ -70,6 +67,18 @@ public class Camera_ {
 		tempMatrix = new Matrix4f();
 	}
 
+	public float getPitch() {
+		return pitch;
+	}
+
+	public float getRoll() {
+		return roll;
+	}
+
+	public float getYaw() {
+		return yaw;
+	}
+
 	/**
 	 * Get the center (The xyz of where you want to look)
 	 * 
@@ -104,6 +113,22 @@ public class Camera_ {
 		yaw = (float) Math.atan2(center.z - eye.z, center.x - eye.x);
 		pitch = (float) Math.asin(center.y - eye.y);
 		// System.out.println(yaw + " " + pitch);
+	}
+
+	/**
+	 * Aim towards angle, you can use setRoll();
+	 * 
+	 * @param y
+	 *            Yaw
+	 * @param p
+	 *            Pitch
+	 */
+	public void aim(float y, float p) {
+		yaw = y;
+		pitch = p;
+		center.y = (float) Math.sin(p) + eye.y;
+		center.x = (float) (Math.cos(yaw) * Math.cos(p)) + eye.x;
+		center.z = (float) (Math.sin(yaw) * Math.cos(p)) + eye.z;
 	}
 
 	/**
@@ -172,6 +197,16 @@ public class Camera_ {
 		freeMode = b;
 	}
 
+	/**
+	 * Roll the camera
+	 * 
+	 * @param r
+	 *            New roll
+	 */
+	public void setRoll(float r) {
+		roll = r;
+	}
+
 	public void update() {
 		if (freeMode) {
 			calculateAngle();
@@ -206,6 +241,8 @@ public class Camera_ {
 				center.x += tempVector0.x * 0.04;
 				center.z += tempVector0.y * 0.04;
 			}
+			aim((float) (yaw + KInput.getMouseDX() / 300),
+					(float) (pitch - KInput.getMouseDY() / 300));
 			normalizeCenter();
 			calculateUp();
 		}

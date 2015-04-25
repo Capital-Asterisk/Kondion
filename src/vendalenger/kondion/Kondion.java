@@ -16,17 +16,12 @@
 
 package vendalenger.kondion;
 
-import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
-import static org.lwjgl.glfw.GLFW.glfwPollEvents;
-import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwWindowShouldClose;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
-import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -40,19 +35,19 @@ import javax.script.ScriptException;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
+import org.lwjgl.util.vector.Vector3f;
 
+import vendalenger.kondion.lwjgl.Camera_;
+import vendalenger.kondion.lwjgl.FlatDrawing;
+import vendalenger.kondion.lwjgl.TTT;
+import vendalenger.kondion.lwjgl.Window;
+import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.objects.Entity;
 import vendalenger.kondion.objects.PhysicEntity;
 import vendalenger.kondion.objects.ProtoEntity;
-import vendalenger.kondion.lwjgl.Camera_;
-import vendalenger.kondion.lwjgl.FlatDrawing;
-import vendalenger.kondion.lwjgl.Window;
-import vendalenger.kondion.lwjgl.TTT;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.scene.Scene;
 
 public class Kondion {
 
@@ -60,6 +55,7 @@ public class Kondion {
 	private static KondionGame game;
 	private static Thread gameThread;
 	private static ScriptEngine jsEngine;
+	private static Scene currentScene;
 	private static List<ProtoEntity> pEntityList;
 	private static List<ScriptObjectMirror> mirrorList;
 	private static List<Entity> entityList;
@@ -134,6 +130,11 @@ public class Kondion {
 		// }
 		currentCamera = new Camera_();
 		currentCamera.look(0, 0, 8, 0, 0, 0);
+
+		currentScene = new Scene();
+		currentScene.addAABlock(new Vector3f(0, 0, 0), 1, 1, 4, 4, 4, 4);
+		currentScene.doGlBuffers();
+
 		try {
 			((Invocable) jsEngine).invokeFunction("start");
 		} catch (NoSuchMethodException e) {
@@ -164,13 +165,14 @@ public class Kondion {
 
 			// Rendering
 
-			TTT.Three();
+			TTT.three();
 
-			glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
+			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
 																// framebuffer
-
 			currentCamera.gluLookAt();
+
+			currentScene.render();
 
 			for (int i = 0; i < entityList.size(); i++) {
 				entityList.get(i).render();

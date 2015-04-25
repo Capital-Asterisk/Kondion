@@ -16,13 +16,7 @@
 
 package vendalenger.kondion.objects;
 
-import java.util.List;
-
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
-import org.lwjgl.util.vector.Vector3f;
-
-import com.sun.javafx.geom.Vec3f;
 
 public class ProtoEntity {
 

@@ -16,25 +16,47 @@
 
 package vendalenger.kondion;
 
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_B;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_E;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_F;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_G;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_H;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_I;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_J;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_K;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_L;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_M;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_N;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_O;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_P;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Q;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_R;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_T;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_U;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_V;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Y;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
 
 import java.nio.DoubleBuffer;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import com.sun.corba.se.impl.ior.ByteBuffer;
-
 import vendalenger.kondion.lwjgl.Window;
 
 public class KInput {
 
 	private static boolean mouseLocked = false;
-	private static float mouseDX, mouseDY;
+	private static double mouseDX = 0, mouseDY = 0, mousePX = 0, mousePY = 0;
 	private static DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
 	private static DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
@@ -68,6 +90,14 @@ public class KInput {
 				return i;
 		}
 		return -1;
+	}
+
+	public static double getMouseDX() {
+		return mouseDX;
+	}
+
+	public static double getMouseDY() {
+		return mouseDY;
 	}
 
 	public static int getMouseX() {
@@ -131,14 +161,22 @@ public class KInput {
 
 	public static void update() {
 		// setMouseLock(true);
+		mouseX.clear();
+		mouseY.clear();
+		GLFW.glfwGetCursorPos(Window.getWindow(), mouseX, mouseY);
+		mouseDX = mouseX.get(0) - mousePX;
+		mouseDY = mouseY.get(0) - mousePY;
 		if (mouseLocked) {
 			// Set mouse position to center
 			GLFW.glfwSetCursorPos(Window.getWindow(), Window.getWidth() / 2,
 					Window.getHeight() / 2);
+			mousePX = Window.getWidth() / 2;
+			mousePY = Window.getHeight() / 2;
+		} else {
+			mousePX = mouseX.get(0);
+			mousePY = mouseY.get(0);
 		}
-		mouseX.clear();
-		mouseY.clear();
-		GLFW.glfwGetCursorPos(Window.getWindow(), mouseX, mouseY);
+		// System.out.println(mouseDX + " " + mouseDY);
 	}
 }
 

@@ -22,14 +22,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-
-import vendalenger.kondion.KHacker;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import javafx.application.Platform;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
+
+import org.lwjgl.opengl.GL11;
+
+import vendalenger.kondion.KHacker;
+import vendalenger.kondion.lwjgl.resource.KondionLoader;
 
 public class Command {
 

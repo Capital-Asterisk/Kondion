@@ -16,29 +16,31 @@
 
 package vendalenger.kondion.objects;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
+import org.lwjgl.util.vector.Vector3f;
+
+// Ambient Obscurance
 public class PhysicEntity extends Entity {
 
 	private float drag = 0.97f;
-	private boolean hasGravity = false;
+	private boolean hasGravity = true;
 	private Vector3f velocity;
 
 	public PhysicEntity(ProtoEntity p, ScriptObjectMirror m) {
 		super(p, m);
 		velocity = new Vector3f();
-		velocity.y = 0.7f;
 	}
 
 	public void move() {
 		if (hasGravity) {
-			Vector3f.add(velocity, position, position);
-			velocity.x *= drag;
-			velocity.y *= drag;
-			velocity.z *= drag;
+			// velocity.y -= 0.007;
 		}
+		position.x += 0.01;
+		Vector3f.add(velocity, position, position);
+		velocity.x *= drag;
+		velocity.y *= drag;
+		velocity.z *= drag;
 	}
 
 	public Vector3f getVelocity() {

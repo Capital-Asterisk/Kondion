@@ -16,11 +16,6 @@
 
 package vendalenger.kondion;
 
-import java.awt.event.MouseAdapter;
-
-import org.lwjgl.glfw.GLFW;
-
-import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.objects.ProtoEntity;
 import vendalenger.port.Command;
 

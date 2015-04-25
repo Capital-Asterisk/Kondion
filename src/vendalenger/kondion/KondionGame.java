@@ -16,8 +16,6 @@
 
 package vendalenger.kondion;
 
-import java.util.Map;
-
 import argo.jdom.JsonRootNode;
 
 public abstract class KondionGame {
