@@ -183,5 +183,4 @@ public class Window {
 	public static void end() {
 		glfwDestroyWindow(Window.getWindow());
 	}
-
 }

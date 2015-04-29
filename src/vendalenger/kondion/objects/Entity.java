@@ -16,9 +16,11 @@
 
 package vendalenger.kondion.objects;
 
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.vector.Vector3f;
 
 import vendalenger.kondion.lwjgl.FlatDrawing;
@@ -70,10 +72,10 @@ public class Entity {
 	}
 
 	public void render() {
-		GL11.glPushMatrix();
-		GL11.glTranslatef(position.x, position.y, position.z);
+		glPushMatrix();
+		glTranslatef(position.x, position.y, position.z);
 		t = KondionLoader.textures.get("human");
 		FlatDrawing.renderBillboard(2.0f, 2.0f, t);
-		GL11.glPopMatrix();
+		glPopMatrix();
 	}
 }

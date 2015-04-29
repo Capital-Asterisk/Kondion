@@ -16,7 +16,6 @@
 
 package vendalenger.kondion.lwjgl.resource;
 
-import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_LINEAR;
@@ -28,11 +27,13 @@ import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
+import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
 import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL20.*;
 
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
@@ -174,6 +175,21 @@ public class KondionLoader {
 			return null;
 		}
 	}
+	
+	public static int newShader(int t, String code, String errName) {
+		int s = glCreateShader(t);
+		glShaderSource(s, code);
+		glCompileShader(s);
+		int c = glGetShaderi(s, GL_COMPILE_STATUS);
+		String shaderLog = glGetShaderInfoLog(s);
+		if (shaderLog.trim().length() > 0) {
+			System.err.println(shaderLog);
+		}
+		if (c == 0) {
+			throw new AssertionError("Error in compiling shader: " + errName);
+		}
+		return s;
+	}
 
 	/**
 	 * Load a nash. (sh on nash already means shader)
@@ -187,16 +203,16 @@ public class KondionLoader {
 		BufferedReader reader;
 		KondionShader nash_shader = null;
 		String line;
-		StringBuilder vert_string = new StringBuilder();
-		StringBuilder frag_string = new StringBuilder();
+		StringBuilder vertSB = new StringBuilder();
+		StringBuilder fragSB = new StringBuilder();
 		try {
 			reader = new BufferedReader(new FileReader(nash));
 			while ((line = reader.readLine()) != null) {
 				if (!line.startsWith("#mode")) {
 					if (mode_vert)
-						vert_string.append(line + "\n");
+						vertSB.append(line + "\n");
 					if (mode_frag)
-						frag_string.append(line + "\n");
+						fragSB.append(line + "\n");
 				} else {
 					mode_vert = false;
 					mode_frag = false;
@@ -217,11 +233,21 @@ public class KondionLoader {
 				}
 			}
 			reader.close();
-
+			int program = glCreateProgram();
+			int vertShader = newShader(GL_VERTEX_SHADER, vertSB.toString(), nash.getPath() + " (VERTEX)");
+			int fragShader = newShader(GL_FRAGMENT_SHADER, fragSB.toString(), nash.getPath() + " (FRAGMENT)");
+			glAttachShader(program, vertShader);
+			glAttachShader(program, fragShader);
+			int loc = glGetUniformLocation(program, "texture1");
+			glUniform1i(loc, 0);
+			glLinkProgram(program);
+			
+			nash_shader = new KondionShader(vertShader, fragShader, program);
+			/*
 			int vert_shader = ARBShaderObjects
 					.glCreateShaderObjectARB(ARBVertexShader.GL_VERTEX_SHADER_ARB);
 			ARBShaderObjects.glShaderSourceARB(vert_shader,
-					vert_string.toString());
+					vertSB.toString());
 			ARBShaderObjects.glCompileShaderARB(vert_shader);
 			if (ARBShaderObjects.glGetObjectParameteriARB(vert_shader,
 					ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL_FALSE) {
@@ -232,7 +258,7 @@ public class KondionLoader {
 			int frag_shader = ARBShaderObjects
 					.glCreateShaderObjectARB(ARBFragmentShader.GL_FRAGMENT_SHADER_ARB);
 			ARBShaderObjects.glShaderSourceARB(frag_shader,
-					frag_string.toString());
+					fragSB.toString());
 			ARBShaderObjects.glCompileShaderARB(frag_shader);
 			if (ARBShaderObjects.glGetObjectParameteriARB(frag_shader,
 					ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL_FALSE) {
@@ -265,8 +291,11 @@ public class KondionLoader {
 			}
 			ARBShaderObjects.glValidateProgramARB(program);
 
-			nash_shader = new KondionShader(vert_shader, frag_shader, 0);
-
+			nash_shader = new KondionShader(vert_shader, frag_shader, program);
+			*/
+			
+			
+			
 		} catch (FileNotFoundException e1) {
 			System.err.println(e1.getMessage());
 		} catch (IOException e) {

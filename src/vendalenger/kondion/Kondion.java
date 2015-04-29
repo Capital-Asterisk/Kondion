@@ -24,6 +24,7 @@ import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,6 +45,8 @@ import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KondionTexture;
 import vendalenger.kondion.objects.Entity;
 import vendalenger.kondion.objects.PhysicEntity;
 import vendalenger.kondion.objects.ProtoEntity;
@@ -99,6 +102,8 @@ public class Kondion {
 					Window.setNatives();
 					Window.initGL(800, 600, false, false, g.getGameInfo()
 							.getStringValue("GameName"));
+					//KondionTexture t = KondionLoader.registerTexture(new File(""), "kondionLoad", GL11.GL_NEAREST, GL11.GL_NEAREST, GL11.GL_CLAMP, GL11.GL_CLAMP);
+					//FlatDrawing.
 					entityList = new ArrayList<Entity>();
 					mirrorList = new ArrayList<ScriptObjectMirror>();
 					pEntityList = new ArrayList<ProtoEntity>();
@@ -111,8 +116,9 @@ public class Kondion {
 						((Invocable) jsEngine).invokeFunction("init");
 					}
 					GLContext.createFromCurrent();
-					KondionLoader.load();
+					Window.update();
 					FlatDrawing.setup();
+					KondionLoader.load();
 					gameLoop();
 				} catch (ScriptException e) {
 					e.printStackTrace();
@@ -132,7 +138,8 @@ public class Kondion {
 		currentCamera.look(0, 0, 8, 0, 0, 0);
 
 		currentScene = new Scene();
-		currentScene.addAABlock(new Vector3f(0, 0, 0), 1, 1, 4, 4, 4, 4);
+		currentScene.addAABlock(new Vector3f(0, 0, 0), 1, 1, 8, 8, 8, 8);
+		currentScene.addAABlock(new Vector3f(2, 1, 16), 1, 1, 8, 8, 8, 8);
 		currentScene.doGlBuffers();
 
 		try {
@@ -143,7 +150,7 @@ public class Kondion {
 			e.printStackTrace();
 		}
 		byte t = 0;
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
+		
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
 
 			// Updating

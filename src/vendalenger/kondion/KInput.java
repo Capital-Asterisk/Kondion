@@ -42,6 +42,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Y;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
+import static org.lwjgl.opengl.GL11.GL_TRUE;
 
 import java.nio.DoubleBuffer;
 import java.util.ArrayList;
@@ -49,7 +50,6 @@ import java.util.List;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import vendalenger.kondion.lwjgl.Window;
 
@@ -124,22 +124,22 @@ public class KInput {
 	}
 
 	public static boolean mouseDown(int button) {
-		return (GLFW.glfwGetMouseButton(Window.getWindow(), button) == GL11.GL_TRUE);
+		return (GLFW.glfwGetMouseButton(Window.getWindow(), button) == GL_TRUE);
 	}
 
 	public static boolean keyboardDown(int key) {
-		return (GLFW.glfwGetKey(Window.getWindow(), key) == GL11.GL_TRUE);
+		return (GLFW.glfwGetKey(Window.getWindow(), key) == GL_TRUE);
 	}
 
 	public static boolean buttonIsDown(int buttonIndex) {
 		if (buttonList.get(buttonIndex).device == 0) {
 			// keyboard test
 			return (GLFW.glfwGetKey(Window.getWindow(),
-					buttonList.get(buttonIndex).key) == GL11.GL_TRUE);
+					buttonList.get(buttonIndex).key) == GL_TRUE);
 		} else if (buttonList.get(buttonIndex).device == 1) {
 			// mouse test
 			return (GLFW.glfwGetMouseButton(Window.getWindow(),
-					buttonList.get(buttonIndex).key) == GL11.GL_TRUE);
+					buttonList.get(buttonIndex).key) == GL_TRUE);
 		}
 		return false;
 	}
