@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Neal Nicdao
+ * Copyright 2015 Neal Nicdao
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -17,6 +17,16 @@
 var EntityPhysClass = Java.type("vendalenger.kondion.objects.Entity");
 var ProtoEntityClass = Java.type("vendalenger.kondion.objects.ProtoEntity");
 
+var Quaternion = Java.type("org.lwjgl.util.vector.Quaternion");
+
+var Matrix2f = Java.type("org.lwjgl.util.vector.Matrix2f");
+var Matrix3f = Java.type("org.lwjgl.util.vector.Matrix3f");
+var Matrix2f = Java.type("org.lwjgl.util.vector.Matrix4f");
+
+var Vector2f = Java.type("org.lwjgl.util.vector.Vector2f");
+var Vector3f = Java.type("org.lwjgl.util.vector.Vector3f");
+var Vector4f = Java.type("org.lwjgl.util.vector.Vector4f");
+
 var blockTypes = {
 	SOLID: 0, CUTOUT: 1, EXCEPT: 2,
 };
@@ -26,34 +36,46 @@ var KJS = {
 	java: Java.type("vendalenger.kondion.KJS"),
 	kondion: Java.type("vendalenger.kondion.Kondion"),
 	kinput: Java.type("vendalenger.kondion.KInput"),
+	b: {
+		// Buttons go here
+	},
+	c: {
+		freeCam: function(mode) {KJS.kondion.getCurrentCamera().setFreeMode(mode);},
+		bindCam: function(ent) {KJS.kondion.getCurrentCamera().bindToEntity(ent)}
+	},
 	e: {
 		rEnt: function(props) {
 			var e = new ProtoEntityClass(props);
 			KJS.kondion.getProtoEntityList().add(e);
 			return e;
 		},
-		spawnEnt: function(id) {
+		spawnEnt: function(id, extra) {
 			var p = KJS.java.getProtoEntity(id);
 			var e;
 			if (p != null) {
-				e = p.create(patchObject({}, p.getObject()));
-				KJS.kondion.getEntityList().add(e.class);
+				e = p.create(patchObject({}, p.getObject()), extra);
+				KJS.kondion.getEntityList().add(e.obj);
 				KJS.kondion.getMirrorList().add(e);
+				e.create();
 			}
 			return e;
 		}
 	},
 	g: {
-		freeCam: function() {KJS.java.freeCam();},
 		setMouseGrab: function(g) {KJS.kinput.setMouseLock(g);}
+	},
+	i: {
+		buttonDown: function(b) {return KJS.kinput.buttonIsDown(b);},
+		keyboardDown: function(b) {return KJS.kinput.keyboardDown(b);},
+		mouseDown: function(b) {return KJS.kinput.mouseDown(b);}
 	},
 	s: {
 		setRootCollision: function() {
 			
 		},
-		newAABlock: function(x, y, z, up, down, left, right, type) {
-		
-		}
+		newAABlockCS: function(pos, cutout, priority, up, dn, no, ea, so, we) {
+			KJS.kondion.getCurrentScene().addAABlock(pos, cutout, priority, up, dn, no, ea, so, we);
+		},
 	},
 	eggs: function() {
 		KJS.kondion.eggs();
@@ -66,24 +88,3 @@ var patchObject = function(obj, patch) {
 	}
 	return obj;
 };
-
-var init = function() {
-	KJS.java.issueCommand("^eggs");
-};
-
-var start = function() {
-	KJS.g.setMouseGrab(true);
-	KJS.e.spawnEnt("ef_klein");
-	KJS.g.freeCam();
-};
-
-KJS.e.rEnt({
-	id: "ef_klein",
-	name: "Klein",
-	traits: ["ph_alive", "kg_playable"],
-	tick: function() {
-		//print(this.name);
-	},
-	notify: function(msg) {
-	}
-});

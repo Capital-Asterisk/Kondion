@@ -20,9 +20,10 @@ import org.lwjgl.opengl.ARBShaderObjects;
 
 public class KondionShader {
 
-	private int vert;
 	private int frag;
+
 	private int prog;
+	private int vert;
 
 	public KondionShader(int v, int f, int p) {
 		vert = v;

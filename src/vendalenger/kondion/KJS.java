@@ -16,17 +16,21 @@
 
 package vendalenger.kondion;
 
+import org.lwjgl.util.vector.Vector3f;
+
 import vendalenger.kondion.objects.ProtoEntity;
 import vendalenger.port.Command;
 
 public class KJS {
 
-	public static void freeCam() {
-		Kondion.getCurrentCamera().setFreeMode(true);
+	public static void addAABlock(float x, float y, float z, boolean cutout,
+			int priority, int up, int dn, int no, int ea, int so, int we) {
+		Kondion.getCurrentScene().addAABlock(new Vector3f(x, y, z), cutout,
+				priority, up, dn, no, ea, so, we);
 	}
 
-	public static void issueCommand(String msg) {
-		Command.issue(msg, false);
+	public static void freeCam() {
+		Kondion.getCurrentCamera().setFreeMode(true);
 	}
 
 	public static ProtoEntity getProtoEntity(String id) {
@@ -36,5 +40,9 @@ public class KJS {
 			}
 		}
 		return null;
+	}
+
+	public static void issueCommand(String msg) {
+		Command.issue(msg, false);
 	}
 }

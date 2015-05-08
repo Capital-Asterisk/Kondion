@@ -20,11 +20,14 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import vendalenger.kondion.KInput;
+import vendalenger.kondion.Kondion;
+
 // Ambient Obscurance
 public class PhysicEntity extends Entity {
 
-	private float drag = 0.97f;
 	private boolean hasGravity = true;
+	private float drag = 0.97f;
 	private Vector3f velocity;
 
 	public PhysicEntity(ProtoEntity p, ScriptObjectMirror m) {
@@ -32,18 +35,28 @@ public class PhysicEntity extends Entity {
 		velocity = new Vector3f();
 	}
 
-	public void move() {
-		if (hasGravity) {
-			// velocity.y -= 0.007;
-		}
-		position.x += 0.01;
-		Vector3f.add(velocity, position, position);
-		velocity.x *= drag;
-		velocity.y *= drag;
-		velocity.z *= drag;
-	}
-
 	public Vector3f getVelocity() {
 		return velocity;
+	}
+
+	public void move() {
+		if (hasGravity) {
+			velocity.y -= 0.007;
+		}
+		// position.x += 0.01;
+		if ((boolean) mirror.get("mouseRotate")) {
+			rotation.x += KInput.getMouseDX() / 300;
+			rotation.y -= KInput.getMouseDY() / 300;
+			if (rotation.y > Math.PI / 2)
+				rotation.y = (float) (Math.PI / 2);
+			if (rotation.y < -Math.PI / 2)
+				rotation.y = (float) (-Math.PI / 2);
+		}
+		position.x += velocity.x * Kondion.getDelta();
+		position.y += velocity.y * Kondion.getDelta();
+		position.z += velocity.z * Kondion.getDelta();
+		//velocity.x *= drag;
+		//velocity.y *= drag;
+		//velocity.z *= drag;
 	}
 }

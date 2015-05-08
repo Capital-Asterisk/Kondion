@@ -1,0 +1,49 @@
+{
+	"GameName": "Morvid",
+	"Id": "electricfence",
+	"Description": "A Kondion game",
+	"Vendor": "Vendalenger",
+	"Version": "0.0.1 Acacia",
+	"Date": "Wed Apr 22 00:27:26 PDT 2015",
+	"Cover": "cover.png",
+	"Startscene": [3, 4],
+	"world1::Main": [
+		["menu0000", "--------", "--------", "--------", "--------", "--------", "--------", "--------"]
+	],
+	"Buttons": {
+		"up": ["Up Button", "key", "w"],
+		"down": ["Down Button", "key", "s"],
+		"left": ["Left Button", "key", "a"],
+		"right": ["Right button", "key", "d"],
+		"open": ["Open a door", "key", "e"]
+	},
+	"Graphics": {
+		"human": ["living/human.png", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"noah": ["maps/noah.png", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
+	},
+	"Audio": {
+		"monkey0": ["weapons/monkey0.wav", "asis"],
+		"monkey1": ["weapons/monkey1.wav", "asis"]
+	},
+	"SAudio": {
+		"monkeyR": ["random", "monkey0", "monkey1"]
+	},
+	"Shader": {
+		"Vertex": {
+			"defaultv0": ["shader0/vert.vert"]
+		},
+		"Fragment": {
+			"defaultf0": ["shader0/frag.frag"]
+		},
+		"VNASH": {
+			"defaultn1": ["shader1/vnash.vnash"]
+		},
+		"Program": {
+			"default0": ["defaultv0", "defaultf0"],
+			"default1": ["defaultn1"]
+		},
+	},
+	"Jars": {
+		"jars/eggs.jar": ["natives/eggs"]
+	}
+}

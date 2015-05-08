@@ -43,9 +43,13 @@ import argo.saj.InvalidSyntaxException;
 public class VD_Keydata {
 
 	public static boolean console = true;
+
 	public static JsonRootNode JSON = null;
+
 	public static List<String> keys;
+
 	public static List<String> tags;
+
 	public static List<JsonNode> values;
 
 	/**
@@ -75,20 +79,6 @@ public class VD_Keydata {
 						"Open by Desktop^open (#) false||-divider-||Cut^f.cut (#)||Copy^f.copy (#)||Paste^f.paste (#)||Rename^f.rename (#) true||Delete^f.del (#)",
 						"menuitem.array");
 		VD_Keydata.set("Debvi.Store.lastLocation", "default", "hide");
-	}
-
-	private static void fromElement(JsonNode list, String cats) {
-		for (int i = 0; i < list.getFieldList().size(); i++) {
-			if (list.getFieldList().get(i).getValue().isArrayNode()) {
-				set(cats + "." + list.getFieldList().get(i).getName().getText(),
-						list.getFieldList().get(i).getValue().getArrayNode()
-								.get(0), list.getFieldList().get(i).getValue()
-								.getArrayNode().get(1).getText());
-			} else {
-				fromElement(list.getFieldList().get(i).getValue(), cats + "."
-						+ list.getFieldList().get(i).getName().getText());
-			}
-		}
 	}
 
 	public static JsonNode get(String key) {
@@ -302,49 +292,6 @@ public class VD_Keydata {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static List<JsonField> toField(List<Object> branch, boolean root) {
-		if (root) {
-			List<JsonField> catList = new ArrayList<JsonField>();
-
-			/* root does not have a name, i is set to 0 */
-			for (int i = 0; i < branch.size(); i++) {
-				if (branch.get(i) instanceof List) {
-					/* [i] is a category */
-					catList.add(toField((List<Object>) branch.get(i), false)
-							.get(0));
-				} else {
-					/* [i] is a leaf (bad for root) */
-					String[] split = ((String) branch.get(i)).split("\\.");
-					catList.add(field(
-							split[split.length - 1],
-							array(get((String) branch.get(i)),
-									string(getTag((String) branch.get(i))))));
-				}
-			}
-			return catList;
-		} else {
-			List<JsonField> list = new ArrayList<JsonField>();
-
-			/* i is set to 1 because [0] is the name of the category */
-			for (int i = 1; i < branch.size(); i++) {
-				if (branch.get(i) instanceof List) {
-					/* [i] is a category */
-					list.add(toField((List<Object>) branch.get(i), false)
-							.get(0));
-				} else {
-					/* [i] is a leaf */
-					String[] split = ((String) branch.get(i)).split("\\.");
-					list.add(field(
-							split[split.length - 1],
-							array(get((String) branch.get(i)),
-									string(getTag((String) branch.get(i))))));
-				}
-			}
-			return Arrays.asList(field((String) branch.get(0), object(list)));
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public static void write(File prefs) {
 		organize();
 		List<JsonField> fieldList = new ArrayList<JsonField>();
@@ -422,6 +369,63 @@ public class VD_Keydata {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.err.println("Error in writing json file.");
+		}
+	}
+
+	private static void fromElement(JsonNode list, String cats) {
+		for (int i = 0; i < list.getFieldList().size(); i++) {
+			if (list.getFieldList().get(i).getValue().isArrayNode()) {
+				set(cats + "." + list.getFieldList().get(i).getName().getText(),
+						list.getFieldList().get(i).getValue().getArrayNode()
+								.get(0), list.getFieldList().get(i).getValue()
+								.getArrayNode().get(1).getText());
+			} else {
+				fromElement(list.getFieldList().get(i).getValue(), cats + "."
+						+ list.getFieldList().get(i).getName().getText());
+			}
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static List<JsonField> toField(List<Object> branch, boolean root) {
+		if (root) {
+			List<JsonField> catList = new ArrayList<JsonField>();
+
+			/* root does not have a name, i is set to 0 */
+			for (int i = 0; i < branch.size(); i++) {
+				if (branch.get(i) instanceof List) {
+					/* [i] is a category */
+					catList.add(toField((List<Object>) branch.get(i), false)
+							.get(0));
+				} else {
+					/* [i] is a leaf (bad for root) */
+					String[] split = ((String) branch.get(i)).split("\\.");
+					catList.add(field(
+							split[split.length - 1],
+							array(get((String) branch.get(i)),
+									string(getTag((String) branch.get(i))))));
+				}
+			}
+			return catList;
+		} else {
+			List<JsonField> list = new ArrayList<JsonField>();
+
+			/* i is set to 1 because [0] is the name of the category */
+			for (int i = 1; i < branch.size(); i++) {
+				if (branch.get(i) instanceof List) {
+					/* [i] is a category */
+					list.add(toField((List<Object>) branch.get(i), false)
+							.get(0));
+				} else {
+					/* [i] is a leaf */
+					String[] split = ((String) branch.get(i)).split("\\.");
+					list.add(field(
+							split[split.length - 1],
+							array(get((String) branch.get(i)),
+									string(getTag((String) branch.get(i))))));
+				}
+			}
+			return Arrays.asList(field((String) branch.get(0), object(list)));
 		}
 	}
 }

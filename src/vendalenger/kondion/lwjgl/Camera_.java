@@ -22,6 +22,8 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import vendalenger.kondion.KInput;
+import vendalenger.kondion.Kondion;
+import vendalenger.kondion.objects.Entity;
 
 /*
  * Camera_ is a traditional name... my first 3d game had a class called Camera_.
@@ -29,22 +31,28 @@ import vendalenger.kondion.KInput;
  */
 public class Camera_ {
 
-	private int[] upDownLeftRight = {0, 0, 0, 0};
-
 	// For Camera position and movement
 	private boolean freeMode = false;
+	private float cameraSpeed = 0.2f;
 	private float yaw, pitch, roll;
+	
 	private Vector3f center;
 	private Vector3f eye;
 	private Vector3f up;
-
+	
+	// Camera control
+	private Entity bind = null;
+	private Vector3f rotLock = null;
+	
+	private int[] upDownLeftRight = {0, 0, 0, 0};
+	
 	// For calculations, no new objects are created for speed.
+	private Matrix4f tempMatrix;
 	private Vector3f tempVector0;
 	private Vector3f tempVector1;
 	private Vector4f tempVector2;
 	private Vector4f tempVector3;
-	private Matrix4f tempMatrix;
-
+	
 	public Camera_() {
 
 		upDownLeftRight[0] = KInput.getButtonIndex("up");
@@ -67,54 +75,6 @@ public class Camera_ {
 		tempMatrix = new Matrix4f();
 	}
 
-	public float getPitch() {
-		return pitch;
-	}
-
-	public float getRoll() {
-		return roll;
-	}
-
-	public float getYaw() {
-		return yaw;
-	}
-
-	/**
-	 * Get the center (The xyz of where you want to look)
-	 * 
-	 * @return a Vector3f
-	 */
-	public Vector3f getCenter() {
-		return center;
-	}
-
-	/**
-	 * Get the eye (The position of the camera)
-	 * 
-	 * @return a Vector3f
-	 */
-	public Vector3f getEye() {
-		return eye;
-	}
-
-	/**
-	 * Get the up vector (A normal vector pointing up relative to the camera)
-	 * 
-	 * @return a Vector3f
-	 */
-	public Vector3f getUp() {
-		return up;
-	}
-
-	/**
-	 * Calculate yaw and pitch, center must be normal
-	 */
-	public void calculateAngle() {
-		yaw = (float) Math.atan2(center.z - eye.z, center.x - eye.x);
-		pitch = (float) Math.asin(center.y - eye.y);
-		// System.out.println(yaw + " " + pitch);
-	}
-
 	/**
 	 * Aim towards angle, you can use setRoll();
 	 * 
@@ -129,6 +89,20 @@ public class Camera_ {
 		center.y = (float) Math.sin(p) + eye.y;
 		center.x = (float) (Math.cos(yaw) * Math.cos(p)) + eye.x;
 		center.z = (float) (Math.sin(yaw) * Math.cos(p)) + eye.z;
+	}
+
+	public void bindToEntity(Entity e) {
+		bind = e;
+		freeMode = false;
+	}
+
+	/**
+	 * Calculate yaw and pitch, center must be normal
+	 */
+	public void calculateAngle() {
+		yaw = (float) Math.atan2(center.z - eye.z, center.x - eye.x);
+		pitch = (float) Math.asin(center.y - eye.y);
+		// System.out.println(yaw + " " + pitch);
 	}
 
 	/**
@@ -159,12 +133,70 @@ public class Camera_ {
 		up.set(tempVector2.x, tempVector2.y, tempVector2.z);
 	}
 
+	public Entity getBindEntity() {
+		return bind;
+	}
+
+	/**
+	 * Get the center (The xyz of where you want to look)
+	 * 
+	 * @return a Vector3f
+	 */
+	public Vector3f getCenter() {
+		return center;
+	}
+
+	/**
+	 * Get the eye (The position of the camera)
+	 * 
+	 * @return a Vector3f
+	 */
+	public Vector3f getEye() {
+		return eye;
+	}
+
+	public float getPitch() {
+		return pitch;
+	}
+
+	public float getRoll() {
+		return roll;
+	}
+
+	/**
+	 * Get the up vector (A normal vector pointing up relative to the camera)
+	 * 
+	 * @return a Vector3f
+	 */
+	public Vector3f getUp() {
+		return up;
+	}
+
+	public float getYaw() {
+		return yaw;
+	}
+
 	/**
 	 * Calls GLU.gluLookAt(...) with eye, center, and up
 	 */
 	public void gluLookAt() {
 		GLU.gluLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x,
 				up.y, up.z);
+	}
+
+	public boolean isFree() {
+		return freeMode;
+	}
+
+	public void lockRotation(Vector3f rot) {
+		rotLock = rot;
+	}
+
+	/**
+	 * Point towards a vector. Eye is unchanged.
+	 */
+	public void look(float desx, float desy, float desz) {
+		center.set(desx, desy, desz);
 	}
 
 	/**
@@ -175,13 +207,6 @@ public class Camera_ {
 		eye.set(posx, posy, posz);
 		center.set(desx, desy, desz);
 		calculateUp();
-	}
-
-	/**
-	 * Point towards a vector. Eye is unchanged.
-	 */
-	public void look(float desx, float desy, float desz) {
-		center.set(desx, desy, desz);
 	}
 
 	/**
@@ -207,42 +232,61 @@ public class Camera_ {
 		roll = r;
 	}
 
+	public void unbind() {
+		bind = null;
+	}
+
 	public void update() {
 		if (freeMode) {
 			calculateAngle();
 			tempVector0.set(0, 0, 0);
+			cameraSpeed = Kondion.getDelta() * 6;
+			bind = null;
 			if (KInput.buttonIsDown(upDownLeftRight[0])) {
 				// forward
-				eye.x += (center.x - eye.x) * 0.04;
-				eye.y += (center.y - eye.y) * 0.04;
-				eye.z += (center.z - eye.z) * 0.04;
+				eye.x += (center.x - eye.x) * cameraSpeed;
+				eye.y += (center.y - eye.y) * cameraSpeed;
+				eye.z += (center.z - eye.z) * cameraSpeed;
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[1])) {
 				// backwards
-				eye.x -= (center.x - eye.x) * 0.04;
-				eye.y -= (center.y - eye.y) * 0.04;
-				eye.z -= (center.z - eye.z) * 0.04;
+				eye.x -= (center.x - eye.x) * cameraSpeed;
+				eye.y -= (center.y - eye.y) * cameraSpeed;
+				eye.z -= (center.z - eye.z) * cameraSpeed;
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[2])) {
 				// left
 				tempVector0.x = (float) Math.cos(yaw + Math.PI / 2);
 				tempVector0.y = (float) Math.sin(yaw + Math.PI / 2);
-				eye.x -= tempVector0.x * 0.04;
-				eye.z -= tempVector0.y * 0.04;
-				center.x -= tempVector0.x * 0.04;
-				center.z -= tempVector0.y * 0.04;
+				eye.x -= tempVector0.x * cameraSpeed;
+				eye.z -= tempVector0.y * cameraSpeed;
+				center.x -= tempVector0.x * cameraSpeed;
+				center.z -= tempVector0.y * cameraSpeed;
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[3])) {
 				// right
 				tempVector0.x = (float) Math.cos(yaw + Math.PI / 2);
 				tempVector0.y = (float) Math.sin(yaw + Math.PI / 2);
-				eye.x += tempVector0.x * 0.04;
-				eye.z += tempVector0.y * 0.04;
-				center.x += tempVector0.x * 0.04;
-				center.z += tempVector0.y * 0.04;
+				eye.x += tempVector0.x * cameraSpeed;
+				eye.z += tempVector0.y * cameraSpeed;
+				center.x += tempVector0.x * cameraSpeed;
+				center.z += tempVector0.y * cameraSpeed;
 			}
+		} else if (bind != null) {
+			eye.x = bind.getPosition().getX();
+			eye.y = bind.getPosition().getY();
+			eye.z = bind.getPosition().getZ();
+		}
+		if (rotLock != null) {
+			yaw = rotLock.x;
+			pitch = rotLock.y;
+			roll = rotLock.z;
+			aim(yaw, pitch);
+		} else {
 			aim((float) (yaw + KInput.getMouseDX() / 300),
 					(float) (pitch - KInput.getMouseDY() / 300));
+		}
+		if (true) {
 			normalizeCenter();
 			calculateUp();
 		}

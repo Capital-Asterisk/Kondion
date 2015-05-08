@@ -74,6 +74,22 @@ public class FileShortcuts {
 	}
 
 	/**
+	 * Get a file from a directory
+	 * 
+	 * @param parent
+	 * @return
+	 */
+	public static File getChild(File parent, String child) {
+		return new File(parent.getAbsolutePath()
+				.substring(
+						0,
+						parent.getAbsolutePath().length()
+								- (parent.getAbsolutePath().endsWith(
+										File.separator) ? 1 : 0))
+				+ File.separator + child);
+	}
+
+	/**
 	 * Read through a text file and return it as a string.
 	 *
 	 * @throws IOException

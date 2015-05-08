@@ -48,17 +48,14 @@ import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
 
 import vendalenger.kondion.lwjgl.Window;
 
 public class KInput {
-
-	private static boolean mouseLocked = false;
-	private static double mouseDX = 0, mouseDY = 0, mousePX = 0, mousePY = 0;
-	private static DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
-	private static DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
 	private static final short[] aToZ = new short[] {GLFW_KEY_A, GLFW_KEY_B,
 			GLFW_KEY_C, GLFW_KEY_D, GLFW_KEY_E, GLFW_KEY_F, GLFW_KEY_G,
@@ -68,12 +65,22 @@ public class KInput {
 			GLFW_KEY_W, GLFW_KEY_X, GLFW_KEY_Y, GLFW_KEY_Z};
 
 	private static List<KButton> buttonList = new ArrayList<KButton>();
+	private static double mouseDX = 0, mouseDY = 0, mousePX = 0, mousePY = 0;
+	private static boolean mouseLocked = false;
+	private static DoubleBuffer mouseX = BufferUtils.createDoubleBuffer(1);
+	private static DoubleBuffer mouseY = BufferUtils.createDoubleBuffer(1);
 
-	/**
-	 * @return The list of all the buttons
-	 */
-	public static List<KButton> getButtonList() {
-		return buttonList;
+	public static boolean buttonIsDown(int buttonIndex) {
+		if (buttonList.get(buttonIndex).device == 0) {
+			// keyboard test
+			return (GLFW.glfwGetKey(Window.getWindow(),
+					buttonList.get(buttonIndex).key) == GL_TRUE);
+		} else if (buttonList.get(buttonIndex).device == 1) {
+			// mouse test
+			return (GLFW.glfwGetMouseButton(Window.getWindow(),
+					buttonList.get(buttonIndex).key) == GL_TRUE);
+		}
+		return false;
 	}
 
 	/**
@@ -92,6 +99,13 @@ public class KInput {
 		return -1;
 	}
 
+	/**
+	 * @return The list of all the buttons
+	 */
+	public static List<KButton> getButtonList() {
+		return buttonList;
+	}
+
 	public static double getMouseDX() {
 		return mouseDX;
 	}
@@ -108,40 +122,18 @@ public class KInput {
 		return (int) mouseY.get(0);
 	}
 
-	/**
-	 * Makes a char into a GLFW key code. 'A' becomes GLFW_KEY_A, 'B' becomes
-	 * GLFW_KEY_B, and so on...
-	 * 
-	 * @param c
-	 *            The char
-	 */
-	public static int toGLFWCode(char c) {
-		if (Character.isLetter(c)) {
-			return aToZ[((int) Character.toUpperCase(c)) - 65];
-		} else {
-			return 0;
-		}
+	public static boolean keyboardDown(int key) {
+		return (GLFW.glfwGetKey(Window.getWindow(), key) == GL_TRUE);
 	}
 
 	public static boolean mouseDown(int button) {
 		return (GLFW.glfwGetMouseButton(Window.getWindow(), button) == GL_TRUE);
 	}
 
-	public static boolean keyboardDown(int key) {
-		return (GLFW.glfwGetKey(Window.getWindow(), key) == GL_TRUE);
-	}
-
-	public static boolean buttonIsDown(int buttonIndex) {
-		if (buttonList.get(buttonIndex).device == 0) {
-			// keyboard test
-			return (GLFW.glfwGetKey(Window.getWindow(),
-					buttonList.get(buttonIndex).key) == GL_TRUE);
-		} else if (buttonList.get(buttonIndex).device == 1) {
-			// mouse test
-			return (GLFW.glfwGetMouseButton(Window.getWindow(),
-					buttonList.get(buttonIndex).key) == GL_TRUE);
-		}
-		return false;
+	public static void regButton(String id, String name, int device, int key) {
+		buttonList.add(new KButton(id, name, device, key));
+		((ScriptObjectMirror) ((ScriptObjectMirror) Kondion.getNashorn().get("KJS")).get("b")).put(id, buttonList.size() - 1);
+		// System.out.println(buttonList.toArray());
 	}
 
 	public static void setMouseLock(boolean b) {
@@ -154,9 +146,19 @@ public class KInput {
 
 	}
 
-	public static void regButton(String id, String name, int device, int key) {
-		buttonList.add(new KButton(id, name, device, key));
-		// System.out.println(buttonList.toArray());
+	/**
+	 * Makes a char into a GLFW key code. 'A' becomes GLFW_KEY_A, 'B' becomes
+	 * GLFW_KEY_B, and so on...
+	 * 
+	 * @param c
+	 *            The char
+	 */
+	public static int toGLFWCode(char c) {
+		if (Character.isLetter(c)) {
+			return aToZ[(Character.toUpperCase(c)) - 65];
+		} else {
+			return 0;
+		}
 	}
 
 	public static void update() {
@@ -182,6 +184,13 @@ public class KInput {
 
 class KButton {
 
+	// Mouse, keyboard
+	public int device;
+
+	public String id;
+	public int key;
+	public String name;
+
 	public KButton(String i, String n, int d, int k) {
 		System.out.println(i);
 		id = i;
@@ -189,10 +198,4 @@ class KButton {
 		device = d;
 		key = k;
 	}
-
-	public String id;
-	public String name;
-	// Mouse, keyboard
-	public int device;
-	public int key;
 }

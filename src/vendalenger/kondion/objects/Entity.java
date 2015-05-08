@@ -28,14 +28,16 @@ import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
 
 public class Entity {
-
-	protected enum states {};
+	
+	private int tickInterval;
 
 	protected float scale = 1.0f;
-	protected Vector3f position;
+	protected KondionTexture t;
 	protected ProtoEntity prototype;
 	protected ScriptObjectMirror mirror;
-	protected KondionTexture t;
+	protected short[] xTraits = null;
+	protected Vector3f position;
+	protected Vector3f rotation;
 
 	// public abstract void draw();
 	// public abstract void tick(String msg);
@@ -44,6 +46,7 @@ public class Entity {
 		prototype = p;
 		mirror = m;
 		position = new Vector3f();
+		rotation = new Vector3f();
 	};
 
 	/*
@@ -51,24 +54,24 @@ public class Entity {
 	 * is pretty obvious
 	 */
 
-	public float getScale() {
-		return scale;
-	}
-
 	public Vector3f getPosition() {
 		return position;
 	}
 
-	public void setScale(float s) {
-		scale = s;
+	/**
+	 * 
+	 * @return Yaw, Pitch, and Roll. Modifiable
+	 */
+	public Vector3f getRotation() {
+		return rotation;
 	}
 
-	public void setPosition(Vector3f p) {
-		position = p;
+	public float getScale() {
+		return scale;
 	}
 
-	public void setPosition(float x, float y, float z) {
-		position.set(x, y, z);
+	public int getTickInterval() {
+		return tickInterval;
 	}
 
 	public void render() {
@@ -77,5 +80,25 @@ public class Entity {
 		t = KondionLoader.textures.get("human");
 		FlatDrawing.renderBillboard(2.0f, 2.0f, t);
 		glPopMatrix();
+	}
+
+	public void setExtraTraits(short[] array) {
+		xTraits = array;
+	}
+
+	public void setPosition(float x, float y, float z) {
+		position.set(x, y, z);
+	}
+
+	public void setPosition(Vector3f p) {
+		position = p;
+	}
+
+	public void setScale(float s) {
+		scale = s;
+	}
+
+	public void setTickInterval(int tickInterval) {
+		this.tickInterval = tickInterval;
 	}
 }

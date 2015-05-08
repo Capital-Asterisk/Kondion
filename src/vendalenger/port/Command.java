@@ -26,14 +26,55 @@ import javafx.application.Platform;
 import javafx.scene.input.Clipboard;
 import javafx.scene.input.ClipboardContent;
 
+import javax.script.ScriptException;
+
 import org.lwjgl.opengl.GL11;
 
 import vendalenger.kondion.KHacker;
+import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 
 public class Command {
 
 	public static ArrayList<Command> commandList = new ArrayList<Command>();
+
+	public boolean hidden;
+
+	public String key, help, usage;
+
+	/**
+	 * Create a command that could be accessed through the console, player chat,
+	 * and so on.
+	 *
+	 * @param keyword
+	 *            the name of the command example: keyword()
+	 * @param quickhelp
+	 *            the quick statement shown when help is called.
+	 * @param use
+	 *            the message given, usually an example, of how to use this
+	 *            method. Automatically begins with "Usage for command: keyword"
+	 */
+	public Command(String keyword, String quickhelp, String use) {
+		key = keyword;
+		help = quickhelp;
+		usage = use;
+
+	}
+
+	/**
+	 * Called when the command is issued.
+	 *
+	 * @param args
+	 *            arguments included in the issue example: keyword(arg1, arg2)
+	 */
+	public Object action(String[] args) {
+		return "";
+	}
+
+	@Override
+	public String toString() {
+		return key;
+	}
 
 	/**
 	 * Add a command to the command list so it could be used.
@@ -284,6 +325,20 @@ public class Command {
 			}
 		}, false);
 
+		Command.addCommand(new Command("kdion.js",
+				"Run some javascript using Nashorn", "kdion.js [string]"
+						+ "\nstring: string - Javascript code") {
+			@Override
+			public String action(String[] args) {
+				try {
+					Kondion.getNashorn().eval(args[0]);
+				} catch (ScriptException e) {
+					e.printStackTrace();
+				}
+				return "";
+			}
+		}, false);
+
 		Command.addCommand(new Command("kdion.rungamedir",
 				"Run a game from a folder", "kdion.rungamefolder [file]"
 						+ "\nfile: json - Path to kondion.json") {
@@ -454,7 +509,6 @@ public class Command {
 			}
 		}, true);
 	}
-
 	public static String fcis(File commands, String... args) {
 		long time = System.currentTimeMillis();
 		System.out.println("FCIS: " + commands.getAbsolutePath());
@@ -586,6 +640,13 @@ public class Command {
 	}
 
 	/**
+	 * Sort the commands by their keyword alphabetically
+	 */
+	public static void sort() {
+		commandList.sort((o1, o2) -> o1.key.compareToIgnoreCase(o2.key));
+	}
+
+	/**
 	 * Issue a command inside a command.
 	 *
 	 * @param said
@@ -685,50 +746,6 @@ public class Command {
 			}
 		}
 		return ret;
-	}
-
-	/**
-	 * Sort the commands by their keyword alphabetically
-	 */
-	public static void sort() {
-		commandList.sort((o1, o2) -> o1.key.compareToIgnoreCase(o2.key));
-	}
-
-	public boolean hidden;
-	public String key, help, usage;
-
-	/**
-	 * Create a command that could be accessed through the console, player chat,
-	 * and so on.
-	 *
-	 * @param keyword
-	 *            the name of the command example: keyword()
-	 * @param quickhelp
-	 *            the quick statement shown when help is called.
-	 * @param use
-	 *            the message given, usually an example, of how to use this
-	 *            method. Automatically begins with "Usage for command: keyword"
-	 */
-	public Command(String keyword, String quickhelp, String use) {
-		key = keyword;
-		help = quickhelp;
-		usage = use;
-
-	}
-
-	/**
-	 * Called when the command is issued.
-	 *
-	 * @param args
-	 *            arguments included in the issue example: keyword(arg1, arg2)
-	 */
-	public Object action(String[] args) {
-		return "";
-	}
-
-	@Override
-	public String toString() {
-		return key;
 	}
 
 }

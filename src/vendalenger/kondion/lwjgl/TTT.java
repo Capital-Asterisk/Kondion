@@ -47,36 +47,136 @@ import org.lwjgl.util.vector.Vector3f;
 
 import poly2Tri.Triangulation;
 
-/*
- * TTT, the same class used in my first 3d lwjgl game. (with modifications) TTT
- * serves the same purpose. as before.
- * 
- * =======================HISTORY OF THE VENDALENGER LOGO=======================
- * Once upon a time while working on my first lwjgl game. I modified NeHe lesson
- * 5 to a point where I had a cube class with a constructor (x, y z). I made 3
- * cubes (0, 2, 0), (1, 0, 0), and (2, 1, 0) creating this when the Camera_ was
- * put a distance:
- *        █
- *       █
- *         █
- * I decided it was a good logo so I made this: 
- * █ SHET 
- *   █ A 
- *  █ BYTE It was too informal, and by mistake I made this: █ █
- * GENERICO █ Generico sounded generic and Spanish so I went back in time when
- * I made up a name similar to Vendalenger (i was like 7 in daycare) and came up
- * with the name. So as a final I made: █ █ VENDALENGER █
- * 
- * btw: There was more before shetabyte. There was 776 and Separate Functions
- * (The names I used back in 2008 Roblox Lua scripting). There was also
- * Nyanbytes (I was such a meme master and got my Steam account id as nyanbyte5)
- * thats it?
- * =============================================================================
- */
 public class TTT {
 
+	/*
+	 * TTT, the same class used in my first 3d lwjgl game. (with modifications)
+	 * TTT serves the same purpose. as before.
+	 * 
+	 * =======================HISTORY OF THE VENDALENGER
+	 * LOGO======================= Once upon a time while working on my first
+	 * lwjgl game. I modified NeHe lesson 5 to a point where I had a cube class
+	 * with a constructor (x, y z). I made 3 cubes (0, 2, 0), (1, 0, 0), and (2,
+	 * 1, 0) creating this when the Camera_ was put a distance: █ █ █ I decided
+	 * it was a good logo so I made this: █ SHET █ A █ BYTE
+	 * 
+	 * It was too informal, and by mistake I made this: █ █ GENERICO █ Generico
+	 * sounded generic and Spanish so I went back in time when I made up a name
+	 * similar to Vendalenger (i was like 7 in daycare) and came up with the
+	 * name. So as a final I made: â–ˆ â–ˆ VENDALENGER â–ˆ
+	 * 
+	 * btw: There was more before shetabyte. There was 776 and Separate
+	 * Functions (The names I used back in 2008 Roblox Lua scripting). There was
+	 * also Nyanbytes (I was such a meme master and got my Steam account id as
+	 * nyanbyte5) thats it?
+	 * ======================================================
+	 * =======================
+	 */
+
 	public static float fov = 50;
+
 	public static boolean fs = false;
+
+	public static void addVect(List<Float> list, Vector3f v) {
+		list.add(v.x);
+		list.add(v.y);
+		list.add(v.z);
+	}
+
+	@SuppressWarnings("unchecked")
+	/**
+	 * Turn an area into a list of Vector2f triangles. The 2nd hardest peice of code I have ever written.
+	 * @param area Your awt area class
+	 * @return A list of Vector2f. 
+	 */
+	public static List<Vector2f> areaToTriangles(Area area)
+			throws java.lang.ArrayIndexOutOfBoundsException {
+		// not mine, it's modified from
+		// http://stackoverflow.com/questions/8144156/using-pathiterator-to-return-all-line-segments-that-constrain-an-area
+		List<double[]> areaPoints = new ArrayList<double[]>();
+		List<List<double[]>> areaSegments = new ArrayList<List<double[]>>();
+		double[] coords = new double[6];
+
+		for (PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi
+				.next()) {
+			// The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
+			// Because the Area is composed of straight lines
+			int type = pi.currentSegment(coords);
+			// We record a double array of {segment type, x coord, y coord}
+			double[] pathIteratorCoords = {type, coords[0], coords[1]};
+			areaPoints.add(pathIteratorCoords);
+		}
+
+		for (int i = 0; i < areaPoints.size(); i++) {
+			// If we're not on the last point, return a line from this point to
+			// the next
+			double[] currentElement = areaPoints.get(i);
+
+			// We need a default value in case we've reached the end of the
+			// ArrayList
+			double[] nextElement = {-1, -1, -1};
+			if (i < areaPoints.size() - 1) {
+				nextElement = areaPoints.get(i + 1);
+			}
+
+			// Make the lines
+			if (currentElement[0] == PathIterator.SEG_MOVETO) {
+				// System.out.println("New shape");
+				areaSegments.add(new ArrayList<double[]>());
+			}
+
+			if (nextElement[0] == PathIterator.SEG_LINETO) {
+				areaSegments.get(areaSegments.size() - 1).add(
+						new double[] {currentElement[1], currentElement[2]});
+				// System.out.println("Add point: (" + currentElement[1] + ", "
+				// + currentElement[2] + ")");
+			} else if (nextElement[0] == PathIterator.SEG_CLOSE) {
+				areaSegments.get(areaSegments.size() - 1).add(
+						new double[] {currentElement[1], currentElement[2]});
+				// System.out.println("Close: (" + currentElement[1] + ", " +
+				// currentElement[2] + ")");
+			}
+		}
+
+		// *** done code snippet
+
+		// now triangulate
+
+		List<double[]> vertices = new ArrayList<double[]>();
+		int[] contours = new int[areaSegments.size()];
+
+		// Reverse last array in areaSegments, then add it first
+		Collections.reverse(areaSegments.get(areaSegments.size() - 1));
+		for (int j = 0; j < areaSegments.get(areaSegments.size() - 1).size(); j++) {
+			vertices.add(areaSegments.get(areaSegments.size() - 1).get(j));
+		}
+		contours[0] = areaSegments.get(areaSegments.size() - 1).size();
+
+		// add the rest, -1 to skip last element
+		for (int i = 0; i < areaSegments.size() - 1; i++) {
+			Collections.reverse(areaSegments.get(i));
+			for (int j = 0; j < areaSegments.get(i).size(); j++) {
+				vertices.add(areaSegments.get(i).get(j));
+			}
+			contours[i + 1] = areaSegments.get(i).size();
+		}
+
+		ArrayList<ArrayList<Integer>> res = Triangulation.triangulate(
+				contours.length, contours,
+				vertices.toArray(new double[vertices.size()][]));
+
+		List<Vector2f> result = new ArrayList<Vector2f>();
+
+		for (ArrayList<Integer> ds : res) {
+			for (Integer inte : ds) {
+				// System.out.println("(" + vertices.get(inte)[0] + ", " +
+				// vertices.get(inte)[1] + ")");
+				result.add(new Vector2f((float) vertices.get(inte)[0],
+						(float) vertices.get(inte)[1]));
+			}
+		}
+		return result;
+	}
 
 	public static int Decide(String message, String objective, int type) {
 		int d = JOptionPane.showConfirmDialog(null, message, objective,
@@ -101,25 +201,17 @@ public class TTT {
 	}
 
 	/**
-	 * Set to 3d mode
+	 * Put elements from a float list into a float buffer
+	 * 
+	 * @param list
+	 *            The Float List
+	 * @param buffer
+	 *            The FloatBuffer
 	 */
-	public static void three() {
-		glViewport(0, 0, Window.getWidth(), Window.getHeight());
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		GLU.gluPerspective(fov,
-				((float) (Window.getWidth()) / (float) (Window.getHeight())),
-				0.1f, 200.0f);
-		glMatrixMode(GL_MODELVIEW);
-		glLoadIdentity();
-		// glCullFace(GL_BACK);
-		glEnable(GL_BLEND);
-		// glEnable(GL_CULL_FACE);
-		glEnable(GL_DEPTH_TEST);
-		glEnable(GL_POINT_SMOOTH);
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glDepthFunc(GL_LEQUAL);
-		glClearDepth(10.0f);
+	public static void listPutFloatBuffer(List<Float> list, FloatBuffer buffer) {
+		for (Float float1 : list) {
+			buffer.put(float1.floatValue());
+		}
 	}
 
 	/**
@@ -168,108 +260,26 @@ public class TTT {
 		list.add(d.z);
 	}
 
-	public static void addVect(List<Float> list, Vector3f v) {
-		list.add(v.x);
-		list.add(v.y);
-		list.add(v.z);
-	}
-	
-	@SuppressWarnings("unchecked")
 	/**
-	 * Turn an area into a list of Vector2f triangles. The 2nd hardest peice of code I have ever written.
-	 * @param area Your awt area class
-	 * @return A list of Vector2f. 
+	 * Set to 3d mode
 	 */
-	public static List<Vector2f> areaToTriangles(Area area) {
-		// not mine, it's modified from
-		// http://stackoverflow.com/questions/8144156/using-pathiterator-to-return-all-line-segments-that-constrain-an-area
-		List<double[]> areaPoints = new ArrayList<double[]>();
-		List<List<double[]>> areaSegments = new ArrayList<List<double[]>>();
-		double[] coords = new double[6];
-
-		for (PathIterator pi = area.getPathIterator(null); !pi.isDone(); pi.next()) {
-		    // The type will be SEG_LINETO, SEG_MOVETO, or SEG_CLOSE
-		    // Because the Area is composed of straight lines
-		    int type = pi.currentSegment(coords);
-		    // We record a double array of {segment type, x coord, y coord}
-		    double[] pathIteratorCoords = {type, coords[0], coords[1]};
-		    areaPoints.add(pathIteratorCoords);
-		}
-		
-		for (int i = 0; i < areaPoints.size(); i++) {
-		    // If we're not on the last point, return a line from this point to the next
-		    double[] currentElement = areaPoints.get(i);
-
-		    // We need a default value in case we've reached the end of the ArrayList
-		    double[] nextElement = {-1, -1, -1};
-		    if (i < areaPoints.size() - 1) {
-		        nextElement = areaPoints.get(i + 1);
-		    }
-
-		    // Make the lines
-		    if (currentElement[0] == PathIterator.SEG_MOVETO) {
-		        //System.out.println("New shape");
-		        areaSegments.add(new ArrayList<double[]>());
-		    } 
-
-		    if (nextElement[0] == PathIterator.SEG_LINETO) {
-		        areaSegments.get(areaSegments.size() - 1).add(new double[] {currentElement[1], currentElement[2]});
-		        //System.out.println("Add point: (" + currentElement[1] + ", " + currentElement[2] + ")");
-		    } else if (nextElement[0] == PathIterator.SEG_CLOSE) {
-		    	areaSegments.get(areaSegments.size() - 1).add(new double[] {currentElement[1], currentElement[2]});
-		        //System.out.println("Close: (" + currentElement[1] + ", " + currentElement[2] + ")");
-		    }
-		}
-		
-		// *** done code snippet
-		
-		// now triangulate
-		
-		List<double[]> vertices = new ArrayList<double[]>();
-		int[] contours = new int[areaSegments.size()];
-		
-		// Reverse last array in areaSegments, then add it first
-		Collections.reverse(areaSegments.get(areaSegments.size() - 1));
-		for (int j = 0; j < areaSegments.get(areaSegments.size() - 1).size(); j++) {
-			vertices.add(areaSegments.get(areaSegments.size() - 1).get(j));
-		}
-		contours[0] = areaSegments.get(areaSegments.size() - 1).size();
-		
-		// add the rest, -1 to skip last element
-		for (int i = 0; i < areaSegments.size() - 1; i ++) {
-			Collections.reverse(areaSegments.get(i));
-			for (int j = 0; j < areaSegments.get(i).size(); j++) {
-				vertices.add(areaSegments.get(i).get(j));
-			}
-			contours[i + 1] = areaSegments.get(i).size();
-		}
-		
-		ArrayList<ArrayList<Integer>> res = Triangulation.triangulate(contours.length,
-				contours, vertices.toArray(new double[vertices.size()][]));
-		
-		List<Vector2f> result = new ArrayList<Vector2f>();
-		
-		for (ArrayList<Integer> ds : res) {
-			for (Integer inte : ds) {
-				//System.out.println("(" + vertices.get(inte)[0] + ", " + vertices.get(inte)[1] + ")");
-				result.add(new Vector2f((float) vertices.get(inte)[0], (float) vertices.get(inte)[1]));
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * Put elements from a float list into a float buffer
-	 * 
-	 * @param list
-	 *            The Float List
-	 * @param buffer
-	 *            The FloatBuffer
-	 */
-	public static void listPutFloatBuffer(List<Float> list, FloatBuffer buffer) {
-		for (Float float1 : list) {
-			buffer.put(float1.floatValue());
-		}
+	public static void three() {
+		glViewport(0, 0, Window.getWidth(), Window.getHeight());
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		GLU.gluPerspective(fov,
+				((float) (Window.getWidth()) / (float) (Window.getHeight())),
+				0.1f, 200.0f);
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		// glCullFace(GL_BACK);
+		glEnable(GL_BLEND);
+		// glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
+		glEnable(GL_POINT_SMOOTH);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glDepthFunc(GL_LEQUAL);
+		glClearDepth(10.0f);
 	}
 
 	/** 2D mode */

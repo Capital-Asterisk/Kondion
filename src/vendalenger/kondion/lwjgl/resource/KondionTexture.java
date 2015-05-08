@@ -21,10 +21,11 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 public class KondionTexture {
 
+	private int imageWidth, imageHeight;
+
+	private int minFilter, magFilter;
 	private boolean mipmapped;
 	private int textureId;
-	private int imageWidth, imageHeight;
-	private int minFilter, magFilter;
 	private int wrapS, wrapT;
 
 	public KondionTexture(int id, int width, int height, int miFilter,
@@ -43,28 +44,28 @@ public class KondionTexture {
 		glBindTexture(GL_TEXTURE_2D, textureId);
 	}
 
-	public boolean isMipmap() {
-		return mipmapped;
-	}
-
-	public int getTextureId() {
-		return textureId;
+	public int getImageHeight() {
+		return imageHeight;
 	}
 
 	public int getImageWidth() {
 		return imageWidth;
 	}
 
-	public int getImageHeight() {
-		return imageHeight;
+	public int getTextureId() {
+		return textureId;
+	}
+
+	public int getWrapS() {
+		return wrapS;
 	}
 
 	public int getWrapT() {
 		return wrapT;
 	}
 
-	public int getWrapS() {
-		return wrapS;
+	public boolean isMipmap() {
+		return mipmapped;
 	}
 
 	public static void unBind() {

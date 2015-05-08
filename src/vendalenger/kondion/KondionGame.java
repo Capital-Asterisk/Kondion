@@ -16,17 +16,28 @@
 
 package vendalenger.kondion;
 
+import java.io.File;
+
 import argo.jdom.JsonRootNode;
 
 public abstract class KondionGame {
 
+	private File gameDir;
 	private JsonRootNode gameInfo;
 
-	public void setGameInfo(JsonRootNode info) {
-		gameInfo = info;
+	public File getGameDir() {
+		return gameDir;
 	}
 
 	public JsonRootNode getGameInfo() {
 		return gameInfo;
+	}
+
+	public void setGameDir(File dir) {
+		gameDir = dir;
+	}
+
+	public void setGameInfo(JsonRootNode info) {
+		gameInfo = info;
 	}
 }

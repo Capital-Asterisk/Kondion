@@ -53,97 +53,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-class FluffyListener implements Runnable {
-
-	public List<StringEvent> listeners;
-	public String name;
-	public String output;
-	public BufferedReader reader;
-	public InputStream stream;
-
-	/**
-	 * Create an Input stream listener
-	 * 
-	 * @param stream
-	 *            The input stream to listen to
-	 * @param name
-	 *            The display name
-	 */
-	public FluffyListener(InputStream stream, String name) {
-		reader = new BufferedReader(new InputStreamReader(stream));
-		listeners = new ArrayList<StringEvent>();
-	}
-
-	/**
-	 * Listen to new lines in the input stream
-	 * 
-	 * @param e
-	 *            Your string event
-	 */
-	public void addListener(StringEvent e) {
-		listeners.add(e);
-	}
-
-	/**
-	 * Output is set to nothing. String events are triggered.
-	 */
-	public void clear() {
-		output = "";
-		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).onLineAdded("", output);
-		}
-	}
-
-	/**
-	 * Print to output without interfering with the input stream
-	 * 
-	 * @param x
-	 *            The string, int, float, ect.. to print
-	 */
-	public void print(Object x) {
-		System.out.print(x);
-	}
-
-	/**
-	 * Print a line to output without interfering with the input stream
-	 * 
-	 * @param x
-	 *            The string, int, float, ect.. to print
-	 */
-	public void println(Object x) {
-		System.out.println(x);
-	}
-
-	/**
-	 * Don't use this
-	 */
-	@Override
-	public void run() {
-		String line = null;
-		try {
-			while ((line = reader.readLine()) != null) {
-				output += line + "\n";
-				for (int i = 0; i < listeners.size(); i++) {
-					listeners.get(i).onLineAdded(line, output);
-				}
-			}
-		} catch (IOException e) { // Restart when pipe break error.
-			run();
-		}
-	}
-
-}
-
-abstract class StringEvent {
-	public String name;
-
-	public StringEvent(String id) {
-		name = id;
-	}
-
-	public abstract void onLineAdded(String line, String total);
-}
-
 public class VD_FlConsole { /* The Fluffy console! Version 4! */
 
 	public static class consoleWindow {
@@ -159,12 +68,16 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 	}
 
 	public static boolean exit = false;
-	protected static int fcVersion = 4;
+
 	public static boolean frameActive = false;
+
 	public static List<FluffyListener> listeners;
+
 	public static Dimension size;
 
 	public static Font terminus;
+
+	protected static int fcVersion = 4;
 
 	public static void addStream(FluffyListener listener) {
 		listeners.add(listener);
@@ -504,4 +417,95 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 			consoleWindow.consoleWindow.setVisible(true);
 		}
 	}
+}
+
+class FluffyListener implements Runnable {
+
+	public List<StringEvent> listeners;
+	public String name;
+	public String output;
+	public BufferedReader reader;
+	public InputStream stream;
+
+	/**
+	 * Create an Input stream listener
+	 * 
+	 * @param stream
+	 *            The input stream to listen to
+	 * @param name
+	 *            The display name
+	 */
+	public FluffyListener(InputStream stream, String name) {
+		reader = new BufferedReader(new InputStreamReader(stream));
+		listeners = new ArrayList<StringEvent>();
+	}
+
+	/**
+	 * Listen to new lines in the input stream
+	 * 
+	 * @param e
+	 *            Your string event
+	 */
+	public void addListener(StringEvent e) {
+		listeners.add(e);
+	}
+
+	/**
+	 * Output is set to nothing. String events are triggered.
+	 */
+	public void clear() {
+		output = "";
+		for (int i = 0; i < listeners.size(); i++) {
+			listeners.get(i).onLineAdded("", output);
+		}
+	}
+
+	/**
+	 * Print to output without interfering with the input stream
+	 * 
+	 * @param x
+	 *            The string, int, float, ect.. to print
+	 */
+	public void print(Object x) {
+		System.out.print(x);
+	}
+
+	/**
+	 * Print a line to output without interfering with the input stream
+	 * 
+	 * @param x
+	 *            The string, int, float, ect.. to print
+	 */
+	public void println(Object x) {
+		System.out.println(x);
+	}
+
+	/**
+	 * Don't use this
+	 */
+	@Override
+	public void run() {
+		String line = null;
+		try {
+			while ((line = reader.readLine()) != null) {
+				output += line + "\n";
+				for (int i = 0; i < listeners.size(); i++) {
+					listeners.get(i).onLineAdded(line, output);
+				}
+			}
+		} catch (IOException e) { // Restart when pipe break error.
+			run();
+		}
+	}
+
+}
+
+abstract class StringEvent {
+	public String name;
+
+	public StringEvent(String id) {
+		name = id;
+	}
+
+	public abstract void onLineAdded(String line, String total);
 }

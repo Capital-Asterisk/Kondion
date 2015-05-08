@@ -28,7 +28,7 @@ public class Traits {
 	}
 
 	public static void initDefault() {
-		traits.add("kg_playable");
+		traits.add("kg_control");
 		traits.add("kg_alive");
 		traits.add("kg_particle");
 

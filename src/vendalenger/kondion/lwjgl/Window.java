@@ -51,20 +51,26 @@ import org.lwjgl.glfw.GLFWvidmode;
 
 public class Window {
 
-	private static long window;
-	private static int windowWidth, windowHeight;
 	private static GLFWKeyCallback keyCallback;
 
-	public static long getWindow() {
-		return window;
+	private static long window;
+
+	private static int windowWidth, windowHeight;
+
+	public static void end() {
+		glfwDestroyWindow(Window.getWindow());
+	}
+
+	public static int getHeight() {
+		return windowHeight;
 	}
 
 	public static int getWidth() {
 		return windowWidth;
 	}
 
-	public static int getHeight() {
-		return windowHeight;
+	public static long getWindow() {
+		return window;
 	}
 
 	/**
@@ -178,9 +184,5 @@ public class Window {
 	public static void update() {
 		glfwSwapBuffers(window); // swap the color buffers
 		glfwPollEvents();
-	}
-
-	public static void end() {
-		glfwDestroyWindow(Window.getWindow());
 	}
 }

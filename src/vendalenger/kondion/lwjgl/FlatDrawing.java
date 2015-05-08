@@ -48,10 +48,12 @@ import vendalenger.kondion.lwjgl.resource.KondionTexture;
 
 public class FlatDrawing {
 
+	public static int vbo_texCoords;
+
+	public static int vbo_unitSquare;
+
 	// private static ArrayList<int[]> canvasTextures = new ArrayList<int[]>();
 	private static FloatBuffer texCoords;
-	public static int vbo_texCoords;
-	public static int vbo_unitSquare;
 
 	public static void renderBillboard(float width, float height,
 			KondionTexture t) {

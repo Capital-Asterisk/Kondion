@@ -16,23 +16,22 @@
 
 package vendalenger.kondion.objects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class ProtoEntity {
 
-	private short[] traits;
-	private ScriptObjectMirror object;
 	private String id;
 	private String name;
+	private ScriptObjectMirror object;
+	private short[] traits;
 
 	public ProtoEntity(ScriptObjectMirror obj) {
 		object = obj;
 		id = (String) obj.get("id");
 		name = (String) obj.get("name");
-	}
-
-	public ScriptObjectMirror getObject() {
-		return object;
 	}
 
 	public void changeObject(ScriptObjectMirror obj) {
@@ -41,13 +40,26 @@ public class ProtoEntity {
 		name = (String) obj.get("name");
 	}
 
-	public ScriptObjectMirror create(ScriptObjectMirror obj) {
+	@SuppressWarnings("unchecked")
+	public ScriptObjectMirror create(ScriptObjectMirror obj,
+			ScriptObjectMirror xtra) {
 		Entity e;
 		if (true) {
 			// is physics entity
 			e = new PhysicEntity(this, obj);
 		}
-		obj.put("class", e);
+		obj.put("mouseRotate", false);
+		if (xtra.containsKey("traits")) {
+			// Add extra traits
+			// e.setExtraTraits(xtra);
+			List<Short> l = new ArrayList<Short>();
+			for (Object s : ((ScriptObjectMirror) xtra.get("traits")).values()) {
+				System.out.println(Traits.getTraitIndex((String) s));
+				l.add(Traits.getTraitIndex((String) s));
+			}
+		}
+		e.setTickInterval((int) object.get("tickInterval"));
+		obj.put("obj", e);
 		return obj;
 	}
 
@@ -57,5 +69,9 @@ public class ProtoEntity {
 
 	public String getName() {
 		return name;
+	}
+
+	public ScriptObjectMirror getObject() {
+		return object;
 	}
 }

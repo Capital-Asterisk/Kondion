@@ -25,6 +25,8 @@ import static org.lwjgl.opengl.GL11.glClearColor;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,98 +38,43 @@ import javax.script.ScriptException;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
-import org.lwjgl.util.vector.Vector3f;
 
+import argo.jdom.JsonNode;
+import argo.jdom.JsonRootNode;
 import vendalenger.kondion.lwjgl.Camera_;
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
 import vendalenger.kondion.objects.Entity;
 import vendalenger.kondion.objects.PhysicEntity;
 import vendalenger.kondion.objects.ProtoEntity;
+import vendalenger.kondion.objects.Traits;
 import vendalenger.kondion.scene.Scene;
+import vendalenger.port.FileShortcuts;
 
 public class Kondion {
 
 	private static Camera_ currentCamera;
+	private static Scene currentScene;
+	private static List<Entity> entityList;
 	private static KondionGame game;
 	private static Thread gameThread;
 	private static ScriptEngine jsEngine;
-	private static Scene currentScene;
-	private static List<ProtoEntity> pEntityList;
 	private static List<ScriptObjectMirror> mirrorList;
-	private static List<Entity> entityList;
+	private static List<ProtoEntity> pEntityList;
 
-	public static Camera_ getCurrentCamera() {
-		return currentCamera;
-	}
-
-	public static Thread getGameThread() {
-		return gameThread;
-	}
-
-	public static KondionGame getGame() {
-		return game;
-	}
-
-	public static List<Entity> getEntityList() {
-		return entityList;
-	}
-
-	public static List<ScriptObjectMirror> getMirrorList() {
-		return mirrorList;
-	}
-
-	public static List<ProtoEntity> getProtoEntityList() {
-		return pEntityList;
-	}
+	private static long ticks;
+	private static float delta;
 
 	public static void eggs() {
 		System.out.println("EGGS");
 		for (int i = 0; i < entityList.size(); i++) {
 			System.out.println(entityList.get(i));
 		}
-	}
-
-	public static void run(KondionGame g) {
-		gameThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Window.setNatives();
-					Window.initGL(800, 600, false, false, g.getGameInfo()
-							.getStringValue("GameName"));
-					//KondionTexture t = KondionLoader.registerTexture(new File(""), "kondionLoad", GL11.GL_NEAREST, GL11.GL_NEAREST, GL11.GL_CLAMP, GL11.GL_CLAMP);
-					//FlatDrawing.
-					entityList = new ArrayList<Entity>();
-					mirrorList = new ArrayList<ScriptObjectMirror>();
-					pEntityList = new ArrayList<ProtoEntity>();
-					jsEngine = new ScriptEngineManager()
-							.getEngineByName("nashorn");
-					jsEngine.eval(new BufferedReader(
-							new InputStreamReader(getClass()
-									.getResourceAsStream("kondiondefault.js"))));
-					for (int i = 0; i < 2; i++) {
-						((Invocable) jsEngine).invokeFunction("init");
-					}
-					GLContext.createFromCurrent();
-					Window.update();
-					FlatDrawing.setup();
-					KondionLoader.load();
-					gameLoop();
-				} catch (ScriptException e) {
-					e.printStackTrace();
-				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				}
-			}
-		});
-		gameThread.start();
 	}
 
 	public static void gameLoop() {
@@ -138,9 +85,8 @@ public class Kondion {
 		currentCamera.look(0, 0, 8, 0, 0, 0);
 
 		currentScene = new Scene();
-		currentScene.addAABlock(new Vector3f(0, 0, 0), 1, 1, 8, 8, 8, 8);
-		currentScene.addAABlock(new Vector3f(2, 1, 16), 1, 1, 8, 8, 8, 8);
-		currentScene.doGlBuffers();
+
+		// currentScene.doGlBuffers();
 
 		try {
 			((Invocable) jsEngine).invokeFunction("start");
@@ -149,22 +95,32 @@ public class Kondion {
 		} catch (ScriptException e) {
 			e.printStackTrace();
 		}
-		byte t = 0;
+
+		ticks = 0;
 		
+		long time = 0;
+		long prevTime = 0l;
+
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
+			prevTime = System.nanoTime();
+			delta = time / 1000000000.0f;
 
 			// Updating
+			// currentScene.getColliders().get(0).no += 0.01;
+			//System.out.println(delta);
+			currentScene.getColliders().get(0).so += delta;
+			//currentScene.getColliders().get(0).z += delta / 2;
+			// currentScene.getColliders().get(0).ea += 0.03;
+			// currentScene.getColliders().get(0).we += 0.001;
+			currentScene.doGlBuffers();
 
 			currentCamera.update();
 			KInput.update();
 
-			if (t == 5) {
-				t = 0;
-				for (int i = 0; i < mirrorList.size(); i++) {
+			for (int i = 0; i < mirrorList.size(); i++) {
+				if (ticks % entityList.get(i).getTickInterval() == 0)
 					mirrorList.get(i).callMember("tick", mirrorList.get(i));
-				}
-			} else
-				t++;
+			}
 			for (Entity entity : entityList) {
 				if (entity instanceof PhysicEntity)
 					((PhysicEntity) entity).move();
@@ -185,10 +141,155 @@ public class Kondion {
 				entityList.get(i).render();
 			}
 
+			ticks++;
 			Window.update();
+			
+			//System.out.println(delta / 1000000.0f);
+			
+			time = System.nanoTime() - prevTime;
 		}
 
 		Window.end();
 		System.exit(0);
+	}
+
+	public static Camera_ getCurrentCamera() {
+		return currentCamera;
+	}
+
+	public static Scene getCurrentScene() {
+		return currentScene;
+	}
+
+	public static List<Entity> getEntityList() {
+		return entityList;
+	}
+
+	public static KondionGame getGame() {
+		return game;
+	}
+	
+	public static float getDelta() {
+		return delta;
+	}
+
+	public static Thread getGameThread() {
+		return gameThread;
+	}
+
+	public static List<ScriptObjectMirror> getMirrorList() {
+		return mirrorList;
+	}
+
+	public static ScriptEngine getNashorn() {
+		return jsEngine;
+	}
+
+	public static List<ProtoEntity> getProtoEntityList() {
+		return pEntityList;
+	}
+
+	public static void run(KondionGame g) {
+		gameThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					Window.setNatives();
+					Window.initGL(800, 600, false, false, g.getGameInfo()
+							.getStringValue("GameName"));
+					GLContext.createFromCurrent();
+
+					entityList = new ArrayList<Entity>();
+					mirrorList = new ArrayList<ScriptObjectMirror>();
+					pEntityList = new ArrayList<ProtoEntity>();
+					jsEngine = new ScriptEngineManager()
+							.getEngineByName("nashorn");
+					
+					System.out.print("Loading Javascript...");
+
+					jsEngine.eval(new BufferedReader(
+							new InputStreamReader(getClass()
+									.getResourceAsStream("kondiondefault.js"))));
+					
+					System.out.print("Parsing game information...");
+					JsonRootNode rootNode = g.getGameInfo();
+					// reusable variable
+					List<JsonNode> array;
+					// Buttons
+					JsonNode node = rootNode.getNode("Buttons");
+					for (int i = 0; i < node.getFieldList().size(); i++) {
+						array = node.getFieldList().get(i).getValue().getArrayNode();
+						KInput.regButton(node.getFieldList().get(i).getName()
+								.getStringValue(), array.get(0).getStringValue(),
+								(array.get(1).getStringValue().equals("key")) ? (0)
+										: (1), KInput.toGLFWCode(array.get(2)
+										.getStringValue().charAt(0)));
+					}
+
+					// Graphics
+					KondionLoader.init();
+					node = rootNode.getNode("Graphics");
+					
+					try {
+						for (int i = 0; i < node.getFieldList().size(); i++) {
+							array = node.getFieldList().get(i).getValue()
+									.getArrayNode();
+							for (int j = 0; j < array.size() - 1; j++) {
+								System.out.println(array.get(j + 1));
+
+							}
+							
+							KondionLoader.queueTexture(FileShortcuts.getChild(
+									g.getGameDir(), "graphics" + File.separator
+									+ array.get(0).getStringValue()), node
+									.getFieldList().get(i).getName().getStringValue(),
+									GL11.class.getField(array.get(1).getStringValue())
+											.getInt(0),
+									GL11.class.getField(array.get(2).getStringValue())
+											.getInt(0),
+									GL11.class.getField(array.get(3).getStringValue())
+											.getInt(0),
+									GL11.class.getField(array.get(4).getStringValue())
+											.getInt(0));
+						}
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					} catch (IllegalAccessException e) {
+						e.printStackTrace();
+					} catch (NoSuchFieldException e) {
+						e.printStackTrace();
+					} catch (SecurityException e) {
+						e.printStackTrace();
+					}
+					
+					System.out.println("Doing other stuff...");
+					Traits.initDefault();
+					FlatDrawing.setup();
+
+					System.out.print("Loading game scripts...");
+					
+					jsEngine.eval(new FileReader(FileShortcuts.getChild(
+							g.getGameDir(), "masterscript.js")));
+					
+
+					((Invocable) jsEngine).invokeFunction("init");
+					Window.update();
+					KondionLoader.load();
+					gameLoop();
+				} catch (ScriptException e) {
+					e.printStackTrace();
+				} catch (NoSuchMethodException e) {
+					e.printStackTrace();
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
+		gameThread.start();
+	}
+
+	public static void setCurrentScene(Scene cs) {
+		currentScene = cs;
 	}
 }

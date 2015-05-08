@@ -24,7 +24,7 @@ import vendalenger.port.VD_FlConsole;
 public class FCStart {
 
 	public static void main(String args[]) {
-		VD_FlConsole.initConsole(600, 400, true);
+		VD_FlConsole.initConsole(600, 400, Boolean.parseBoolean(args[0]));
 		Command.commandSetup();
 		VD_FlConsole.showConsole();
 		Command.fcis(new File("startup.fcis"), "startup");
