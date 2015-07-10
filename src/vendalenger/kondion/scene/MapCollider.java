@@ -1,6 +1,6 @@
 package vendalenger.kondion.scene;
 
-public class Collider {
+public class MapCollider {
 	public int priority;
 	public byte shape;
 	public boolean solid;

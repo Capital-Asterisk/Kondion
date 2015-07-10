@@ -104,7 +104,7 @@ public class Command {
 					try {
 						sum += Double.parseDouble(s);
 					} catch (NumberFormatException e) {
-						System.err.println("addition: " + s
+						VD_FlConsole.println("addition: " + s
 								+ " is not a valid number.");
 					}
 				}
@@ -150,7 +150,7 @@ public class Command {
 					ClipboardContent cbc = new ClipboardContent();
 					ArrayList<String> files = new ArrayList<String>();
 					for (int i = 0; i < args.length; i++) {
-						System.out.println("Clipboard: " + args[i]);
+						VD_FlConsole.println("Clipboard: " + args[i]);
 						files.add(args[i]);
 					}
 					cbc.putFilesByPath(files);
@@ -258,12 +258,12 @@ public class Command {
 					@Override
 					public String action(String[] args) {
 						if (args[0].equalsIgnoreCase("null")) {
-							System.out.println("Showing list of commands: ");
+							VD_FlConsole.println("Showing list of commands: ");
 							System.out
 									.println("For more details, use help key\n");
 							for (int i = 0; i < Command.commandList.size(); i++) {
 								if (!commandList.get(i).hidden) {
-									System.out.println(Command.commandList
+									VD_FlConsole.println(Command.commandList
 											.get(i).key
 											+ " - "
 											+ Command.commandList.get(i).help);
@@ -320,7 +320,7 @@ public class Command {
 				"In Java, Thread.activeCount();" + "\nIs called") {
 			@Override
 			public String action(String[] args) {
-				System.out.println(Thread.activeCount());
+				VD_FlConsole.println(Thread.activeCount());
 				return Thread.activeCount() + "";
 			}
 		}, false);
@@ -448,7 +448,7 @@ public class Command {
 				"^print [string] " + "\nHELLO WORLD!!!!!") {
 			@Override
 			public String action(String[] args) {
-				System.out.println(args[0]);
+				VD_FlConsole.println(args[0]);
 				return args[0];
 			}
 		}, false);
@@ -460,26 +460,26 @@ public class Command {
 			@Override
 			public String action(String[] args) {
 				// The \u2588 character is the full block character.
-				System.out
+				VD_FlConsole
 						.println("\u2588\u2588\u2588\u2588  \u2588\u2588\u2588\u2588\u2588   \u2588   \u2588 \u2588\u2588\u2588\u2588\u2588 \u2588   \u2588   \u2588     \u2588\u2588\u2588\u2588\u2588 \u2588 \u2588   \u2588 \u2588\u2588\u2588\u2588\u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588   \u2588 \u2588   \u2588   \u2588   \u2588 \u2588   \u2588 \u2588   \u2588   \u2588     \u2588     \u2588 \u2588  \u2588  \u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588   \u2588 \u2588   \u2588    \u2588 \u2588  \u2588   \u2588 \u2588   \u2588   \u2588     \u2588\u2588\u2588\u2588\u2588 \u2588 \u2588\u2588\u2588   \u2588\u2588\u2588\u2588\u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588   \u2588 \u2588   \u2588     \u2588   \u2588   \u2588 \u2588   \u2588   \u2588     \u2588     \u2588 \u2588  \u2588  \u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588\u2588\u2588\u2588  \u2588\u2588\u2588\u2588\u2588     \u2588   \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588   \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588 \u2588 \u2588   \u2588 \u2588\u2588\u2588\u2588\u2588");
-				System.out.println("");
-				System.out
+				VD_FlConsole.println("");
+				VD_FlConsole
 						.println("\u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588     \u2588     \u2588     \u2588         \u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588\u2588\u2588\u2588\u2588 \u2588  \u2588\u2588 \u2588  \u2588\u2588 \u2588\u2588\u2588\u2588\u2588    \u2588");
-				System.out
+				VD_FlConsole
 						.println("\u2588     \u2588   \u2588 \u2588   \u2588     \u2588   ");
-				System.out
+				VD_FlConsole
 						.println("\u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588 \u2588\u2588\u2588\u2588\u2588   \u2588");
 				return "Eggs";
 			}
@@ -511,7 +511,7 @@ public class Command {
 	}
 	public static String fcis(File commands, String... args) {
 		long time = System.currentTimeMillis();
-		System.out.println("FCIS: " + commands.getAbsolutePath());
+		VD_FlConsole.println("FCIS: " + commands.getAbsolutePath());
 		String ret = "";
 		// ^fc.fcis /home/neal/Desktop/eggs.fcis (John Smith) Fiona 12
 		try {
@@ -528,7 +528,7 @@ public class Command {
 			ret = "Failed to read file: " + e.getCause();
 			e.printStackTrace();
 		}
-		System.out.println("FCIS: Finished in "
+		VD_FlConsole.println("FCIS: Finished in "
 				+ (System.currentTimeMillis() - time) + "ms");
 		return ret;
 	}
@@ -617,12 +617,12 @@ public class Command {
 					try {
 						res = commandList.get(i).action(a);
 					} catch (ArrayIndexOutOfBoundsException e) {
-						System.err.println("Fluffy Console error:");
-						System.err.println("Missing arguments");
+						VD_FlConsole.println("Fluffy Console error:");
+						VD_FlConsole.println("Missing arguments");
 					}
 
 					if (typed && !res.equals("")) {
-						System.out.println(res);
+						VD_FlConsole.println(res);
 					}
 				}
 			}
@@ -633,8 +633,8 @@ public class Command {
 			}
 
 			if (error) {
-				System.err.println("Fluffy Console error:");
-				System.err.println(errorMessage);
+				VD_FlConsole.println("Fluffy Console error:");
+				VD_FlConsole.println(errorMessage);
 			}
 		}
 	}
@@ -730,8 +730,8 @@ public class Command {
 					try {
 						ret = commandList.get(i).action(a);
 					} catch (ArrayIndexOutOfBoundsException e) {
-						System.err.println("Fluffy Console error:");
-						System.err.println("Missing arguments");
+						VD_FlConsole.println("Fluffy Console error:");
+						VD_FlConsole.println("Missing arguments");
 					}
 
 				}
@@ -741,8 +741,8 @@ public class Command {
 				errorMessage = "Command: " + raw.split(" ")[0]
 						+ " does not exist." + "\nPlugin not installed?";
 			} else {
-				System.out.println("Fluffy Console error:");
-				System.out.println(errorMessage);
+				VD_FlConsole.println("Fluffy Console error:");
+				VD_FlConsole.println(errorMessage);
 			}
 		}
 		return ret;

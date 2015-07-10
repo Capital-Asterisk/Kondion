@@ -34,6 +34,7 @@ import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
+import static org.lwjgl.glfw.GLFW.glfwHideWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
@@ -71,6 +72,13 @@ public class Window {
 
 	public static long getWindow() {
 		return window;
+	}
+	
+	public static void setWindowVisible(boolean b) {
+		if (b) 
+			glfwShowWindow(window);
+		else
+			glfwHideWindow(window);
 	}
 
 	/**
@@ -131,8 +139,7 @@ public class Window {
 
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
-		glfwShowWindow(window);
-
+		
 		// TTT.Two();
 	}
 

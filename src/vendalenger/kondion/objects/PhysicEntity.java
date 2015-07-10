@@ -16,45 +16,73 @@
 
 package vendalenger.kondion.objects;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import org.lwjgl.util.vector.Vector3f;
 
 import vendalenger.kondion.KInput;
+import vendalenger.kondion.collision.EntityCollider;
+import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.Kondion;
 
-// Ambient Obscurance
 public class PhysicEntity extends Entity {
 
-	private boolean hasGravity = true;
-	private float drag = 0.97f;
-	private Vector3f velocity;
+	protected float gravity = 0.2f;
+	protected float drag = 0.97f;
+	protected List<EntityCollider> colliders;
+	protected Vector3f velocity;
 
 	public PhysicEntity(ProtoEntity p, ScriptObjectMirror m) {
 		super(p, m);
 		velocity = new Vector3f();
+		colliders = new ArrayList<EntityCollider>();
+	}
+	
+	public void thrust(float x, float y, float z) {
+		velocity.x += x;
+		velocity.y += y;
+		velocity.z += z;
+	}
+	
+	public void thrustYAngle(float radian, float amt, float max) {
+
+		// If velocity magnitude (without y) is lower than max, or max is 0
+		if (max == 0) {
+			velocity.x -= (float) Math.cos(radian) * amt;
+			velocity.z -= (float) Math.sin(radian) * amt;
+		} else {
+			Math.sqrt(
+					(velocity.x * velocity.x)
+					+ (velocity.z * velocity.z));
+			velocity.x -= (float) Math.cos(radian) * amt;
+			velocity.z -= (float) Math.sin(radian) * amt;
+		}
 	}
 
 	public Vector3f getVelocity() {
 		return velocity;
 	}
+	
+	public void collideTerrain() {
+		for (int i = 0; i < colliders.size(); i++) {
+			if (colliders.get(i) instanceof FixedCylinderCollider) {
+				if (!Kondion.getCurrentScene().entityCheckFixedCylinder(this, (FixedCylinderCollider) colliders.get(i))) {
+					//position.y += 0.3f;
+					velocity.y = 0.3f;
+				}
+			}
+		}
+	}
 
 	public void move() {
-		if (hasGravity) {
-			velocity.y -= 0.007;
-		}
-		// position.x += 0.01;
-		if ((boolean) mirror.get("mouseRotate")) {
-			rotation.x += KInput.getMouseDX() / 300;
-			rotation.y -= KInput.getMouseDY() / 300;
-			if (rotation.y > Math.PI / 2)
-				rotation.y = (float) (Math.PI / 2);
-			if (rotation.y < -Math.PI / 2)
-				rotation.y = (float) (-Math.PI / 2);
-		}
 		position.x += velocity.x * Kondion.getDelta();
 		position.y += velocity.y * Kondion.getDelta();
 		position.z += velocity.z * Kondion.getDelta();
+		collideTerrain();
+		//velocity.y -= gravity;
 		//velocity.x *= drag;
 		//velocity.y *= drag;
 		//velocity.z *= drag;

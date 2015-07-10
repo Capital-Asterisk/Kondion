@@ -23,6 +23,10 @@ import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,11 +34,16 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
+import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
@@ -55,8 +64,11 @@ import vendalenger.kondion.objects.ProtoEntity;
 import vendalenger.kondion.objects.Traits;
 import vendalenger.kondion.scene.Scene;
 import vendalenger.port.FileShortcuts;
+import vendalenger.port.VD_FlConsole;
 
 public class Kondion {
+	
+	private static JFrame loadingScreen;
 
 	private static Camera_ currentCamera;
 	private static Scene currentScene;
@@ -100,6 +112,8 @@ public class Kondion {
 		
 		long time = 0;
 		long prevTime = 0l;
+		
+		Window.setWindowVisible(true);
 
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
 			prevTime = System.nanoTime();
@@ -114,7 +128,6 @@ public class Kondion {
 			// currentScene.getColliders().get(0).we += 0.001;
 			currentScene.doGlBuffers();
 
-			currentCamera.update();
 			KInput.update();
 
 			for (int i = 0; i < mirrorList.size(); i++) {
@@ -125,6 +138,8 @@ public class Kondion {
 				if (entity instanceof PhysicEntity)
 					((PhysicEntity) entity).move();
 			}
+			
+			currentCamera.update();
 
 			// Rendering
 
@@ -140,13 +155,15 @@ public class Kondion {
 			for (int i = 0; i < entityList.size(); i++) {
 				entityList.get(i).render();
 			}
-
+			
+			
 			ticks++;
 			Window.update();
 			
 			//System.out.println(delta / 1000000.0f);
 			
 			time = System.nanoTime() - prevTime;
+
 		}
 
 		Window.end();
@@ -190,6 +207,30 @@ public class Kondion {
 	}
 
 	public static void run(KondionGame g) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				loadingScreen = new JFrame("KONDION Game Engine");
+				loadingScreen.setLayout(new BorderLayout());
+				loadingScreen.setUndecorated(false);
+				loadingScreen.setIconImage(VD_FlConsole.consoleWindow.consoleWindow.getIconImage());
+				loadingScreen.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				
+				ImageIcon img = new ImageIcon(
+						Kondion.class.getResource("kondion.png"));
+				final JLabel imgl = new JLabel(img);
+				imgl.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+				imgl.setOpaque(true);
+				imgl.setBackground(java.awt.Color.decode("#080808"));
+				imgl.setPreferredSize(new Dimension(800, 600));
+				
+				loadingScreen.add(imgl);
+				loadingScreen.pack();
+				loadingScreen.setLocationRelativeTo(null);
+				loadingScreen.setVisible(true);
+			}
+			
+		}).start();
 		gameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -275,6 +316,10 @@ public class Kondion {
 					((Invocable) jsEngine).invokeFunction("init");
 					Window.update();
 					KondionLoader.load();
+					
+					loadingScreen.setVisible(false);
+					loadingScreen.dispose();
+					
 					gameLoop();
 				} catch (ScriptException e) {
 					e.printStackTrace();

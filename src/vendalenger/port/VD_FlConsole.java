@@ -24,8 +24,11 @@ import java.awt.FontFormatException;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
@@ -46,8 +49,11 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -67,20 +73,19 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 		public static JButton outputButton;
 	}
 
-	public static boolean exit = false;
-
-	public static boolean frameActive = false;
-
-	public static List<FluffyListener> listeners;
-
-	public static Dimension size;
-
-	public static Font terminus;
-
-	protected static int fcVersion = 4;
+	private static boolean exit = false;
+	private static boolean frameActive = false;
+	private static int inputTo = 0;
+	private static int outputTo = 0;
+	private static List<FluffyListener> listeners;
+	private static Dimension size;
+	private static Font terminus;
+	private static int fcVersion = 5;
 
 	public static void addStream(FluffyListener listener) {
+		listener.index = listeners.size();
 		listeners.add(listener);
+		new Thread(listener).start();
 	}
 
 	/**
@@ -88,6 +93,7 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 	 * initialized.
 	 */
 	public static void clear() {
+		listeners.get(outputTo).clear();
 		consoleWindow.jta.setText("");
 	}
 
@@ -135,17 +141,18 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 				FluffyListener sysOut = new FluffyListener(outPis, "System.out");
 				StringEvent e = new StringEvent("console_window") {
 					@Override
-					public void onLineAdded(String line, String total) {
-						consoleWindow.jta.setText(total);
-						consoleWindow.jta.setCaretPosition(consoleWindow.jta
-								.getDocument().getLength());
-
+					public void onLineAdded(String line, String total, int ind) {
+						if (outputTo == ind) {
+							consoleWindow.jta.setText(total);
+							consoleWindow.jta.setCaretPosition(consoleWindow.jta
+									.getDocument().getLength());
+						}
 					}
 				};
 				sysErr.addListener(e);
 				sysOut.addListener(e);
-				new Thread(sysErr).start();
-				new Thread(sysOut).start();
+				addStream(sysOut);
+				addStream(sysErr);
 			} catch (IOException e) {
 				e.printStackTrace();
 				JOptionPane.showMessageDialog(null,
@@ -155,6 +162,22 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 			startScanner();
 		}
 
+	}
+	
+	/**
+	 * Prints the object to the current selected stream
+	 * @param x The object to print
+	 */
+	public static void print(Object x) {
+		listeners.get(outputTo).print(x);;
+	}
+	
+	/**
+	 * Prints the object to the current selected stream. Creates a new line
+	 * @param x The object to print
+	 */
+	public static void println(Object x) {
+		listeners.get(outputTo).println(x);
 	}
 
 	/**
@@ -305,10 +328,31 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 			consoleWindow.inputButton.setFont(consoleWindow.jta.getFont());
 			consoleWindow.inputButton.setBorder(BorderFactory
 					.createEmptyBorder(2, 8, 2, 8));
+			
 			consoleWindow.outputButton.setText("O");
 			consoleWindow.outputButton.setFont(consoleWindow.jta.getFont());
 			consoleWindow.outputButton.setBorder(BorderFactory
 					.createEmptyBorder(2, 8, 2, 8));
+			consoleWindow.outputButton
+			.addMouseListener(new MouseAdapter() {
+				public void mousePressed(java.awt.event.MouseEvent e) {
+					JPopupMenu j = new JPopupMenu();
+					JMenuItem f;
+					for (FluffyListener fluffyListener : listeners) {
+						f = new JMenuItem(fluffyListener.name);
+						f.addActionListener(new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								outputTo = listeners.indexOf(fluffyListener);
+								fluffyListener.println("Switched");
+							}
+						});
+						j.add(f);
+					}
+					//j.add(new JMenuItem("EGGS"));
+					j.show(consoleWindow.outputButton, e.getX(), e.getY());
+				}
+			});
 
 			consoleWindow.input.setFont(consoleWindow.jta.getFont());
 			consoleWindow.input.setBorder(BorderFactory.createEmptyBorder());
@@ -421,6 +465,7 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 
 class FluffyListener implements Runnable {
 
+	public int index;
 	public List<StringEvent> listeners;
 	public String name;
 	public String output;
@@ -435,9 +480,10 @@ class FluffyListener implements Runnable {
 	 * @param name
 	 *            The display name
 	 */
-	public FluffyListener(InputStream stream, String name) {
+	public FluffyListener(InputStream stream, String n) {
 		reader = new BufferedReader(new InputStreamReader(stream));
 		listeners = new ArrayList<StringEvent>();
+		name = n;
 	}
 
 	/**
@@ -456,7 +502,7 @@ class FluffyListener implements Runnable {
 	public void clear() {
 		output = "";
 		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).onLineAdded("", output);
+			listeners.get(i).onLineAdded("", output, index);
 		}
 	}
 
@@ -467,7 +513,10 @@ class FluffyListener implements Runnable {
 	 *            The string, int, float, ect.. to print
 	 */
 	public void print(Object x) {
-		System.out.print(x);
+		output += x;
+		for (int i = 0; i < listeners.size(); i++) {
+			listeners.get(i).onLineAdded(x.toString(), output, index);
+		}
 	}
 
 	/**
@@ -477,7 +526,10 @@ class FluffyListener implements Runnable {
 	 *            The string, int, float, ect.. to print
 	 */
 	public void println(Object x) {
-		System.out.println(x);
+		output += x + "\n";
+		for (int i = 0; i < listeners.size(); i++) {
+			listeners.get(i).onLineAdded(x.toString(), output, index);
+		}
 	}
 
 	/**
@@ -490,7 +542,7 @@ class FluffyListener implements Runnable {
 			while ((line = reader.readLine()) != null) {
 				output += line + "\n";
 				for (int i = 0; i < listeners.size(); i++) {
-					listeners.get(i).onLineAdded(line, output);
+					listeners.get(i).onLineAdded(line, output, index);
 				}
 			}
 		} catch (IOException e) { // Restart when pipe break error.
@@ -507,5 +559,5 @@ abstract class StringEvent {
 		name = id;
 	}
 
-	public abstract void onLineAdded(String line, String total);
+	public abstract void onLineAdded(String line, String total, int index);
 }

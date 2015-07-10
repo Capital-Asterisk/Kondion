@@ -19,6 +19,8 @@ package vendalenger.kondion.objects;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.sun.xml.internal.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
+
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public class ProtoEntity {
@@ -26,27 +28,51 @@ public class ProtoEntity {
 	private String id;
 	private String name;
 	private ScriptObjectMirror object;
-	private short[] traits;
+	private Short[] traits;
 
 	public ProtoEntity(ScriptObjectMirror obj) {
 		object = obj;
 		id = (String) obj.get("id");
 		name = (String) obj.get("name");
+		List<Short> l = new ArrayList<Short>();
+		for (Object s : ((ScriptObjectMirror) obj.get("traits")).values()) {
+			System.err.println(s);
+			l.add(Traits.getTraitIndex((String) s));
+			if (l.get(l.size() - 1) == -1) {
+				l.remove(l.size() - 1);
+			}
+		}
+		traits = l.toArray(new Short[l.size()]);
 	}
 
 	public void changeObject(ScriptObjectMirror obj) {
 		object = obj;
 		id = (String) obj.get("id");
 		name = (String) obj.get("name");
+		List<Short> l = new ArrayList<Short>();
+		for (String s : ((ScriptObjectMirror) obj.get("traits")).keySet()) {
+			l.add(Traits.getTraitIndex(s));
+			if (l.get(l.size() - 1) == -1) {
+				l.remove(l.size() - 1);
+			}
+		}
+		traits = l.toArray(new Short[l.size()]);
 	}
 
 	@SuppressWarnings("unchecked")
 	public ScriptObjectMirror create(ScriptObjectMirror obj,
 			ScriptObjectMirror xtra) {
 		Entity e;
-		if (true) {
+		if (Traits.hasTrait(traits, Traits.getTraitIndex("et_static"))) {
 			// is physics entity
+			e = new Entity(this, obj);
+		} else if (Traits.hasTrait(traits, Traits.getTraitIndex("et_physic"))) {
 			e = new PhysicEntity(this, obj);
+		} else if (Traits.hasTrait(traits, Traits.getTraitIndex("et_alive"))) {
+			e = new LivingEntity(this, obj);
+		} else {
+			System.err.println("Unknown entity type (et) trait");
+			return null;
 		}
 		obj.put("mouseRotate", false);
 		if (xtra.containsKey("traits")) {

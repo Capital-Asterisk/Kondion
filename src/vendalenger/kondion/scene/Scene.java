@@ -42,30 +42,38 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import vendalenger.kondion.collision.EntityCollider;
+import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.kondion.objects.PhysicEntity;
 
 public class Scene {
 
 	public static final byte AA_A = 0, WEDGE_A = 1, WEDGE_B = 2;
 
-	private List<Collider> colliders;
-	private FloatBuffer cordData;
-	private int cordHandle;
-	private FloatBuffer normData;
-	private int normHandle;
-	private boolean solidWorld = true;
+	private List<MapCollider> colliders;
 
 	private FloatBuffer vertData;
+	private FloatBuffer cordData;
+	private FloatBuffer normData;
+	
+	private int cordHandle;
+	private int normHandle;
 	private int vertHandle;
+	
+	private boolean solidWorld = true;
+
+	private MapCollider temp1;
+	private boolean temp0 = false;
 
 	public Scene() {
-		colliders = new ArrayList<Collider>();
+		colliders = new ArrayList<MapCollider>();
 	}
 
 	public void addAABlock(Vector3f pos, boolean cutout, int priority, int up,
 			int dn, int no, int ea, int so, int we) {
-		Collider c = new Collider();
+		MapCollider c = new MapCollider();
 		c.shape = AA_A;
 		c.solid = !cutout;
 		c.up = up;
@@ -96,7 +104,7 @@ public class Scene {
 
 		List<Vector2f> polys;
 
-		Collider to;
+		MapCollider to;
 
 		for (int i = 0; i < colliders.size(); i++) {
 			to = colliders.get(i);
@@ -131,7 +139,7 @@ public class Scene {
 				boolean[] exposedWalls = new boolean[] {false, false, false,
 						false, false, false};
 				boolean xInt, yInt, zInt;
-				Collider co = null;
+				MapCollider co = null;
 
 				for (int j = 0; j < colliders.size(); j++) {
 					co = colliders.get(j);
@@ -294,8 +302,75 @@ public class Scene {
 		glBufferData(GL_ARRAY_BUFFER, cordData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
+	
+	/**
+	 * 
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return true if point is not inside a wall
+	 */
+	public boolean checkPointCollision(float x, float y, float z) {
+		temp0 = false;
+		for (int i = 0; i < colliders.size(); i++) {
+			temp1 = colliders.get(i);
+			
+			if ((temp1.x - temp1.we < x && x < temp1.x + temp1.ea)
+					&& (temp1.y - temp1.dn < y && y < temp1.y + temp1.up)
+					&& (temp1.z - temp1.no < z && z < temp1.z + temp1.so)) {
+			
+				if (colliders.get(i).solid) {
+					
+					return false;
+				} else {
+					
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * 
+	 * @param e
+	 * @param c
+	 * @param d
+	 * @return true if entity is not inside a wall
+	 */
+	public boolean entityCheckFixedCylinder(PhysicEntity e, FixedCylinderCollider c) {
+		boolean ret = false;
+		for (int i = 0; i < colliders.size(); i++) {
+			
+			// Check if in height range
+			if (colliders.get(i).y + colliders.get(i).up > e.getPosition().y + c.up
+				&& colliders.get(i).y - colliders.get(i).dn < e.getPosition().y - c.dn
+					) {
+				// In range!
+				
+				// Check if inside current collider (slice)
+				
+			}
+			
+			// if on edge, check if collider has other colliders touching it, 
+			// See if other collider touches it
+			
+			
+			/*// Check heights
+			if (colliders.get(i).y + colliders.get(i).up < e.getPosition().y + c.up) {
+				// not inside
+				
+			} else {
+				ret = false;
+			}*/
+			
+			
+		}
+		return checkPointCollision(e.getPosition().x, e.getPosition().y, e.getPosition().z);
+	}
 
-	public List<Collider> getColliders() {
+	public List<MapCollider> getColliders() {
 		return colliders;
 	}
 

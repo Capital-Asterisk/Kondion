@@ -26,7 +26,7 @@ var start = function() {
 KJS.e.rEnt({
 	id: "mv_player",
 	name: "You",
-	traits: ["kg_alive", "ph_gravity"],
+	traits: ["et_alive", "ph_gravity"],
 	tickInterval: 1,
 	create: function() {
 		
@@ -36,7 +36,12 @@ KJS.e.rEnt({
 	},
 	tick: function() {
 		if (KJS.i.buttonDown(KJS.b.open)) {
-			this.obj.getVelocity().y += 0.05;
+			this.obj.getVelocity().y = 3;
+			
+			
+		}
+		if (KJS.i.buttonDown(KJS.b.up)) {
+			this.obj.thrustYAngle(this.obj.getRotation().x - Math.PI, 0.5, 10);
 		}
 	}
 });
