@@ -49,7 +49,6 @@ import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -144,8 +143,9 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 					public void onLineAdded(String line, String total, int ind) {
 						if (outputTo == ind) {
 							consoleWindow.jta.setText(total);
-							consoleWindow.jta.setCaretPosition(consoleWindow.jta
-									.getDocument().getLength());
+							consoleWindow.jta
+									.setCaretPosition(consoleWindow.jta
+											.getDocument().getLength());
 						}
 					}
 				};
@@ -163,21 +163,31 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 		}
 
 	}
-	
+
 	/**
 	 * Prints the object to the current selected stream
-	 * @param x The object to print
+	 * 
+	 * @param x
+	 *            The object to print
 	 */
 	public static void print(Object x) {
-		listeners.get(outputTo).print(x);;
+		if (!listeners.isEmpty())
+			listeners.get(outputTo).print(x);
+		else
+			System.out.println(x);
 	}
-	
+
 	/**
 	 * Prints the object to the current selected stream. Creates a new line
-	 * @param x The object to print
+	 * 
+	 * @param x
+	 *            The object to print
 	 */
 	public static void println(Object x) {
-		listeners.get(outputTo).println(x);
+		if (!listeners.isEmpty())
+			listeners.get(outputTo).println(x);
+		else
+			System.out.println(x);
 	}
 
 	/**
@@ -328,13 +338,13 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 			consoleWindow.inputButton.setFont(consoleWindow.jta.getFont());
 			consoleWindow.inputButton.setBorder(BorderFactory
 					.createEmptyBorder(2, 8, 2, 8));
-			
+
 			consoleWindow.outputButton.setText("O");
 			consoleWindow.outputButton.setFont(consoleWindow.jta.getFont());
 			consoleWindow.outputButton.setBorder(BorderFactory
 					.createEmptyBorder(2, 8, 2, 8));
-			consoleWindow.outputButton
-			.addMouseListener(new MouseAdapter() {
+			consoleWindow.outputButton.addMouseListener(new MouseAdapter() {
+				@Override
 				public void mousePressed(java.awt.event.MouseEvent e) {
 					JPopupMenu j = new JPopupMenu();
 					JMenuItem f;
@@ -349,7 +359,7 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 						});
 						j.add(f);
 					}
-					//j.add(new JMenuItem("EGGS"));
+					// j.add(new JMenuItem("EGGS"));
 					j.show(consoleWindow.outputButton, e.getX(), e.getY());
 				}
 			});

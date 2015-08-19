@@ -503,12 +503,12 @@ public class Command {
 						+ "\n       █████▒      ▒████"
 						+ "\n▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬"
 						+ "\n   ▖       █"
-						+ "\n  ▚     █       VENDALENGER 2014"
-						+ "\n         █";
+						+ "\n  ▚     █       VENDALENGER 2014" + "\n         █";
 				return vendalenger;
 			}
 		}, true);
 	}
+
 	public static String fcis(File commands, String... args) {
 		long time = System.currentTimeMillis();
 		VD_FlConsole.println("FCIS: " + commands.getAbsolutePath());

@@ -38,11 +38,10 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
 
-import vendalenger.kondion.collision.EntityCollider;
 import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -57,11 +56,11 @@ public class Scene {
 	private FloatBuffer vertData;
 	private FloatBuffer cordData;
 	private FloatBuffer normData;
-	
+
 	private int cordHandle;
 	private int normHandle;
 	private int vertHandle;
-	
+
 	private boolean solidWorld = true;
 
 	private MapCollider temp1;
@@ -111,9 +110,12 @@ public class Scene {
 			if (to.shape == AA_A) {
 				// loop through each face
 
+				// Create areas
+
 				// Floor
 				walls[0] = new Area(new Rectangle2D.Double(-to.we, -to.no,
 						to.we + to.ea, to.no + to.so));
+
 				// Ceiling
 				walls[1] = new Area(new Rectangle2D.Double(-to.we, -to.no,
 						to.we + to.ea, to.no + to.so));
@@ -133,6 +135,34 @@ public class Scene {
 				// West Wall
 				walls[5] = new Area(new Rectangle2D.Double(-to.no, -to.dn,
 						to.so + to.no, to.up + to.dn));
+
+				// Create walls with normals and no holes
+
+				colliders.get(i).walls = new float[4][];
+
+				// West is -x, north is -z
+				// {PointA-X, PointA-Z, PointB-X, PointB-Z,
+				// A-Top, A-Bottom, B-Top, B-Bottom,
+				// unit normx, unit normy,
+				// holex, holey, holewidth, holeheight}
+
+				// North
+				colliders.get(i).walls[0] = new float[] {to.x - to.we,
+						to.z - to.no, // Point A
+						to.x + to.ea, to.z - to.no, // Point B
+						to.y + to.up, to.y - to.dn, // Top & bottom stays the
+													// same
+						to.y + to.up, to.y - to.dn, // same here
+						0, 0, -1};
+
+				// East
+				colliders.get(i).walls[0] = new float[] {3};
+
+				// South
+				colliders.get(i).walls[0] = new float[] {3};
+
+				// West
+				colliders.get(i).walls[0] = new float[] {3};
 
 				// loop through other colliders and check for collisions
 
@@ -165,6 +195,7 @@ public class Scene {
 							if (yInt && xInt && zInt) {
 								// Get walls inside other colliders then
 								// subtract area
+								// TODO: and also add holes
 
 								// Floor
 								if (co.y - co.dn < to.y + to.up
@@ -234,7 +265,53 @@ public class Scene {
 				}
 
 				for (int j = 0; j < walls.length; j++) {
+
+					/*
+					 * Old and inefficient collision system
+					 * 
+					 * List<List<Double[]>> list = new
+					 * ArrayList<List<Double[]>>(); double[] coords = new
+					 * double[6];
+					 * 
+					 * System.out.println("NEW WALL" + j);
+					 * 
+					 * for (PathIterator pi = walls[j].getPathIterator(null);
+					 * !pi.isDone(); pi .next()) { pi.currentSegment(coords);
+					 * Double[] point = {coords[0], coords[1]};
+					 * System.out.println("WALL POINT (" + coords[0] + ", " +
+					 * coords[1] + ")"); boolean unique = true;
+					 * 
+					 * for (int k = 0; k < list.size(); k++) { for (int l = 0; l
+					 * < list.get(k).size(); l++) {
+					 * 
+					 * // if the x is equal to our point's x if
+					 * (list.get(k).get(l)[0].equals(point[0])) { unique =
+					 * false; boolean duplicate = false;
+					 * 
+					 * for (int m = 0; m < list.get(k).size(); m++) { //
+					 * --RECORD-- THE FARTHEST I'VE GOTTEN IN FOR LOOPS if
+					 * (list.get(k).get(m)[1].equals(point[1])) { duplicate =
+					 * true; m = list.get(k).size(); } }
+					 * 
+					 * // Add to that list if no duplicates if (!duplicate)
+					 * list.get(k).add(point);
+					 * 
+					 * // like a break l = list.get(k).size(); } } }
+					 * 
+					 * if (unique) { list.add(new ArrayList<Double[]>());
+					 * list.get(list.size() - 1).add(point); } }
+					 * 
+					 * System.out.println("PRINTING GROUPS:");
+					 * 
+					 * for (int k = 0; k < list.size(); k++) {
+					 * System.out.println("GROUP: " + k); for (int l = 0; l <
+					 * list.get(k).size(); l++) { System.out.println("POINT (" +
+					 * list.get(k).get(l)[0] + ", " + list.get(k).get(l)[1] +
+					 * ")"); } }
+					 */
+
 					try {
+						// Triangulate walls into vertex data
 						polys = TTT.areaToTriangles(walls[j]);
 						for (int k = 0; k < polys.size(); k++) {
 							switch (j) {
@@ -260,7 +337,7 @@ public class Scene {
 											polys.get(k).x);
 								break;
 							}
-							a.translate(to.x, to.y, to.z);
+							a.add(to.x, to.y, to.z);
 							TTT.addVect(verts, a);
 							cords.add(16 / (to.we + to.ea) * polys.get(k).x);
 							cords.add(16 / (to.no + to.so) * polys.get(k).y);
@@ -302,7 +379,7 @@ public class Scene {
 		glBufferData(GL_ARRAY_BUFFER, cordData, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-	
+
 	/**
 	 * 
 	 * @param x
@@ -314,24 +391,24 @@ public class Scene {
 		temp0 = false;
 		for (int i = 0; i < colliders.size(); i++) {
 			temp1 = colliders.get(i);
-			
+
 			if ((temp1.x - temp1.we < x && x < temp1.x + temp1.ea)
 					&& (temp1.y - temp1.dn < y && y < temp1.y + temp1.up)
 					&& (temp1.z - temp1.no < z && z < temp1.z + temp1.so)) {
-			
+
 				if (colliders.get(i).solid) {
-					
+
 					return false;
 				} else {
-					
+
 					return true;
 				}
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * 
 	 * @param e
@@ -339,35 +416,23 @@ public class Scene {
 	 * @param d
 	 * @return true if entity is not inside a wall
 	 */
-	public boolean entityCheckFixedCylinder(PhysicEntity e, FixedCylinderCollider c) {
+	public boolean entityCheckFixedCylinder(PhysicEntity e,
+			FixedCylinderCollider c) {
 		boolean ret = false;
 		for (int i = 0; i < colliders.size(); i++) {
-			
+
 			// Check if in height range
-			if (colliders.get(i).y + colliders.get(i).up > e.getPosition().y + c.up
-				&& colliders.get(i).y - colliders.get(i).dn < e.getPosition().y - c.dn
-					) {
+			if (colliders.get(i).y + colliders.get(i).up > e.getPosition().y
+					+ c.up
+					&& colliders.get(i).y - colliders.get(i).dn < e
+							.getPosition().y - c.dn) {
 				// In range!
-				
-				// Check if inside current collider (slice)
-				
+
 			}
-			
-			// if on edge, check if collider has other colliders touching it, 
-			// See if other collider touches it
-			
-			
-			/*// Check heights
-			if (colliders.get(i).y + colliders.get(i).up < e.getPosition().y + c.up) {
-				// not inside
-				
-			} else {
-				ret = false;
-			}*/
-			
-			
+
 		}
-		return checkPointCollision(e.getPosition().x, e.getPosition().y, e.getPosition().z);
+		return checkPointCollision(e.getPosition().x, e.getPosition().y,
+				e.getPosition().z);
 	}
 
 	public List<MapCollider> getColliders() {

@@ -46,9 +46,11 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWvidmode;
+import org.lwjgl.opengl.GL11;
 
 public class Window {
 
@@ -73,9 +75,9 @@ public class Window {
 	public static long getWindow() {
 		return window;
 	}
-	
+
 	public static void setWindowVisible(boolean b) {
-		if (b) 
+		if (b)
 			glfwShowWindow(window);
 		else
 			glfwHideWindow(window);
@@ -113,7 +115,7 @@ public class Window {
 		glfwWindowHint(GLFW_VISIBLE, GL_FALSE); // the window will stay hidden
 												// after creation
 		glfwWindowHint(GLFW_RESIZABLE, GL_TRUE); // the window will be resizable
-
+		
 		window = glfwCreateWindow(width, height, title, NULL, NULL);
 		if (window == NULL) {
 			System.err.println("Error in initializing GLFW Window");
@@ -140,6 +142,9 @@ public class Window {
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		
+		System.out.println("GLFW Version: " + GLFW.glfwGetVersionString());
+		//System.out.println("OpenGL Version: " + GL11.glGetString(GL11.GL_VERSION));
+
 		// TTT.Two();
 	}
 
@@ -161,6 +166,8 @@ public class Window {
 		System.out.println("Architecture: " + System.getProperty("os.arch"));
 		System.out.println("Data model: " + dataModel);
 		String os = System.getProperty("os.name").toLowerCase();
+		System.out.println("CPU Cores: "
+				+ Runtime.getRuntime().availableProcessors());
 
 		/* Detect the Operating system then load the appropriate lwjgl natives */
 		if (os.contains("nix") || os.contains("aix") || os.contains("nux")) {

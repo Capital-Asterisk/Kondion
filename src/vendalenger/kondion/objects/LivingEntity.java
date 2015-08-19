@@ -18,15 +18,13 @@ package vendalenger.kondion.objects;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
-import org.lwjgl.util.vector.Vector3f;
-
 import vendalenger.kondion.KInput;
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.objects.control.LEControl;
 
 public class LivingEntity extends PhysicEntity {
-	
+
 	private LEControl intel;
 
 	public LivingEntity(ProtoEntity p, ScriptObjectMirror m) {
@@ -34,10 +32,11 @@ public class LivingEntity extends PhysicEntity {
 		colliders.add(new FixedCylinderCollider(1, 1, 1));
 		intel = null;
 	}
-	
+
+	@Override
 	public void move() {
-		//if (intel != null)
-			//intel.tick();
+		// if (intel != null)
+		// intel.tick();
 		if ((boolean) mirror.get("mouseRotate")) {
 			rotation.x += KInput.getMouseDX() / 300;
 			rotation.y -= KInput.getMouseDY() / 300;
@@ -49,12 +48,12 @@ public class LivingEntity extends PhysicEntity {
 		position.x += velocity.x * Kondion.getDelta();
 		position.y += velocity.y * Kondion.getDelta();
 		position.z += velocity.z * Kondion.getDelta();
-		
+
 		collideTerrain();
 
 		velocity.y -= gravity;
-		//velocity.x *= drag;
-		//velocity.y *= drag;
-		//velocity.z *= drag;
+		// velocity.x *= drag;
+		// velocity.y *= drag;
+		// velocity.z *= drag;
 	}
 }

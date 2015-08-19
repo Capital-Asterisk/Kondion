@@ -26,17 +26,17 @@ public class Traits {
 	public static short getTraitIndex(String t) {
 		return (short) traits.indexOf(t);
 	}
-	
+
 	public static boolean hasTrait(short[] array, short trait) {
-		for (short s: array)
-			if(s == trait)
+		for (short s : array)
+			if (s == trait)
 				return true;
 		return false;
 	}
 
 	public static boolean hasTrait(Short[] array, short trait) {
-		for (Short s: array)
-			if(s.equals(trait))
+		for (Short s : array)
+			if (s.equals(trait))
 				return true;
 		return false;
 	}
@@ -46,10 +46,10 @@ public class Traits {
 		traits.add("et_static");
 		traits.add("et_physic");
 		traits.add("et_alive");
-		
+
 		traits.add("kg_control");
 		traits.add("kg_particle");
-		
+
 		traits.add("gl_billboard");
 		traits.add("gl_sprite");
 

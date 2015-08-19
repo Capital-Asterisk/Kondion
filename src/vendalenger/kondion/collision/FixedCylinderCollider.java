@@ -5,9 +5,10 @@ public class FixedCylinderCollider extends EntityCollider {
 	public float radius;
 	public float up;
 	public float dn;
-	
+
 	/**
 	 * Create a new Fixed Cylinder, diagram below
+	 * 
 	 * <pre>
 	 * {@code
 	 * 
@@ -23,9 +24,13 @@ public class FixedCylinderCollider extends EntityCollider {
 	 *    █████      ▼
 	 * }
 	 * </pre>
-	 * @param rad Radius
-	 * @param height Up
-	 * @param down Down
+	 * 
+	 * @param rad
+	 *            Radius
+	 * @param height
+	 *            Up
+	 * @param down
+	 *            Down
 	 * @see vendalenger.kondion.collision.EntityCollider
 	 */
 	public FixedCylinderCollider(float rad, float height, float down) {
@@ -33,11 +38,11 @@ public class FixedCylinderCollider extends EntityCollider {
 		up = height;
 		dn = down;
 	}
-	
+
 	@Override
 	public void move() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 }

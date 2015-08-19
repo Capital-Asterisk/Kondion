@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="JOML-master/src"/>
+	<classpathentry kind="src" path="poly2tri"/>
 	<classpathentry kind="lib" path="argo-3.12.jar"/>
-	<classpathentry kind="lib" path="lwjgl_util.jar"/>
 	<classpathentry kind="lib" path="lwjgl.jar"/>
 	<classpathentry kind="lib" path="zip4j_1.3.2.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

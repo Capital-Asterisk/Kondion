@@ -16,11 +16,13 @@
 
 package vendalenger.kondion.lwjgl;
 
-import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
+import java.nio.FloatBuffer;
 
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 import vendalenger.kondion.KInput;
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.objects.Entity;
@@ -33,26 +35,29 @@ public class Camera_ {
 
 	// For Camera position and movement
 	private boolean freeMode = false;
+	private int fov = 50;
 	private float cameraSpeed = 0.2f;
 	private float yaw, pitch, roll;
-	
+
 	private Vector3f center;
 	private Vector3f eye;
 	private Vector3f up;
-	
+
+	private Matrix4f prespectiveMatrix;
+
 	// Camera control
 	private Entity bind = null;
 	private Vector3f rotLock = null;
-	
+
 	private int[] upDownLeftRight = {0, 0, 0, 0};
-	
+
 	// For calculations, no new objects are created for speed.
 	private Matrix4f tempMatrix;
 	private Vector3f tempVector0;
 	private Vector3f tempVector1;
 	private Vector4f tempVector2;
 	private Vector4f tempVector3;
-	
+
 	public Camera_() {
 
 		upDownLeftRight[0] = KInput.getButtonIndex("up");
@@ -67,6 +72,8 @@ public class Camera_ {
 		center = new Vector3f();
 		eye = new Vector3f();
 		up = new Vector3f();
+
+		prespectiveMatrix = new Matrix4f();
 
 		tempVector0 = new Vector3f();
 		tempVector1 = new Vector3f();
@@ -122,12 +129,11 @@ public class Camera_ {
 		 * tempVector2.y, tempVector2.z); // well... im upset...
 		 */
 		// set template up vector
-		tempVector2.set(0.0f, 1.0f, 0.0f);
-		tempMatrix.setIdentity();
+		tempVector2.set(0.0f, 1.0f, 0.0f, 1.0f);
+		tempMatrix.identity();
 		tempVector1.set(0.0f, 0.0f, 1.0f); // set rotate mode to z axis
 		tempMatrix.rotate(roll, tempVector1); // rotate it
-		Matrix4f.transform(tempMatrix, tempVector2, tempVector2); // rotate tv2
-
+		tempMatrix.transform(tempVector2); // rotate tv2
 		// set up to tv2
 		// very upsetting...
 		up.set(tempVector2.x, tempVector2.y, tempVector2.z);
@@ -180,8 +186,28 @@ public class Camera_ {
 	 * Calls GLU.gluLookAt(...) with eye, center, and up
 	 */
 	public void gluLookAt() {
-		GLU.gluLookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z, up.x,
-				up.y, up.z);
+		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+		if (fov < 1) {
+			prespectiveMatrix
+					.identity()
+					.perspective(
+							(float) Math.toRadians(TTT.getPrefFov()),
+							((float) (Window.getWidth()) / (float) (Window
+									.getHeight())), 0.01f, 100.0f)
+					.lookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z,
+							up.x, up.y, up.z).get(fb);
+		} else {
+			prespectiveMatrix
+					.identity()
+					.perspective(
+							(float) Math.toRadians(fov),
+							((float) (Window.getWidth()) / (float) (Window
+									.getHeight())), 0.01f, 100.0f)
+					.lookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z,
+							up.x, up.y, up.z).get(fb);
+		}
+		GL11.glMultMatrix(fb);
+		// GL20.glUniformMatrix4(0, true, fb);
 	}
 
 	public boolean isFree() {
@@ -213,9 +239,9 @@ public class Camera_ {
 	 * Center is normalized relative to eye.
 	 */
 	public void normalizeCenter() {
-		Vector3f.sub(center, eye, tempVector0);
-		tempVector0.normalise();
-		Vector3f.add(tempVector0, eye, center);
+		center.sub(eye, tempVector0);
+		tempVector0.normalize();
+		tempVector0.add(eye, center);
 	}
 
 	public void setFreeMode(boolean b) {
@@ -273,9 +299,9 @@ public class Camera_ {
 				center.z += tempVector0.y * cameraSpeed;
 			}
 		} else if (bind != null) {
-			eye.x = bind.getPosition().getX();
-			eye.y = bind.getPosition().getY();
-			eye.z = bind.getPosition().getZ();
+			eye.x = bind.getPosition().x;
+			eye.y = bind.getPosition().y;
+			eye.z = bind.getPosition().z;
 		}
 		if (rotLock != null) {
 			yaw = rotLock.x;

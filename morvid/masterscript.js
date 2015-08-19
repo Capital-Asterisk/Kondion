@@ -18,9 +18,9 @@ var start = function() {
 	KJS.c.bindCam(player.obj);
 	KJS.kondion.getCurrentCamera().lockRotation(player.obj.getRotation());
 	KJS.s.newAABlockCS(new Vector3f(0, 0, 0), true, 2, 7, 1, 8, 8, 8, 8);
-	KJS.s.newAABlockCS(new Vector3f(0, 0, 0), true, 2, 1, 6, 2, 2, 2, 2);
-	KJS.s.newAABlockCS(new Vector3f(1, 1, 15), true, 2, 4, 1, 8, 8, 8, 8);
-	KJS.s.newAABlockCS(new Vector3f(-2, 4, 20), true, 2, 1, 15, 8, 8, 8, 8);
+	KJS.s.newAABlockCS(new Vector3f(0, 0, 0), true, 2, 1, 5, 9, 2, 2, 2);
+	//KJS.s.newAABlockCS(new Vector3f(1, 1, 15), true, 2, 4, 1, 8, 8, 8, 8);
+	//KJS.s.newAABlockCS(new Vector3f(-2, 4, 20), true, 2, 1, 15, 8, 8, 8, 8);
 };
 
 KJS.e.rEnt({
@@ -42,6 +42,11 @@ KJS.e.rEnt({
 		}
 		if (KJS.i.buttonDown(KJS.b.up)) {
 			this.obj.thrustYAngle(this.obj.getRotation().x - Math.PI, 0.5, 10);
+		} else {
+			this.obj.velocity.set(0, this.obj.velocity.y, 0);
+		}
+		if (KJS.i.buttonDown(KJS.b.down)) {
+			print("(" + this.obj.position.x + ", " + this.obj.position.y + ", " + this.obj.position.z + ")");
 		}
 	}
 });

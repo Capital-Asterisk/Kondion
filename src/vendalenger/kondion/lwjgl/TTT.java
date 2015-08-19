@@ -41,41 +41,20 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
-import org.lwjgl.util.glu.GLU;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import poly2Tri.Triangulation;
+import vendalenger.kondion.Kondion;
 
 public class TTT {
 
 	/*
 	 * TTT, the same class used in my first 3d lwjgl game. (with modifications)
 	 * TTT serves the same purpose. as before.
-	 * 
-	 * =======================HISTORY OF THE VENDALENGER
-	 * LOGO======================= Once upon a time while working on my first
-	 * lwjgl game. I modified NeHe lesson 5 to a point where I had a cube class
-	 * with a constructor (x, y z). I made 3 cubes (0, 2, 0), (1, 0, 0), and (2,
-	 * 1, 0) creating this when the Camera_ was put a distance: █ █ █ I decided
-	 * it was a good logo so I made this: █ SHET █ A █ BYTE
-	 * 
-	 * It was too informal, and by mistake I made this: █ █ GENERICO █ Generico
-	 * sounded generic and Spanish so I went back in time when I made up a name
-	 * similar to Vendalenger (i was like 7 in daycare) and came up with the
-	 * name. So as a final I made: â–ˆ â–ˆ VENDALENGER â–ˆ
-	 * 
-	 * btw: There was more before shetabyte. There was 776 and Separate
-	 * Functions (The names I used back in 2008 Roblox Lua scripting). There was
-	 * also Nyanbytes (I was such a meme master and got my Steam account id as
-	 * nyanbyte5) thats it?
-	 * ======================================================
-	 * =======================
 	 */
 
-	public static float fov = 50;
-
-	public static boolean fs = false;
+	private static int prefFov = 50;
 
 	public static void addVect(List<Float> list, Vector3f v) {
 		list.add(v.x);
@@ -214,6 +193,10 @@ public class TTT {
 		}
 	}
 
+	public static int getPrefFov() {
+		return prefFov;
+	}
+
 	/**
 	 * Quad shortcut for a triangle vertex or normal array.
 	 * <p>
@@ -267,9 +250,10 @@ public class TTT {
 		glViewport(0, 0, Window.getWidth(), Window.getHeight());
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		GLU.gluPerspective(fov,
-				((float) (Window.getWidth()) / (float) (Window.getHeight())),
-				0.1f, 200.0f);
+		Kondion.getCurrentCamera().gluLookAt();
+		// GLU.gluPerspective(fov,
+		// ((float) (Window.getWidth()) / (float) (Window.getHeight())),
+		// 0.1f, 200.0f);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		// glCullFace(GL_BACK);

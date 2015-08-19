@@ -20,7 +20,7 @@ import java.io.File;
 
 import argo.jdom.JsonRootNode;
 
-public abstract class KondionGame {
+public class KondionGame {
 
 	private File gameDir;
 	private JsonRootNode gameInfo;

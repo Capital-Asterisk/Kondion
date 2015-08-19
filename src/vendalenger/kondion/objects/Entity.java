@@ -19,16 +19,16 @@ package vendalenger.kondion.objects;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
 import static org.lwjgl.opengl.GL11.glTranslatef;
+
+import org.joml.Vector3f;
+
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
-import org.lwjgl.util.vector.Vector3f;
-
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
 
 public class Entity {
-	
+
 	private int tickInterval;
 
 	protected float scale = 1.0f;

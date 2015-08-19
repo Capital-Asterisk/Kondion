@@ -18,16 +18,8 @@ package vendalenger.kondion;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
-
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.port.Command;
 import vendalenger.port.FileShortcuts;
-import vendalenger.port.VD_FlConsole;
 import argo.jdom.JdomParser;
-import argo.jdom.JsonNode;
 import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
 
@@ -35,22 +27,13 @@ public class KHacker {
 
 	private static boolean hacking = false;
 
-	public static void runGame(KondionGame k) {
-		hacking = true;
-		VD_FlConsole.initConsole(500, 500, true);
-		Command.commandSetup();
-		VD_FlConsole.showConsole();
-		new Thread(() -> {
-			// Initializer.setNatives();
-			// Initializer.initGL(800, 600, false, false, k.getWindowName());
-			// FlatDrawing.setup();
-			// KondionLoader.init();
-			// Command.issue("^fc.fcis (kondion/" + k.getGameId() +
-			// "/init.fcis)", false);
-
-			}).start();
-	}
-
+	/**
+	 * Run a game directly from a folder, without a .kog file. For debug
+	 * purposes.
+	 * 
+	 * @param path
+	 *            Path to your game folder
+	 */
 	public static void runGame(String path) {
 		try {
 			KondionGame game = new KondionGame() {};

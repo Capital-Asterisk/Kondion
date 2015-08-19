@@ -19,11 +19,9 @@ package vendalenger.kondion.objects;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Vector3f;
+
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
-import org.lwjgl.util.vector.Vector3f;
-
-import vendalenger.kondion.KInput;
 import vendalenger.kondion.collision.EntityCollider;
 import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.Kondion;
@@ -33,6 +31,8 @@ public class PhysicEntity extends Entity {
 	protected float gravity = 0.2f;
 	protected float drag = 0.97f;
 	protected List<EntityCollider> colliders;
+	protected Vector3f prevPos;
+	protected Vector3f prevRot;
 	protected Vector3f velocity;
 
 	public PhysicEntity(ProtoEntity p, ScriptObjectMirror m) {
@@ -40,13 +40,13 @@ public class PhysicEntity extends Entity {
 		velocity = new Vector3f();
 		colliders = new ArrayList<EntityCollider>();
 	}
-	
+
 	public void thrust(float x, float y, float z) {
 		velocity.x += x;
 		velocity.y += y;
 		velocity.z += z;
 	}
-	
+
 	public void thrustYAngle(float radian, float amt, float max) {
 
 		// If velocity magnitude (without y) is lower than max, or max is 0
@@ -54,9 +54,7 @@ public class PhysicEntity extends Entity {
 			velocity.x -= (float) Math.cos(radian) * amt;
 			velocity.z -= (float) Math.sin(radian) * amt;
 		} else {
-			Math.sqrt(
-					(velocity.x * velocity.x)
-					+ (velocity.z * velocity.z));
+			Math.sqrt((velocity.x * velocity.x) + (velocity.z * velocity.z));
 			velocity.x -= (float) Math.cos(radian) * amt;
 			velocity.z -= (float) Math.sin(radian) * amt;
 		}
@@ -65,12 +63,13 @@ public class PhysicEntity extends Entity {
 	public Vector3f getVelocity() {
 		return velocity;
 	}
-	
+
 	public void collideTerrain() {
 		for (int i = 0; i < colliders.size(); i++) {
 			if (colliders.get(i) instanceof FixedCylinderCollider) {
-				if (!Kondion.getCurrentScene().entityCheckFixedCylinder(this, (FixedCylinderCollider) colliders.get(i))) {
-					//position.y += 0.3f;
+				if (!Kondion.getCurrentScene().entityCheckFixedCylinder(this,
+						(FixedCylinderCollider) colliders.get(i))) {
+					// position.y += 0.3f;
 					velocity.y = 0.3f;
 				}
 			}
@@ -82,9 +81,9 @@ public class PhysicEntity extends Entity {
 		position.y += velocity.y * Kondion.getDelta();
 		position.z += velocity.z * Kondion.getDelta();
 		collideTerrain();
-		//velocity.y -= gravity;
-		//velocity.x *= drag;
-		//velocity.y *= drag;
-		//velocity.z *= drag;
+		// velocity.y -= gravity;
+		// velocity.x *= drag;
+		// velocity.y *= drag;
+		// velocity.z *= drag;
 	}
 }

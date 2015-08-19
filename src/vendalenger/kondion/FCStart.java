@@ -23,10 +23,18 @@ import vendalenger.port.VD_FlConsole;
 
 public class FCStart {
 
+	/**
+	 * Start with fluffy console only
+	 * 
+	 * @param args
+	 *            Command line arguments, what else?
+	 */
 	public static void main(String args[]) {
 		VD_FlConsole.initConsole(600, 400, Boolean.parseBoolean(args[0]));
 		Command.commandSetup();
 		VD_FlConsole.showConsole();
+
+		/* Run the startup script */
 		Command.fcis(new File("startup.fcis"), "startup");
 	}
 }

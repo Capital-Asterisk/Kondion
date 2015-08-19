@@ -17,15 +17,19 @@
 var EntityPhysClass = Java.type("vendalenger.kondion.objects.Entity");
 var ProtoEntityClass = Java.type("vendalenger.kondion.objects.ProtoEntity");
 
-var Quaternion = Java.type("org.lwjgl.util.vector.Quaternion");
+var Quaternionf = Java.type("org.joml.Quaternionf");
+var Matrix3f = Java.type("org.joml.Matrix3f");
+var Matrix2f = Java.type("org.joml.Matrix4f");
+var Vector2f = Java.type("org.joml.Vector2f");
+var Vector3f = Java.type("org.joml.Vector3f");
+var Vector4f = Java.type("org.joml.Vector4f");
 
-var Matrix2f = Java.type("org.lwjgl.util.vector.Matrix2f");
-var Matrix3f = Java.type("org.lwjgl.util.vector.Matrix3f");
-var Matrix2f = Java.type("org.lwjgl.util.vector.Matrix4f");
-
-var Vector2f = Java.type("org.lwjgl.util.vector.Vector2f");
-var Vector3f = Java.type("org.lwjgl.util.vector.Vector3f");
-var Vector4f = Java.type("org.lwjgl.util.vector.Vector4f");
+var Quaterniond = Java.type("org.joml.Quaterniond");
+var Matrix3d = Java.type("org.joml.Matrix3d");
+var Matrix2d = Java.type("org.joml.Matrix4d");
+var Vector2d = Java.type("org.joml.Vector2d");
+var Vector3d = Java.type("org.joml.Vector3d");
+var Vector4d = Java.type("org.joml.Vector4d");
 
 var blockTypes = {
 	SOLID: 0, CUTOUT: 1, EXCEPT: 2,
@@ -88,3 +92,5 @@ var patchObject = function(obj, patch) {
 	}
 	return obj;
 };
+
+var world = {};
