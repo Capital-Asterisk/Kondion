@@ -41,6 +41,7 @@ import java.util.List;
 
 import javax.swing.JOptionPane;
 
+import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
@@ -157,6 +158,21 @@ public class TTT {
 		return result;
 	}
 
+	public static Matrix3f rotateByUnitVector(Matrix3f tgt, float cos, float sin, float x, float y, float z) {
+		float C = 1.0f - cos;
+        float xy = x * y, xz = x * z, yz = y * z;
+        tgt.m00 = cos + x * x * C;
+        tgt.m10 = xy * C - z * sin;
+        tgt.m20 = xz * C + y * sin;
+        tgt.m01 = xy * C + z * sin;
+        tgt.m11 = cos + y * y * C;
+        tgt.m21 = yz * C - x * sin;
+        tgt.m02 = xz * C - y * sin;
+        tgt.m12 = yz * C + x * sin;
+        tgt.m22 = cos + z * z * C;
+		return tgt;
+	}
+	
 	public static int Decide(String message, String objective, int type) {
 		int d = JOptionPane.showConfirmDialog(null, message, objective,
 				JOptionPane.YES_NO_OPTION, type);

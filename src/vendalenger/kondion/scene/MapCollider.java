@@ -8,9 +8,9 @@ public class MapCollider {
 	public float up, dn, no, ea, so, we;
 	public float x, y, z;
 
-	// {PointA-X, PointA-Y, PointB-X, PointB-Y,
-	// A-Top, A-Bottom, B-Top, B-Bottom,
-	// unit normx, unit normy,
-	// holex, holey, holewidth, holeheight}
+	// {0 PointA-X, 1 PointA-Y, 2 PointB-X, 3 PointB-Y,
+	// 4 A-Top, 5 A-Bottom, 6 B-Top, 7 B-Bottom,
+	// 8 unit normx, 9 unit normy,
+	// 10 holex, 11 holey, 12 holewidth, 13 holeheight}
 	public float[][] walls;
 }

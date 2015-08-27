@@ -2,6 +2,8 @@ package vendalenger.kondion.collision;
 
 public class FixedCylinderCollider extends EntityCollider {
 
+	public byte collisionAmt;
+	public float collisions[][];
 	public float radius;
 	public float up;
 	public float dn;
@@ -37,6 +39,20 @@ public class FixedCylinderCollider extends EntityCollider {
 		radius = rad;
 		up = height;
 		dn = down;
+		collisionAmt = 0;
+		// Unit x, y, z, distance
+		// Max of 8 collisions
+		// listed the lazy way
+		collisions = new float[][] {
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0},
+				new float[] {0, 0, 0, 0}
+		};
 	}
 
 	@Override

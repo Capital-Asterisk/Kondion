@@ -24,6 +24,7 @@ import org.joml.Vector3f;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.collision.EntityCollider;
 import vendalenger.kondion.collision.FixedCylinderCollider;
+import vendalenger.kondion.scene.MapCollider;
 import vendalenger.kondion.Kondion;
 
 public class PhysicEntity extends Entity {
@@ -34,6 +35,7 @@ public class PhysicEntity extends Entity {
 	protected Vector3f prevPos;
 	protected Vector3f prevRot;
 	protected Vector3f velocity;
+	private EntityCollider temp0;
 
 	public PhysicEntity(ProtoEntity p, ScriptObjectMirror m) {
 		super(p, m);
@@ -66,14 +68,28 @@ public class PhysicEntity extends Entity {
 
 	public void collideTerrain() {
 		for (int i = 0; i < colliders.size(); i++) {
+			temp0 = colliders.get(i);
 			if (colliders.get(i) instanceof FixedCylinderCollider) {
-				if (!Kondion.getCurrentScene().entityCheckFixedCylinder(this,
-						(FixedCylinderCollider) colliders.get(i))) {
-					// position.y += 0.3f;
-					velocity.y = 0.3f;
+				Kondion.getCurrentScene().entityCheckFixedCylinder(this,
+						(FixedCylinderCollider) temp0);
+				if (((FixedCylinderCollider) temp0).collisionAmt > 0) {
+					for (int j = 0; j < ((FixedCylinderCollider) temp0).collisionAmt; j++) {
+						
+						position.x += ((FixedCylinderCollider) temp0).collisions[j][0]
+								* ((FixedCylinderCollider) temp0).collisions[j][3];
+						position.y += ((FixedCylinderCollider) temp0).collisions[j][1]
+								* ((FixedCylinderCollider) temp0).collisions[j][3];
+						position.z += ((FixedCylinderCollider) colliders.get(i)).collisions[j][2]
+								* ((FixedCylinderCollider) temp0).collisions[j][3];
+						
+						velocity.x *= 1 - ((FixedCylinderCollider) temp0).collisions[j][0];
+						velocity.y *= 1 - ((FixedCylinderCollider) temp0).collisions[j][1];
+						velocity.z *= 1 - ((FixedCylinderCollider) temp0).collisions[j][2];
+					}
 				}
 			}
 		}
+		//System.out.println(velocity.x);
 	}
 
 	public void move() {

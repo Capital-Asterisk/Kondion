@@ -38,10 +38,12 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
+import vendalenger.kondion.KInput;
 import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -122,7 +124,7 @@ public class Scene {
 
 				// North wall
 				walls[2] = new Area(new Rectangle2D.Double(-to.we, -to.dn,
-						to.we + to.ea, to.up + to.dn));
+					to.we + to.ea, to.up + to.dn));
 
 				// East wall
 				walls[3] = new Area(new Rectangle2D.Double(-to.no, -to.dn,
@@ -147,22 +149,40 @@ public class Scene {
 				// holex, holey, holewidth, holeheight}
 
 				// North
-				colliders.get(i).walls[0] = new float[] {to.x - to.we,
-						to.z - to.no, // Point A
-						to.x + to.ea, to.z - to.no, // Point B
-						to.y + to.up, to.y - to.dn, // Top & bottom stays the
-													// same
-						to.y + to.up, to.y - to.dn, // same here
-						0, 0, -1};
+				colliders.get(i).walls[0] = new float[] {
+					to.x - to.we, to.z - to.no, // Point A
+					to.x + to.ea, to.z - to.no, // Point B
+						
+					to.y + to.up, to.y - to.dn, // Top & bottom same
+					to.y + to.up, to.y - to.dn, // same here
+					0, -1};
 
 				// East
-				colliders.get(i).walls[0] = new float[] {3};
+				colliders.get(i).walls[1] = new float[] {
+					to.z + to.ea, to.z - to.no,
+					to.z + to.ea, to.z + to.so,
+					
+					to.y + to.up, to.y - to.dn,
+					to.y + to.up, to.y - to.dn,
+					1, 0};
 
 				// South
-				colliders.get(i).walls[0] = new float[] {3};
+				colliders.get(i).walls[2] = new float[] {
+					to.x - to.we, to.z + to.so, // Point A
+					to.x + to.ea, to.z + to.so, // Point B
+						
+					to.y + to.up, to.y - to.dn, // Top & bottom same
+					to.y + to.up, to.y - to.dn, // same here
+					0, 1};
 
 				// West
-				colliders.get(i).walls[0] = new float[] {3};
+				colliders.get(i).walls[3] = new float[] {
+					to.z - to.we, to.z - to.no,
+					to.z - to.we, to.z + to.so,
+					
+					to.y + to.up, to.y - to.dn,
+					to.y + to.up, to.y - to.dn,
+					-1, 0};
 
 				// loop through other colliders and check for collisions
 
@@ -408,31 +428,96 @@ public class Scene {
 
 		return false;
 	}
-
+	
+	String[] eggs = new String[] {"North", "East", "South", "West"};
 	/**
 	 * 
 	 * @param e
 	 * @param c
-	 * @param d
-	 * @return true if entity is not inside a wall
 	 */
-	public boolean entityCheckFixedCylinder(PhysicEntity e,
+	public void entityCheckFixedCylinder(PhysicEntity e,
 			FixedCylinderCollider c) {
+		
+		c.collisionAmt = 0;
+		
 		boolean ret = false;
+		
 		for (int i = 0; i < colliders.size(); i++) {
+			temp1 = colliders.get(i);
 
-			// Check if in height range
-			if (colliders.get(i).y + colliders.get(i).up > e.getPosition().y
-					+ c.up
-					&& colliders.get(i).y - colliders.get(i).dn < e
-							.getPosition().y - c.dn) {
+			// Check if in range
+			if ((temp1.y + temp1.up > e.getPosition().y - c.up - c.dn)
+					&& (temp1.y - temp1.dn < e.getPosition().y + c.dn + c.up)
+					&& (temp1.x - temp1.we < e.getPosition().x && e.getPosition().x < temp1.x + temp1.ea)
+					&& (temp1.z - temp1.no < e.getPosition().z && e.getPosition().z < temp1.z + temp1.so)) {
 				// In range!
-
+				
+				// Now do height collisions
+				// Bottom
+				if (temp1.y - temp1.dn > e.getPosition().y - c.dn) {
+					// You tripped
+					c.collisions[c.collisionAmt][0] = 0;
+					c.collisions[c.collisionAmt][1] = 1;
+					c.collisions[c.collisionAmt][2] = 0;
+					c.collisions[c.collisionAmt][3] = (temp1.y - temp1.dn) - (e.getPosition().y - c.dn);
+					c.collisionAmt ++;
+				}
+				
+				// Top
+				if (temp1.y + temp1.up < e.getPosition().y + c.up) {
+					// You raised the roof
+					c.collisions[c.collisionAmt][0] = 0;
+					c.collisions[c.collisionAmt][1] = -1;
+					c.collisions[c.collisionAmt][2] = 0;
+					c.collisions[c.collisionAmt][3] = ((e.getPosition().y + c.up) - (temp1.y + temp1.up));
+					c.collisionAmt ++;
+				}
+				
+				for (int j = 0; j < temp1.walls.length; j++) {
+					Matrix3f mat = new Matrix3f();
+					TTT.rotateByUnitVector(mat,
+							temp1.walls[j][8],
+							temp1.walls[j][9],
+							0, -1, 0);
+					
+					
+					mat.invert();
+					Vector3f pointA = new Vector3f(
+							temp1.walls[j][0],
+							0,
+							temp1.walls[j][1]);
+					Vector3f pointB = new Vector3f(
+							temp1.walls[j][2],
+							0,
+							temp1.walls[j][3]);
+					Vector3f pos = new Vector3f();
+					mat.transform(e.getPosition(), pos);
+					mat.transform(pointA);
+					mat.transform(pointB);
+					if (KInput.buttonIsDown(2)) {
+						System.out.println(eggs[j] + ": " + (pointA.x - pos.x));
+					}
+					
+					if (pointA.x - pos.x < c.radius) {
+						// Collision Detected with Wall!
+						
+						c.collisions[c.collisionAmt][0] = temp1.walls[j][8];
+						c.collisions[c.collisionAmt][1] = 0;
+						c.collisions[c.collisionAmt][2] = temp1.walls[j][9];
+						c.collisions[c.collisionAmt][3] = pointA.x - pos.x - c.radius;
+						c.collisionAmt ++;
+						
+					}
+					
+				}
+				
+			} else {
+				
+				
 			}
 
 		}
-		return checkPointCollision(e.getPosition().x, e.getPosition().y,
-				e.getPosition().z);
+		
 	}
 
 	public List<MapCollider> getColliders() {
