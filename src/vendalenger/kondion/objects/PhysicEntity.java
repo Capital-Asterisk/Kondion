@@ -82,9 +82,13 @@ public class PhysicEntity extends Entity {
 						position.z += ((FixedCylinderCollider) colliders.get(i)).collisions[j][2]
 								* ((FixedCylinderCollider) temp0).collisions[j][3];
 						
-						velocity.x *= 1 - ((FixedCylinderCollider) temp0).collisions[j][0];
-						velocity.y *= 1 - ((FixedCylinderCollider) temp0).collisions[j][1];
-						velocity.z *= 1 - ((FixedCylinderCollider) temp0).collisions[j][2];
+						//System.out.println("b4(" + velocity.x + ", " + velocity.y + ", " + velocity.z + ")");
+						velocity.x *= 1 - Math.abs(((FixedCylinderCollider) temp0).collisions[j][0]);
+						velocity.y *= 1 - Math.abs(((FixedCylinderCollider) temp0).collisions[j][1]);
+						velocity.z *= 1 - Math.abs(((FixedCylinderCollider) temp0).collisions[j][2]);
+						
+						//System.out.println(((FixedCylinderCollider) temp0).collisions[j][1]);
+						//System.out.println("af(" + velocity.x + ", " + velocity.y + ", " + velocity.z + ")");
 					}
 				}
 			}
@@ -93,10 +97,11 @@ public class PhysicEntity extends Entity {
 	}
 
 	public void move() {
+		collideTerrain();
 		position.x += velocity.x * Kondion.getDelta();
 		position.y += velocity.y * Kondion.getDelta();
 		position.z += velocity.z * Kondion.getDelta();
-		collideTerrain();
+		
 		// velocity.y -= gravity;
 		// velocity.x *= drag;
 		// velocity.y *= drag;

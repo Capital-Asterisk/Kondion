@@ -36,6 +36,7 @@ import java.awt.geom.Area;
 import java.awt.geom.Rectangle2D;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.joml.Matrix3f;
@@ -150,8 +151,8 @@ public class Scene {
 
 				// North
 				colliders.get(i).walls[0] = new float[] {
-					to.x - to.we, to.z - to.no, // Point A
-					to.x + to.ea, to.z - to.no, // Point B
+					to.x - to.we, -to.no, // Point A
+					to.x + to.ea, -to.no, // Point B
 						
 					to.y + to.up, to.y - to.dn, // Top & bottom same
 					to.y + to.up, to.y - to.dn, // same here
@@ -159,8 +160,8 @@ public class Scene {
 
 				// East
 				colliders.get(i).walls[1] = new float[] {
-					to.z + to.ea, to.z - to.no,
-					to.z + to.ea, to.z + to.so,
+					to.ea, to.z - to.no,
+					to.ea, to.z + to.so,
 					
 					to.y + to.up, to.y - to.dn,
 					to.y + to.up, to.y - to.dn,
@@ -168,8 +169,8 @@ public class Scene {
 
 				// South
 				colliders.get(i).walls[2] = new float[] {
-					to.x - to.we, to.z + to.so, // Point A
-					to.x + to.ea, to.z + to.so, // Point B
+					to.x - to.we, to.so, // Point A
+					to.x + to.ea, to.so, // Point B
 						
 					to.y + to.up, to.y - to.dn, // Top & bottom same
 					to.y + to.up, to.y - to.dn, // same here
@@ -177,15 +178,19 @@ public class Scene {
 
 				// West
 				colliders.get(i).walls[3] = new float[] {
-					to.z - to.we, to.z - to.no,
-					to.z - to.we, to.z + to.so,
+					-to.we, to.z - to.no,
+					-to.we, to.z + to.so,
 					
 					to.y + to.up, to.y - to.dn,
 					to.y + to.up, to.y - to.dn,
 					-1, 0};
 
-				// loop through other colliders and check for collisions
-
+				// loop through other colliders and check for collisions, make wall holes
+				List<float[]> NHole = new ArrayList<float[]>();
+				List<float[]> EHole = new ArrayList<float[]>();
+				List<float[]> SHole = new ArrayList<float[]>();
+				List<float[]> WHole = new ArrayList<float[]>();
+			
 				boolean[] exposedWalls = new boolean[] {false, false, false,
 						false, false, false};
 				boolean xInt, yInt, zInt;
@@ -245,6 +250,11 @@ public class Scene {
 													+ (co.x - to.x), -co.dn
 													+ (co.y - to.y), co.ea
 													+ co.we, co.up + co.dn)));
+									NHole.add(new float[] {-co.we
+											+ (co.x - to.x), -co.dn
+											+ (co.y - to.y), co.ea
+											+ co.we, co.up + co.dn});
+									//-to.we
 								}
 
 								// East
@@ -255,6 +265,10 @@ public class Scene {
 													+ (co.z - to.z), -co.dn
 													+ (co.y - to.y), co.so
 													+ co.no, co.up + co.dn)));
+									EHole.add(new float[] {-co.no
+											+ (co.z - to.z), -co.dn
+											+ (co.y - to.y), co.so
+											+ co.no, co.up + co.dn});
 								}
 
 								// South
@@ -265,6 +279,10 @@ public class Scene {
 													+ (co.x - to.x), -co.dn
 													+ (co.y - to.y), co.ea
 													+ co.we, co.up + co.dn)));
+									SHole.add(new float[] {-co.we
+											+ (co.x - to.x), -co.dn
+											+ (co.y - to.y), co.ea
+											+ co.we, co.up + co.dn});
 								}
 
 								// West
@@ -275,6 +293,10 @@ public class Scene {
 													+ (co.z - to.z), -co.dn
 													+ (co.y - to.y), co.so
 													+ co.no, co.up + co.dn)));
+									WHole.add(new float[] {-co.no
+											+ (co.z - to.z), -co.dn
+											+ (co.y - to.y), co.so
+											+ co.no, co.up + co.dn});
 								}
 							}
 
@@ -283,11 +305,17 @@ public class Scene {
 						}
 					}
 				}
+				
+				colliders.get(i).rectHoles = new float[4][][];
+				colliders.get(i).rectHoles[0] = NHole.toArray(new float[NHole.size()][]);
+				colliders.get(i).rectHoles[1] = EHole.toArray(new float[EHole.size()][]);
+				colliders.get(i).rectHoles[2] = SHole.toArray(new float[SHole.size()][]);
+				colliders.get(i).rectHoles[3] = WHole.toArray(new float[WHole.size()][]);
 
 				for (int j = 0; j < walls.length; j++) {
 
 					/*
-					 * Old and inefficient collision system
+					 * Old and inefficient wall system
 					 * 
 					 * List<List<Double[]>> list = new
 					 * ArrayList<List<Double[]>>(); double[] coords = new
@@ -461,6 +489,7 @@ public class Scene {
 					c.collisions[c.collisionAmt][2] = 0;
 					c.collisions[c.collisionAmt][3] = (temp1.y - temp1.dn) - (e.getPosition().y - c.dn);
 					c.collisionAmt ++;
+					//System.out.println("bottom");
 				}
 				
 				// Top
@@ -474,39 +503,65 @@ public class Scene {
 				}
 				
 				for (int j = 0; j < temp1.walls.length; j++) {
+					
+					// Make a new matrix
 					Matrix3f mat = new Matrix3f();
+					
 					TTT.rotateByUnitVector(mat,
-							temp1.walls[j][8],
-							temp1.walls[j][9],
+							temp1.walls[j][8], // normal x
+							temp1.walls[j][9], // normal y
 							0, -1, 0);
 					
 					
-					mat.invert();
-					Vector3f pointA = new Vector3f(
+					mat.invert(); // invert it
+					
+					Vector3f pointA = new Vector3f( // wall point A
 							temp1.walls[j][0],
 							0,
 							temp1.walls[j][1]);
-					Vector3f pointB = new Vector3f(
+					Vector3f pointB = new Vector3f( // wall point B
 							temp1.walls[j][2],
 							0,
 							temp1.walls[j][3]);
+					
+					
 					Vector3f pos = new Vector3f();
-					mat.transform(e.getPosition(), pos);
+					pos.add(e.getPosition());
+					pos.sub(temp1.x, temp1.y, temp1.z);
+					mat.transform(pos, pos);
 					mat.transform(pointA);
 					mat.transform(pointB);
-					if (KInput.buttonIsDown(2)) {
-						System.out.println(eggs[j] + ": " + (pointA.x - pos.x));
-					}
 					
 					if (pointA.x - pos.x < c.radius) {
 						// Collision Detected with Wall!
 						
-						c.collisions[c.collisionAmt][0] = temp1.walls[j][8];
-						c.collisions[c.collisionAmt][1] = 0;
-						c.collisions[c.collisionAmt][2] = temp1.walls[j][9];
-						c.collisions[c.collisionAmt][3] = pointA.x - pos.x - c.radius;
-						c.collisionAmt ++;
+						//System.out.println((float) Math.cos((pointA.x - pos.x) * (Math.PI / c.radius / 2)));
 						
+						// Too much formal code... needs something informal right now
+						// it really motivates me
+						boolean fucked = false;
+						float val = (float) Math.cos((pointA.x - pos.x) * (Math.PI / c.radius / 2));
+						
+						for (int k = 0; k < temp1.rectHoles[j].length; k++) {
+							// check if in hole
+							// temp1.rectHoles[i][k][0] is x
+							// temp1.rectHoles[i][k][1] is y
+							
+							if (temp1.rectHoles[j][k][0] < pos.z + val
+								&& temp1.rectHoles[j][k][0] + temp1.rectHoles[j][k][2] > pos.z - val
+								&& temp1.rectHoles[j][k][1] < pos.y + c.dn // c.up cancels out: pos.y - c.up + c.up + c.dn
+								&& temp1.rectHoles[j][k][1] + temp1.rectHoles[j][k][3] > pos.y - c.up) {
+								fucked = true;
+							}
+						}
+						
+						if (!fucked) {
+							c.collisions[c.collisionAmt][0] = temp1.walls[j][8];
+							c.collisions[c.collisionAmt][1] = 0;
+							c.collisions[c.collisionAmt][2] = temp1.walls[j][9];
+							c.collisions[c.collisionAmt][3] = pointA.x - pos.x - c.radius;
+							c.collisionAmt ++;
+						}
 					}
 					
 				}
