@@ -45,6 +45,7 @@ import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.KInput;
+import vendalenger.kondion.KMath;
 import vendalenger.kondion.collision.FixedCylinderCollider;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -149,40 +150,43 @@ public class Scene {
 				// unit normx, unit normy,
 				// holex, holey, holewidth, holeheight}
 
+				//walls[2] = new Area(new Rectangle2D.Double(-to.we, -to.dn,
+				//		to.we + to.ea, to.up + to.dn));
+				
 				// North
 				colliders.get(i).walls[0] = new float[] {
-					to.x - to.we, -to.no, // Point A
-					to.x + to.ea, -to.no, // Point B
+					-to.we, -to.no, // Point A
+					to.ea, -to.no, // Point B
 						
-					to.y + to.up, to.y - to.dn, // Top & bottom same
-					to.y + to.up, to.y - to.dn, // same here
+					to.up, -to.dn, // Top & bottom same
+					to.up, -to.dn, // same here
 					0, -1};
 
 				// East
 				colliders.get(i).walls[1] = new float[] {
-					to.ea, to.z - to.no,
-					to.ea, to.z + to.so,
+					to.ea, -to.no,
+					to.ea, to.so,
 					
-					to.y + to.up, to.y - to.dn,
-					to.y + to.up, to.y - to.dn,
+					to.up, -to.dn,
+					to.up, -to.dn,
 					1, 0};
 
 				// South
 				colliders.get(i).walls[2] = new float[] {
-					to.x - to.we, to.so, // Point A
-					to.x + to.ea, to.so, // Point B
+					to.ea, to.so, // Point A
+					-to.we, to.so, // Point B
 						
-					to.y + to.up, to.y - to.dn, // Top & bottom same
-					to.y + to.up, to.y - to.dn, // same here
+					to.up, -to.dn, // Top & bottom same
+					to.up, -to.dn, // same here
 					0, 1};
-
+				
 				// West
 				colliders.get(i).walls[3] = new float[] {
-					-to.we, to.z - to.no,
-					-to.we, to.z + to.so,
+					-to.we, -to.no,
+					-to.we, to.so,
 					
-					to.y + to.up, to.y - to.dn,
-					to.y + to.up, to.y - to.dn,
+					to.up, -to.dn,
+					to.up, -to.dn,
 					-1, 0};
 
 				// loop through other colliders and check for collisions, make wall holes
@@ -190,7 +194,9 @@ public class Scene {
 				List<float[]> EHole = new ArrayList<float[]>();
 				List<float[]> SHole = new ArrayList<float[]>();
 				List<float[]> WHole = new ArrayList<float[]>();
-			
+				List<float[]> FHole = new ArrayList<float[]>();
+				List<float[]> CHole = new ArrayList<float[]>();
+				
 				boolean[] exposedWalls = new boolean[] {false, false, false,
 						false, false, false};
 				boolean xInt, yInt, zInt;
@@ -230,6 +236,10 @@ public class Scene {
 													+ (co.x - to.x), -co.no
 													+ (co.z - to.z), co.we
 													+ co.ea, co.no + co.so)));
+									FHole.add(new float[] {-co.we
+											+ (co.x - to.x), -co.no
+											+ (co.z - to.z), co.we
+											+ co.ea, co.no + co.so});
 								}
 
 								// Ceiling
@@ -240,6 +250,10 @@ public class Scene {
 													+ (co.x - to.x), -co.no
 													+ (co.z - to.z), co.we
 													+ co.ea, co.no + co.so)));
+									CHole.add(new float[] {-co.we
+											+ (co.x - to.x), -co.no
+											+ (co.z - to.z), co.we
+											+ co.ea, co.no + co.so});
 								}
 
 								// North
@@ -283,6 +297,14 @@ public class Scene {
 											+ (co.x - to.x), -co.dn
 											+ (co.y - to.y), co.ea
 											+ co.we, co.up + co.dn});
+									System.out.println("South hole: #" + i + " "
+											+ (-co.we
+													+ (co.x - to.x)) + " "
+											+ (-co.dn
+													+ (co.y - to.y)) + " "
+											+ (co.ea
+													+ co.we) + " "
+											+ (co.up + co.dn));
 								}
 
 								// West
@@ -306,11 +328,13 @@ public class Scene {
 					}
 				}
 				
-				colliders.get(i).rectHoles = new float[4][][];
+				colliders.get(i).rectHoles = new float[6][][];
 				colliders.get(i).rectHoles[0] = NHole.toArray(new float[NHole.size()][]);
 				colliders.get(i).rectHoles[1] = EHole.toArray(new float[EHole.size()][]);
 				colliders.get(i).rectHoles[2] = SHole.toArray(new float[SHole.size()][]);
 				colliders.get(i).rectHoles[3] = WHole.toArray(new float[WHole.size()][]);
+				colliders.get(i).rectHoles[4] = FHole.toArray(new float[FHole.size()][]);
+				colliders.get(i).rectHoles[5] = CHole.toArray(new float[CHole.size()][]);
 
 				for (int j = 0; j < walls.length; j++) {
 
@@ -477,32 +501,69 @@ public class Scene {
 			if ((temp1.y + temp1.up > e.getPosition().y - c.up - c.dn)
 					&& (temp1.y - temp1.dn < e.getPosition().y + c.dn + c.up)
 					&& (temp1.x - temp1.we < e.getPosition().x && e.getPosition().x < temp1.x + temp1.ea)
-					&& (temp1.z - temp1.no < e.getPosition().z && e.getPosition().z < temp1.z + temp1.so)) {
+					&& (temp1.z - temp1.no < e.getPosition().z && e.getPosition().z < temp1.z + temp1.so)
+					
+					&& (temp1.y + temp1.up >= e.getPrevPos().y + c.up)
+					&& (temp1.y - temp1.dn <= e.getPrevPos().y - c.dn)
+					) {
+				
+				/*KMath.axisAlignedCollision(
+					temp1.x - temp1.we, temp1.z - temp1.no, temp1.we + temp1.ea, temp1.no + temp1.so,
+					e.getPosition().x - c.radius, e.getPosition().z - c.radius, c.radius * 2, c.radius * 2)*/
 				// In range!
 				
 				// Now do height collisions
 				// Bottom
+				
+				boolean holed = false;
 				if (temp1.y - temp1.dn > e.getPosition().y - c.dn) {
-					// You tripped
-					c.collisions[c.collisionAmt][0] = 0;
-					c.collisions[c.collisionAmt][1] = 1;
-					c.collisions[c.collisionAmt][2] = 0;
-					c.collisions[c.collisionAmt][3] = (temp1.y - temp1.dn) - (e.getPosition().y - c.dn);
-					c.collisionAmt ++;
+					for (int j = 0; j < temp1.rectHoles[4].length; j++) {
+						
+						/*if (
+						temp1.rectHoles[4][j][0] + c.radius * 2 < e.getPosition().x + c.radius - temp1.x // if not under hole, axis aligned collision formula
+						&& temp1.rectHoles[4][j][0] + temp1.rectHoles[4][j][2] - c.radius * 2 > e.getPosition().x - c.radius - temp1.x
+						&& temp1.rectHoles[4][j][1] + c.radius * 2 < e.getPosition().z + c.radius - temp1.z
+						&& temp1.rectHoles[4][j][3] + temp1.rectHoles[4][j][1] - c.radius * 2 > e.getPosition().z - c.radius - temp1.z
+						) {*/
+						if (KMath.axisAlignedInside(
+								temp1.rectHoles[4][j][0], temp1.rectHoles[4][j][1], temp1.rectHoles[4][j][2], temp1.rectHoles[4][j][3],
+								e.getPosition().x - c.radius - temp1.x, e.getPosition().z - c.radius - temp1.z, c.radius * 2, c.radius * 2)) {
+							holed = true;
+							
+						}
+					}
+					if (!holed) {
+						// You tripped (touched floor)
+						c.collisions[c.collisionAmt][0] = 0;
+						c.collisions[c.collisionAmt][1] = 1;
+						c.collisions[c.collisionAmt][2] = 0;
+						c.collisions[c.collisionAmt][3] = (temp1.y - temp1.dn) - (e.getPosition().y - c.dn);
+						c.collisionAmt ++;
+					}
 					//System.out.println("bottom");
 				}
 				
+				holed = false;
 				// Top
 				if (temp1.y + temp1.up < e.getPosition().y + c.up) {
-					// You raised the roof
-					c.collisions[c.collisionAmt][0] = 0;
-					c.collisions[c.collisionAmt][1] = -1;
-					c.collisions[c.collisionAmt][2] = 0;
-					c.collisions[c.collisionAmt][3] = ((e.getPosition().y + c.up) - (temp1.y + temp1.up));
-					c.collisionAmt ++;
+					for (int j = 0; j < temp1.rectHoles[5].length; j++) {
+						if (KMath.axisAlignedInside(
+								temp1.rectHoles[5][j][0], temp1.rectHoles[5][j][1], temp1.rectHoles[5][j][2], temp1.rectHoles[5][j][3],
+								e.getPosition().x - c.radius - temp1.x, e.getPosition().z - c.radius - temp1.z, c.radius * 2, c.radius * 2)) {
+							holed = true;
+						}
+					}
+					if (!holed) {
+						// You raised the roof
+						c.collisions[c.collisionAmt][0] = 0;
+						c.collisions[c.collisionAmt][1] = -1;
+						c.collisions[c.collisionAmt][2] = 0;
+						c.collisions[c.collisionAmt][3] = ((e.getPosition().y + c.up) - (temp1.y + temp1.up));
+						c.collisionAmt ++;
+					}
 				}
 				
-				for (int j = 0; j < temp1.walls.length; j++) {
+				for (int j = 0; j < 4; j++) {
 					
 					// Make a new matrix
 					Matrix3f mat = new Matrix3f();
@@ -541,16 +602,23 @@ public class Scene {
 						// it really motivates me
 						boolean fucked = false;
 						float val = (float) Math.cos((pointA.x - pos.x) * (Math.PI / c.radius / 2));
-						
 						for (int k = 0; k < temp1.rectHoles[j].length; k++) {
 							// check if in hole
 							// temp1.rectHoles[i][k][0] is x
 							// temp1.rectHoles[i][k][1] is y
 							
-							if (temp1.rectHoles[j][k][0] < pos.z + val
+							/*if (temp1.rectHoles[j][k][0] < pos.z + val // axis aligned collision formula
 								&& temp1.rectHoles[j][k][0] + temp1.rectHoles[j][k][2] > pos.z - val
 								&& temp1.rectHoles[j][k][1] < pos.y + c.dn // c.up cancels out: pos.y - c.up + c.up + c.dn
-								&& temp1.rectHoles[j][k][1] + temp1.rectHoles[j][k][3] > pos.y - c.up) {
+								&& temp1.rectHoles[j][k][1] + temp1.rectHoles[j][k][3] > pos.y - c.up) {*/
+							if (KMath.axisAlignedInside(
+									temp1.rectHoles[j][k][0], temp1.rectHoles[j][k][1], temp1.rectHoles[j][k][2], temp1.rectHoles[j][k][3],
+									pos.z - val, pos.y - c.up, val * 2, c.dn + c.up)) {
+								System.out.println("Collider: #" + i + ", x:" + temp1.x + " y:" + temp1.y + " z:" + temp1.z + " n:" + temp1.no + " e:" + temp1.ea + " s:" + temp1.so + " w:" + temp1.we);
+								System.out.println("Wall: x:" + temp1.walls[j][0] + " y:" + temp1.walls[j][1] + " w:" + temp1.walls[j][2] + " h:" + temp1.walls[j][3]);
+								System.out.println("Hole: #" + j + " " + temp1.rectHoles[j][k][0] + " " + temp1.rectHoles[j][k][1] + " " + temp1.rectHoles[j][k][2] + " " + temp1.rectHoles[j][k][3]);
+								System.out.println("Area: x:" + (pos.z - val) + " y:" + (pos.y - c.up) + " w:" + (val * 2) + " h:" + (c.dn + c.up));
+								System.out.println("Entity: x:" + e.getPosition().x + " y:" + e.getPosition().y + " z:" + e.getPosition().z);
 								fucked = true;
 							}
 						}

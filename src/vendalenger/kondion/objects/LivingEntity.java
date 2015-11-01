@@ -37,6 +37,7 @@ public class LivingEntity extends PhysicEntity {
 	public void move() {
 		// if (intel != null)
 		// intel.tick();
+		prevPos.set(position);
 		if ((boolean) mirror.get("mouseRotate")) {
 			rotation.x += KInput.getMouseDX() / 300;
 			rotation.y -= KInput.getMouseDY() / 300;

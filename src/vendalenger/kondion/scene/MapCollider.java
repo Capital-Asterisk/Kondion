@@ -15,6 +15,7 @@ public class MapCollider {
 	public float[][] walls;
 	
 	// {x, y, width, height}
+	// North, East, South, West, Floor, Ceil
 	public float[][][] rectHoles;
 	
 	// {x1, y1, x2, y2, x3...}

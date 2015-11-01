@@ -40,6 +40,7 @@ var KJS = {
 	java: Java.type("vendalenger.kondion.KJS"),
 	kondion: Java.type("vendalenger.kondion.Kondion"),
 	kinput: Java.type("vendalenger.kondion.KInput"),
+	instance: {},
 	b: {
 		// Buttons go here
 	},

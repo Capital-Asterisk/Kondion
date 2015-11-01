@@ -40,7 +40,16 @@ public class PhysicEntity extends Entity {
 	public PhysicEntity(ProtoEntity p, ScriptObjectMirror m) {
 		super(p, m);
 		velocity = new Vector3f();
+		prevPos = new Vector3f();
 		colliders = new ArrayList<EntityCollider>();
+	}
+	
+	public float getGravity() {
+		return gravity;
+	}
+
+	public void setGravity(float gravity) {
+		this.gravity = gravity;
 	}
 
 	public void thrust(float x, float y, float z) {
@@ -60,10 +69,6 @@ public class PhysicEntity extends Entity {
 			velocity.x -= (float) Math.cos(radian) * amt;
 			velocity.z -= (float) Math.sin(radian) * amt;
 		}
-	}
-
-	public Vector3f getVelocity() {
-		return velocity;
 	}
 
 	public void collideTerrain() {
@@ -98,6 +103,7 @@ public class PhysicEntity extends Entity {
 
 	public void move() {
 		collideTerrain();
+		prevPos.set(position);
 		position.x += velocity.x * Kondion.getDelta();
 		position.y += velocity.y * Kondion.getDelta();
 		position.z += velocity.z * Kondion.getDelta();
@@ -106,5 +112,13 @@ public class PhysicEntity extends Entity {
 		// velocity.x *= drag;
 		// velocity.y *= drag;
 		// velocity.z *= drag;
+	}
+	
+	public Vector3f getVelocity() {
+		return velocity;
+	}
+	
+	public Vector3f getPrevPos() {
+		return prevPos;
 	}
 }
