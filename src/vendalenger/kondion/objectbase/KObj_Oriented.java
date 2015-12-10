@@ -14,23 +14,14 @@
  * the License.
  */
 
-package vendalenger.kondion.scene;
+package vendalenger.kondion.objectbase;
 
-import java.util.ArrayList;
+import org.joml.Vector3f;
 
-import vendalenger.kondion.objectbase.KObj_Node;
-import vendalenger.kondion.objectbase.KObj_Renderable;
-
-public class Scene extends KObj_Node {
+public abstract class KObj_Oriented extends KObj_Node {
 	
-	public boolean physic;
-	public boolean render;
-	public boolean update;
+	public final Vector3f pos = new Vector3f();
+	public final Vector3f rot = new Vector3f();
 	
-	public Scene() {
-		physic = false;
-		render = false;
-		update = false;
-		parent = this;
-	}
+	
 }

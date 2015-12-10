@@ -30,8 +30,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
+
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -46,54 +46,42 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
-import argo.jdom.JsonNode;
-import argo.jdom.JsonRootNode;
+import sun.font.Script;
 import vendalenger.kondion.lwjgl.Camera_;
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.objects.Entity;
-import vendalenger.kondion.objects.PhysicEntity;
-import vendalenger.kondion.objects.ProtoEntity;
-import vendalenger.kondion.objects.Traits;
 import vendalenger.kondion.scene.Scene;
 import vendalenger.port.FileShortcuts;
 import vendalenger.port.VD_FlConsole;
+import argo.jdom.JsonNode;
+import argo.jdom.JsonRootNode;
 
 public class Kondion {
 
 	private static JFrame loadingScreen;
 
 	private static Camera_ currentCamera;
-	private static Scene currentScene;
-	private static List<Entity> entityList;
 	private static KondionGame game;
-	private static Thread gameThread;
+	private static Scene currentScene;
 	private static ScriptEngine jsEngine;
-	private static List<ScriptObjectMirror> mirrorList;
-	private static List<ProtoEntity> pEntityList;
+	private static Thread gameThread;
 
 	private static long ticks;
 	private static float delta;
 
-	public static void eggs() {
-		System.out.println("EGGS");
-		for (int i = 0; i < entityList.size(); i++) {
-			System.out.println(entityList.get(i));
-		}
-	}
-
-	public static void gameLoop() {
+	private static void gameLoop() {
 		// if (GLFW.glfwGetKey(Initializer.window, GLFW.) == GL_TRUE) {
 		// currentCamera.getEye().z += 0.1;
 		// }
 		currentCamera = new Camera_();
 		currentCamera.look(0, 0, 8, 0, 0, 0);
-
-		currentScene = new Scene();
-
 		// currentScene.doGlBuffers();
+		
+		// DEBUG
+		currentScene = new Scene();
+		// END
 
 		try {
 			((Invocable) jsEngine).invokeFunction("start");
@@ -109,32 +97,10 @@ public class Kondion {
 		long prevTime = 0l;
 
 		Window.setWindowVisible(true);
-
-		currentScene.doGlBuffers();
-
+		
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
 			prevTime = System.nanoTime();
 			delta = time / 1000000000.0f;
-
-			// Updating
-			// currentScene.getColliders().get(0).no += 0.01;
-			// System.out.println(delta);
-			// currentScene.getColliders().get(0).so += delta;
-			// currentScene.getColliders().get(0).z += delta / 2;
-			// currentScene.getColliders().get(0).ea += 0.03;
-			// currentScene.getColliders().get(0).we += 0.001;
-			// currentScene.doGlBuffers();
-
-			KInput.update();
-
-			for (int i = 0; i < mirrorList.size(); i++) {
-				if (ticks % entityList.get(i).getTickInterval() == 0)
-					mirrorList.get(i).callMember("tick", mirrorList.get(i));
-			}
-			for (Entity entity : entityList) {
-				if (entity instanceof PhysicEntity)
-					((PhysicEntity) entity).move();
-			}
 
 			currentCamera.update();
 
@@ -147,17 +113,14 @@ public class Kondion {
 																// framebuffer
 			// currentCamera.gluLookAt();
 
-			currentScene.render();
-
-			for (int i = 0; i < entityList.size(); i++) {
-				entityList.get(i).render();
-			}
-
+			/*for (int i = 0; i < currentScene.getRenders().size(); i++) {
+				currentScene.getRenders().get(i).render();
+				
+			}*/
+			
 			ticks++;
 			Window.update();
-
-			// System.out.println(delta / 1000000.0f);
-
+			
 			time = System.nanoTime() - prevTime;
 
 		}
@@ -169,13 +132,9 @@ public class Kondion {
 	public static Camera_ getCurrentCamera() {
 		return currentCamera;
 	}
-
+	
 	public static Scene getCurrentScene() {
 		return currentScene;
-	}
-
-	public static List<Entity> getEntityList() {
-		return entityList;
 	}
 
 	public static KondionGame getGame() {
@@ -189,17 +148,9 @@ public class Kondion {
 	public static Thread getGameThread() {
 		return gameThread;
 	}
-
-	public static List<ScriptObjectMirror> getMirrorList() {
-		return mirrorList;
-	}
-
+	
 	public static ScriptEngine getNashorn() {
 		return jsEngine;
-	}
-
-	public static List<ProtoEntity> getProtoEntityList() {
-		return pEntityList;
 	}
 
 	public static void run(KondionGame g) {
@@ -238,9 +189,6 @@ public class Kondion {
 							.getStringValue("GameName"));
 					GLContext.createFromCurrent();
 					
-					entityList = new ArrayList<Entity>();
-					mirrorList = new ArrayList<ScriptObjectMirror>();
-					pEntityList = new ArrayList<ProtoEntity>();
 					jsEngine = new ScriptEngineManager()
 							.getEngineByName("nashorn");
 
@@ -312,7 +260,6 @@ public class Kondion {
 					}
 
 					System.out.println("Doing other stuff...");
-					Traits.initDefault();
 					FlatDrawing.setup();
 
 					System.out.print("Loading game scripts...");
@@ -340,8 +287,9 @@ public class Kondion {
 		});
 		gameThread.start();
 	}
-
-	public static void setCurrentScene(Scene cs) {
-		currentScene = cs;
+	
+	public static void eggs() {
+		System.out.println("EGGS");
 	}
+
 }

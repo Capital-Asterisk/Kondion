@@ -636,6 +636,12 @@ public class Command {
 				VD_FlConsole.println("Fluffy Console error:");
 				VD_FlConsole.println(errorMessage);
 			}
+		} else {
+			try {
+				Kondion.getNashorn().eval(said);
+			} catch (ScriptException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

@@ -19,6 +19,10 @@ by: Neal Nicdao
 A game engine based mostly on LWJGL and Java Nashorn.
 Currently in development
 
+K[name here] is only used in the source code and files to avoid conflict with
+KDE. Kondion will be in the name of other Kondion related content.
+
+
 Credits
 
 Argo: argo-3.12.jar

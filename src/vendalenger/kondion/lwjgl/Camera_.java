@@ -25,7 +25,6 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import vendalenger.kondion.KInput;
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.objects.Entity;
 
 /*
  * Camera_ is a traditional name... my first 3d game had a class called Camera_.
@@ -46,7 +45,7 @@ public class Camera_ {
 	private Matrix4f prespectiveMatrix;
 
 	// Camera control
-	private Entity bind = null;
+	//private Entity bind = null;
 	private Vector3f rotLock = null;
 
 	private int[] upDownLeftRight = {0, 0, 0, 0};
@@ -98,10 +97,10 @@ public class Camera_ {
 		center.z = (float) (Math.sin(yaw) * Math.cos(p)) + eye.z;
 	}
 
-	public void bindToEntity(Entity e) {
+	/*public void bindToEntity(Entity e) {
 		bind = e;
 		freeMode = false;
-	}
+	}*/
 
 	/**
 	 * Calculate yaw and pitch, center must be normal
@@ -139,9 +138,9 @@ public class Camera_ {
 		up.set(tempVector2.x, tempVector2.y, tempVector2.z);
 	}
 
-	public Entity getBindEntity() {
+	/*public Entity getBindEntity() {
 		return bind;
-	}
+	}*/
 
 	/**
 	 * Get the center (The xyz of where you want to look)
@@ -259,7 +258,7 @@ public class Camera_ {
 	}
 
 	public void unbind() {
-		bind = null;
+		//bind = null;
 	}
 
 	public void update() {
@@ -267,7 +266,7 @@ public class Camera_ {
 			calculateAngle();
 			tempVector0.set(0, 0, 0);
 			cameraSpeed = Kondion.getDelta() * 6;
-			bind = null;
+			//bind = null;
 			if (KInput.buttonIsDown(upDownLeftRight[0])) {
 				// forward
 				eye.x += (center.x - eye.x) * cameraSpeed;
@@ -298,11 +297,11 @@ public class Camera_ {
 				center.x += tempVector0.x * cameraSpeed;
 				center.z += tempVector0.y * cameraSpeed;
 			}
-		} else if (bind != null) {
+		}/* else if (bind != null) {
 			eye.x = bind.getPosition().x;
 			eye.y = bind.getPosition().y;
 			eye.z = bind.getPosition().z;
-		}
+		}*/
 		if (rotLock != null) {
 			yaw = rotLock.x;
 			pitch = rotLock.y;

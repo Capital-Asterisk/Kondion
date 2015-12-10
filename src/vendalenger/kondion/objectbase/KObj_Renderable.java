@@ -14,23 +14,16 @@
  * the License.
  */
 
-package vendalenger.kondion.scene;
+package vendalenger.kondion.objectbase;
 
-import java.util.ArrayList;
+import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.materials.KMat_erial;
 
-import vendalenger.kondion.objectbase.KObj_Node;
-import vendalenger.kondion.objectbase.KObj_Renderable;
-
-public class Scene extends KObj_Node {
+public abstract class KObj_Renderable extends KObj_Oriented {
 	
-	public boolean physic;
-	public boolean render;
-	public boolean update;
+	protected KondionTexture texture;
+	protected KMat_erial material;
 	
-	public Scene() {
-		physic = false;
-		render = false;
-		update = false;
-		parent = this;
-	}
+	public abstract void render();
+	
 }
