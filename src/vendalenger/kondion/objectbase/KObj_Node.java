@@ -18,143 +18,175 @@ package vendalenger.kondion.objectbase;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import jdk.nashorn.api.scripting.AbstractJSObject;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import org.joml.Vector3f;
 
+import com.sun.xml.internal.ws.util.StringUtils;
+
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.scene.Scene;
+import vendalenger.kondion.kobj.Scene;
 
 
 public abstract class KObj_Node implements Map<String, KObj_Node> {
 
-	public final List<KObj_Node> children;
+	protected static final boolean pointer = true;
+	
+	protected final List<KObj_Node> children;
+	protected final List<String> childNames;
 	protected KObj_Node parent;
 	public String name;
 	public ScriptObjectMirror s;
 	
+	public abstract void update();
+	
 	public KObj_Node() {
 		children = new ArrayList<KObj_Node>();
-	}
-
-	/**
-	 * Add an object to this object.
-	 * <pre>
-	 * {@code
-	 * scene.add(floor);
-	 * }
-	 * </pre>
-	 * @param e A new object to add
-	 * @return this
-	 */
-	public KObj_Node add(KObj_Node e) {
-		e.parent = this;
-		return this;
+		childNames = new ArrayList<String>();
+		name = getClass().getSimpleName();
 	}
 	
-	/**
-	 * Add multiple objects to this object.
-	 * <pre>
-	 * {@code
-	 * scene.addMulti(objA, objB, objC, objD);
-	 * }
-	 * </pre>
-	 * @param e A new object to add
-	 * @return this
-	 */
-	public KObj_Node addMulti(KObj_Node... list) {
-		for (KObj_Node e : list) {
-			e.parent = this;
-		}
-		return this;
-	}
-	
-	public Scene getScene() {
+	/*public Scene getScene() {
 		KObj_Node eggs = this.parent;
 		while (!(eggs instanceof Scene)) {
 			eggs = eggs.parent;
-			/*if (eggs == this) {
-				System.err.println("PARENT LOOP DETECTED");
-				return null;
-			}*/
+			//if (eggs == this) {
+			//	System.err.println("PARENT LOOP DETECTED");
+			//	return null;
+			//}
 		}
 		return (Scene) eggs;
+	}*/
+	
+	public String nameTree() {
+		String s = "****Tree for " + name + "****";
+		for (int i = 0; i < size(); i++) {
+			s += "\n";
+			s += childNames.get(i);
+			if (children.get(i).size() > 0) {
+				s = children.get(i).nameTree(s, 1);
+			}
+		}
+		return s;
 	}
 	
+	public String nameTree(String current, int depth) {
+		for (int i = 0; i < size(); i++) {
+			current += "\n";
+			current += new String(new char[depth]).replace("\0", "-");
+			current += childNames.get(i);
+			if (children.get(i).size() > 0)
+				current = children.get(i).nameTree(current, depth + 1);
+		}
+		return current;
+	}
+	
+	public String listChildren() {
+		String s = "****Children of " + name + "****";
+		for (String name : childNames) {
+			s += "\n-" + name;
+		}
+		return s;
+	}
+	
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 	
 	@Override
 	public int size() {
-		// TODO Auto-generated method stub
-		return 0;
+		return children.size();
 	}
 
 	@Override
 	public boolean isEmpty() {
-		// TODO Auto-generated method stub
-		return false;
+		return children.isEmpty() || childNames.isEmpty();
 	}
 
 	@Override
 	public boolean containsKey(Object key) {
-		// TODO Auto-generated method stub
-		return false;
+		return childNames.indexOf(key) != -1;
 	}
 
 	@Override
 	public boolean containsValue(Object value) {
-		// TODO Auto-generated method stub
-		return false;
+		return children.indexOf(value) != -1;
 	}
 
 	@Override
 	public KObj_Node get(Object key) {
-		System.out.println("SCOOP");
-		return null;
+		return children.get(childNames.indexOf(key));
 	}
 
 	@Override
 	public KObj_Node put(String key, KObj_Node value) {
-		System.out.println("POOT");
-		return null;
+		if (key != null && value != null) {
+			if (!containsKey(key)) {
+				children.add(value);
+				childNames.add(key);
+			} else {
+				children.set(childNames.indexOf(key), value);
+			}
+			if (!pointer) {
+				value.parent = this;
+				value.name = key;
+			}
+		}
+		return this;
 	}
 
+	/**
+	 * Remove an object from this node
+	 * @param key Name of the object or the object itself.
+	 */
 	@Override
 	public KObj_Node remove(Object key) {
-		System.out.println("EXTERMINATE");
-		return null;
+		
+		if (key instanceof String) {
+			int index = childNames.indexOf(key);
+			children.remove(index);
+			childNames.remove(index);
+		} else if (key instanceof KObj_Node) {
+			int index = children.indexOf(key);
+			children.remove(index);
+			childNames.remove(index);
+		} else {
+			System.err.println("throw here");
+		}
+		return this;
 	}
 
 	@Override
 	public void putAll(Map<? extends String, ? extends KObj_Node> m) {
-		// TODO Auto-generated method stub
-		
+		System.err.println("Not yet implemented");
 	}
 
 	@Override
 	public void clear() {
-		// TODO Auto-generated method stub
-		
+		children.clear();
+		childNames.clear();
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Set<String> keySet() {
-		// TODO Auto-generated method stub
-		return null;
+		return (Set<String>) Collections.unmodifiableList(childNames);
 	}
 
 	@Override
 	public Collection<KObj_Node> values() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableList(children);
 	}
 
 	@Override
 	public Set<java.util.Map.Entry<String, KObj_Node>> entrySet() {
-		System.out.println("SET!");
 		return null;
 	}
 }

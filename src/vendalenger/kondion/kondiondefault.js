@@ -28,6 +28,9 @@ var Vector2d = Java.type("org.joml.Vector2d");
 var Vector3d = Java.type("org.joml.Vector3d");
 var Vector4d = Java.type("org.joml.Vector4d");
 
+var KObj_Board = Java.type("vendalenger.kondion.kobj.KObj_Board");
+var Scene = Java.type("vendalenger.kondion.kobj.KObj_Board");
+
 //^kdion.rungamedir (electricfence/kondion.json)
 var KJS = {
 	java: Java.type("vendalenger.kondion.KJS"),
@@ -36,7 +39,7 @@ var KJS = {
 	b: {
 		// Buttons go here
 	},
-	c: {
+	cam: {
 		freeCam: function(mode) {KJS.kondion.getCurrentCamera().setFreeMode(mode);},
 		bindCam: function(ent) {KJS.kondion.getCurrentCamera().bindToEntity(ent)}
 	},
@@ -51,15 +54,12 @@ var KJS = {
 	o: {
 		
 	},
-	r: {
-		Board: Java.type("vendalenger.kondion.kobj.KObj_Board")
-	},
 	eggs: function() {
 		KJS.kondion.eggs();
 	}
 };
 
-var scene;
+var SCN;
 
 var patchObject = function(obj, patch) {
 	for (var aname in patch) {
@@ -67,3 +67,8 @@ var patchObject = function(obj, patch) {
 	}
 	return obj;
 };
+
+var kondionInit = function() {
+	SCN = KJS.kondion.getCurrentScene();
+	delete kondionInit;
+}

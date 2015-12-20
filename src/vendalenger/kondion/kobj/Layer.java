@@ -14,23 +14,28 @@
  * the License.
  */
 
-package vendalenger.kondion.scene;
-
-import java.util.ArrayList;
+package vendalenger.kondion.kobj;
 
 import vendalenger.kondion.objectbase.KObj_Node;
-import vendalenger.kondion.objectbase.KObj_Renderable;
 
-public class Scene extends KObj_Node {
+public class Layer extends KObj_Node {
+	
+	protected static final boolean pointer = false;
 	
 	public boolean physic;
 	public boolean render;
 	public boolean update;
 	
-	public Scene() {
+	public Layer() {
 		physic = false;
 		render = false;
 		update = false;
 		parent = this;
+	}
+
+	@Override
+	public void update() {
+		// TODO Auto-generated method stub
+		
 	}
 }

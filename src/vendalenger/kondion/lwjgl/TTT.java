@@ -140,7 +140,6 @@ public class TTT {
 			}
 			contours[i + 1] = areaSegments.get(i).size();
 		}
-
 		ArrayList<ArrayList<Integer>> res = Triangulation.triangulate(
 				contours.length, contours,
 				vertices.toArray(new double[vertices.size()][]));

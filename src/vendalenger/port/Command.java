@@ -638,7 +638,7 @@ public class Command {
 			}
 		} else {
 			try {
-				Kondion.getNashorn().eval(said);
+				System.out.println(Kondion.getNashorn().eval(said));
 			} catch (ScriptException e) {
 				e.printStackTrace();
 			}

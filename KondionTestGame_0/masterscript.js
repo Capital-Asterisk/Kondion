@@ -13,5 +13,11 @@ var init = function() {
 
 var start = function() {
 	KJS.g.setMouseGrab(true);
-	//KJS.kondion.getCurrentScene().add(new KJS.r.Board());
+	SCN.Apple = new KObj_Board();
+	SCN.Apple.Seeds = new KObj_Board();
+	SCN.Apple.Seeds.Poison = new KObj_Board();
+	
+	SCN.Foo = new KObj_Board();
+	SCN.Foo.Bar = new KObj_Board();
+	SCN.Foo.Bar.HelloWorld = new KObj_Board();
 };

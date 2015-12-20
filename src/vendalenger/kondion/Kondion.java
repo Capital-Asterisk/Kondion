@@ -47,12 +47,12 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
 import sun.font.Script;
+import vendalenger.kondion.kobj.Scene;
 import vendalenger.kondion.lwjgl.Camera_;
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.scene.Scene;
 import vendalenger.port.FileShortcuts;
 import vendalenger.port.VD_FlConsole;
 import argo.jdom.JsonNode;
@@ -84,6 +84,7 @@ public class Kondion {
 		// END
 
 		try {
+			((Invocable) jsEngine).invokeFunction("kondionInit");
 			((Invocable) jsEngine).invokeFunction("start");
 		} catch (NoSuchMethodException e) {
 			e.printStackTrace();
