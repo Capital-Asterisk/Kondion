@@ -29,4 +29,8 @@ public class KJS {
 	public static void issueCommand(String msg) {
 		Command.issue(msg, false);
 	}
+	
+	public static float fps() {
+		return Kondion.getFramerate();
+	}
 }

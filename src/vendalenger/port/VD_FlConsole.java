@@ -18,12 +18,13 @@ package vendalenger.port;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontFormatException;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.RenderingHints;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
@@ -45,6 +46,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
+import javax.sound.sampled.LineUnavailableException;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -56,9 +63,17 @@ import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.Timer;
 import javax.swing.WindowConstants;
 
-public class VD_FlConsole { /* The Fluffy console! Version 4! */
+import vendalenger.kondion.Kondion;
+
+public class VD_FlConsole { /* The Fluffy console! Version 6! +20% Ram usage! */
+
+	public static Color background;
+	public static Color foreground;
+	public static Font terminus;
+	public static Font terminusDerived;
 
 	public static class consoleWindow {
 		public static JFrame consoleWindow;
@@ -67,8 +82,7 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 		public static JTextField input;
 		public static JPanel inputBar;
 		public static JButton inputButton;
-		public static JScrollPane jsp;
-		public static JTextArea jta;
+
 		public static JButton outputButton;
 	}
 
@@ -78,22 +92,20 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 	private static int outputTo = 0;
 	private static List<FluffyListener> listeners;
 	private static Dimension size;
-	private static Font terminus;
-	private static int fcVersion = 5;
+	private static final int fcVersion = 6;
 
 	public static void addStream(FluffyListener listener) {
-		listener.index = listeners.size();
 		listeners.add(listener);
 		new Thread(listener).start();
 	}
 
 	/**
-	 * Clear the console window. Make sure that the console window is already
-	 * initialized.
+	 * Clear the current console window
 	 */
 	public static void clear() {
+		// TODO
 		listeners.get(outputTo).clear();
-		consoleWindow.jta.setText("");
+		// consoleWindow.jta.setText("");
 	}
 
 	/**
@@ -124,11 +136,238 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 	 */
 	public static void initConsole(int width, int height, boolean system) {
 
+		System.out.println("To see console output, please use -fc false");
+
 		listeners = new ArrayList<FluffyListener>();
 		size = new Dimension(width, height);
 
+		// Create window
+
+		// Load the terminus font
+
+		try {
+			terminus = Font.createFont(Font.TRUETYPE_FONT,
+					VD_FlConsole.class.getResourceAsStream("terminusbold.ttf"));
+			terminusDerived = terminus.deriveFont(12.0f);
+		} catch (FontFormatException e1) {
+			e1.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+
+		Image back = Toolkit.getDefaultToolkit().getImage(
+				Kondion.class.getResource("kondion_fc.png"));
+
+		// Initialization
+
+		consoleWindow.enterButton = new JButton();
+		consoleWindow.inputButton = new JButton();
+		consoleWindow.outputButton = new JButton();
+		consoleWindow.inputBar = new JPanel();
+		consoleWindow.consoleWindow = new JFrame() {
+
+			private static final long serialVersionUID = -1019922149890228914L;
+
+			@Override
+			public void paint(Graphics g) {
+				super.paint(g);
+				g.drawImage(back, getWidth() / 2 - 128, getHeight() / 2 - 128,
+						256, 256, null);
+			}
+
+		};
+
+		consoleWindow.input = new JTextField() {
+
+			private static final long serialVersionUID = -6483898230273400318L;
+
+			@Override
+			protected void paintComponent(Graphics g) {
+				super.paintComponent(g);
+				String match = "";
+				if (this.getText().startsWith("^")) {
+					for (int i = 0; i < Command.commandList.size(); i++) {
+						if (Command.commandList.get(i).key.startsWith(this
+								.getText().substring(1))
+								&& !Command.commandList.get(i).hidden) {
+							if (match.length() > Command.commandList.get(i).key
+									.length() || match.equals("")) {
+								match = Command.commandList.get(i).key;
+							}
+						}
+					}
+				}
+				g.setColor(getForeground().darker().darker());
+				g.drawString("^" + match, -getScrollOffset(), 16);
+
+				g.setColor(getForeground());
+				g.drawString(this.getText(), -getScrollOffset(), 16);
+			}
+		};
+
+		// Window
+
+		consoleWindow.consoleWindow.getContentPane().setLayout(
+				new BorderLayout());
+		consoleWindow.consoleWindow.setResizable(true);
+		consoleWindow.consoleWindow.setPreferredSize(size);
+		consoleWindow.consoleWindow.setSize(size);
+		consoleWindow.consoleWindow
+				.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+		consoleWindow.consoleWindow.setVisible(false);
+		consoleWindow.consoleWindow.setTitle("Fluffy Console " + fcVersion);
+		consoleWindow.consoleWindow.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				hideConsole();
+			}
+		});
+
+		// Paint the icon
+
+		BufferedImage logo = new BufferedImage(48, 48,
+				BufferedImage.TYPE_4BYTE_ABGR);
+		Graphics g = logo.getGraphics();
+		g.setColor(new Color(0.1f, 0.1f, 0.1f));
+		g.fillRect(0, 0, 48, 48);
+		g.setColor(new Color(103, 255, 0));
+		g.fillRect(28, 10, 10, 10);
+		g.fillRect(8, 20, 10, 10);
+		g.fillRect(18, 30, 10, 10);
+		g.setColor(Color.white);
+		g.setFont(terminus.deriveFont(Font.BOLD, 12));
+		g.drawString("FC" + fcVersion, 8, 19);
+		g.drawString("VDLG", 19, 29);
+		g.dispose();
+		consoleWindow.consoleWindow.setIconImage(logo);
+
+		// Bottom bar
+
+		consoleWindow.inputBar.setLayout(new BoxLayout(consoleWindow.inputBar,
+				BoxLayout.LINE_AXIS));
+
+		consoleWindow.enterButton.setText("^");
+		consoleWindow.enterButton.setFont(terminusDerived);
+		consoleWindow.enterButton.setBorder(BorderFactory.createEmptyBorder(2,
+				8, 2, 8));
+		consoleWindow.enterButton.addActionListener(e -> consoleWindow.input
+				.getKeyListeners()[0].keyPressed(new KeyEvent(
+				consoleWindow.input, 0, 0, 0, KeyEvent.VK_ENTER, '\n')));
+		consoleWindow.inputButton.setText("I");
+		consoleWindow.inputButton.setFont(terminusDerived);
+		consoleWindow.inputButton.setBorder(BorderFactory.createEmptyBorder(2,
+				8, 2, 8));
+
+		consoleWindow.outputButton.setText("O");
+		consoleWindow.outputButton.setFont(terminusDerived);
+		consoleWindow.outputButton.setBorder(BorderFactory.createEmptyBorder(2,
+				8, 2, 8));
+		consoleWindow.outputButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(java.awt.event.MouseEvent e) {
+				JPopupMenu j = new JPopupMenu();
+				JMenuItem f;
+
+				for (FluffyListener fluffyListener : listeners) {
+
+					consoleWindow.consoleWindow.remove(fluffyListener.visual);
+
+					f = new JMenuItem(fluffyListener.name);
+					f.addActionListener(new ActionListener() {
+						@Override
+						public void actionPerformed(ActionEvent e) {
+							System.err.println(fluffyListener.name);
+							outputTo = listeners.indexOf(fluffyListener);
+							// consoleWindow.consoleWindow.remove(((BorderLayout)
+							// consoleWindow.consoleWindow.getLayout()).getLayoutComponent(BorderLayout.CENTER));
+							// consoleWindow.consoleWindow.remove(BorderLayout.CENTER);
+							consoleWindow.consoleWindow.add(
+									fluffyListener.visual, BorderLayout.CENTER);
+							fluffyListener.println("Switched");
+							consoleWindow.consoleWindow.revalidate();
+							fluffyListener.visual.repaint();
+						}
+					});
+					j.add(f);
+				}
+				// j.add(new JMenuItem("EGGS"));
+				j.show(consoleWindow.outputButton, e.getX(), e.getY());
+			}
+		});
+
+		consoleWindow.input.setFont(terminusDerived);
+		consoleWindow.input.setBorder(BorderFactory.createEmptyBorder());
+		consoleWindow.input.setText("^");
+		consoleWindow.input
+				.setPreferredSize(new Dimension(Short.MAX_VALUE, 24));
+		setColor(Color.WHITE, new Color(14, 14, 14));
+		consoleWindow.input.addKeyListener(new KeyListener() {
+			int index = -1;
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+					System.out.println("> " + consoleWindow.input.getText());
+					if (consoleWindow.history.contains(consoleWindow.input
+							.getText())) {
+						consoleWindow.history.remove(consoleWindow.input
+								.getText());
+					}
+					index = -1;
+					consoleWindow.history.add(0, consoleWindow.input.getText());
+					Command.issue(consoleWindow.input.getText(), true);
+					consoleWindow.input.setText("^");
+				}
+				if (e.getKeyCode() == KeyEvent.VK_UP) {
+					if (consoleWindow.history.size() > 0) {
+						if (consoleWindow.history.size() > index + 1) {
+							index++;
+						}
+						consoleWindow.input.setText(consoleWindow.history
+								.get(index));
+					}
+				}
+				if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+					if (consoleWindow.history.size() > 0) {
+						if (0 < index - 1) {
+							index--;
+							consoleWindow.input.setText(consoleWindow.history
+									.get(index));
+						}
+					}
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {}
+
+			@Override
+			public void keyTyped(KeyEvent e) {}
+		});
+
+		// Add everything
+
+		consoleWindow.inputBar.add(consoleWindow.input);
+		consoleWindow.inputBar.add(consoleWindow.enterButton);
+		consoleWindow.inputBar.add(consoleWindow.inputButton);
+		consoleWindow.inputBar.add(consoleWindow.outputButton);
+
+		consoleWindow.consoleWindow.add(consoleWindow.inputBar,
+				BorderLayout.SOUTH);
+		// consoleWindow.consoleWindow.add(new
+		// JLabel("Hit the Output button to see outputs"),
+		// BorderLayout.CENTER);
+
+		// Others
+
+		consoleWindow.history = new ArrayList<String>();
+		frameActive = true;
+
+		// End of window
+
 		PipedOutputStream errPos = new PipedOutputStream();
 		PipedOutputStream outPos = new PipedOutputStream();
+
 		if (system) {
 			try {
 				System.setErr(new PrintStream(errPos, true));
@@ -138,19 +377,12 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 
 				FluffyListener sysErr = new FluffyListener(errPis, "System.err");
 				FluffyListener sysOut = new FluffyListener(outPis, "System.out");
-				StringEvent e = new StringEvent("console_window") {
-					@Override
-					public void onLineAdded(String line, String total, int ind) {
-						if (outputTo == ind) {
-							consoleWindow.jta.setText(total);
-							consoleWindow.jta
-									.setCaretPosition(consoleWindow.jta
-											.getDocument().getLength());
-						}
-					}
-				};
-				sysErr.addListener(e);
-				sysOut.addListener(e);
+
+				sysErr.secondary.setBackground(Color.BLACK);
+				sysErr.secondary.setForeground(Color.ORANGE);
+				sysOut.secondary.setBackground(Color.BLACK);
+				sysOut.secondary.setForeground(Color.CYAN);
+
 				addStream(sysOut);
 				addStream(sysErr);
 			} catch (IOException e) {
@@ -200,20 +432,23 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 	 */
 	public static void setColor(Color fore, Color back) {
 		if (fore != null) {
+			foreground = fore;
 			consoleWindow.enterButton.setForeground(fore);
 			consoleWindow.inputButton.setForeground(fore);
 			consoleWindow.outputButton.setForeground(fore);
 			consoleWindow.inputBar.setForeground(fore);
 			consoleWindow.input.setForeground(fore);
-			consoleWindow.jta.setForeground(fore);
+			// consoleWindow.jta.setForeground(fore);
 		}
 		if (back != null) {
+			background = back;
+			consoleWindow.consoleWindow.getContentPane().setBackground(back);
 			consoleWindow.enterButton.setBackground(back);
 			consoleWindow.inputButton.setBackground(back);
 			consoleWindow.outputButton.setBackground(back);
 			consoleWindow.inputBar.setBackground(back);
 			consoleWindow.input.setBackground(back);
-			consoleWindow.jta.setBackground(back);
+			// consoleWindow.jta.setBackground(back);
 		}
 	}
 
@@ -222,218 +457,8 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 	 * initialized.
 	 */
 	public static void showConsole() {
-		if (!frameActive) {
-			try { /* Load a font */
-				terminus = Font.createFont(Font.TRUETYPE_FONT,
-						VD_FlConsole.class
-								.getResourceAsStream("terminusbold.ttf"));
-			} catch (FontFormatException e1) {
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-
-			consoleWindow.enterButton = new JButton();
-			consoleWindow.inputButton = new JButton();
-			consoleWindow.outputButton = new JButton();
-			consoleWindow.inputBar = new JPanel();
-			consoleWindow.consoleWindow = new JFrame();
-			consoleWindow.input = new JTextField() {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				protected void paintComponent(Graphics g) {
-					super.paintComponent(g);
-					String match = "";
-					if (this.getText().startsWith("^")) {
-						for (int i = 0; i < Command.commandList.size(); i++) {
-							if (Command.commandList.get(i).key.startsWith(this
-									.getText().substring(1))
-									&& !Command.commandList.get(i).hidden) {
-								if (match.length() > Command.commandList.get(i).key
-										.length() || match.equals("")) {
-									match = Command.commandList.get(i).key;
-								}
-							}
-						}
-					}
-					g.setColor(getForeground().darker().darker());
-					g.drawString("^" + match, -getScrollOffset(), 16);
-
-					g.setColor(getForeground());
-					g.drawString(this.getText(), -getScrollOffset(), 16);
-				}
-			};
-			consoleWindow.jta = new JTextArea() {
-				private static final long serialVersionUID = 1L;
-
-				@Override
-				public void paintComponent(Graphics g) {/* Disable anti aliasing */
-					Graphics2D g2 = (Graphics2D) g;
-					g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-							RenderingHints.VALUE_TEXT_ANTIALIAS_OFF);
-					g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-							RenderingHints.VALUE_RENDER_QUALITY);
-					super.paintComponent(g2);
-				}
-			};
-
-			/* Window and icon */
-
-			consoleWindow.consoleWindow.getContentPane().setLayout(
-					new BorderLayout());
-			consoleWindow.consoleWindow.setResizable(true);
-			consoleWindow.consoleWindow.setPreferredSize(size);
-			consoleWindow.consoleWindow.setSize(size);
-			consoleWindow.consoleWindow
-					.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
-			consoleWindow.consoleWindow.setVisible(false);
-			consoleWindow.consoleWindow.setTitle("Fluffy Console " + fcVersion);
-			consoleWindow.consoleWindow.addWindowListener(new WindowAdapter() {
-				@Override
-				public void windowClosing(WindowEvent e) {
-					hideConsole();
-				}
-			});
-
-			/* Paint the icon */
-
-			BufferedImage logo = new BufferedImage(48, 48,
-					BufferedImage.TYPE_4BYTE_ABGR);
-			Graphics g = logo.getGraphics();
-			g.setColor(new Color(0.1f, 0.1f, 0.1f));
-			g.fillRect(0, 0, 48, 48);
-			g.setColor(new Color(103, 255, 0));
-			g.fillRect(28, 10, 10, 10);
-			g.fillRect(8, 20, 10, 10);
-			g.fillRect(18, 30, 10, 10);
-			g.setColor(Color.white);
-			g.setFont(consoleWindow.jta.getFont().deriveFont(Font.BOLD, 12));
-			g.drawString("FC" + fcVersion, 8, 19);
-			g.drawString("VDLG", 19, 29);
-			g.dispose();
-			consoleWindow.consoleWindow.setIconImage(logo);
-
-			consoleWindow.jta.setEditable(false);
-			consoleWindow.jta.setFont(terminus.deriveFont(12.0f));
-			consoleWindow.jsp = new JScrollPane(consoleWindow.jta);
-			// jsp.getHorizontalScrollBar().setVa
-			consoleWindow.jsp.setBorder(BorderFactory.createEmptyBorder());
-
-			/* Bottom bar */
-
-			consoleWindow.inputBar.setLayout(new BoxLayout(
-					consoleWindow.inputBar, BoxLayout.LINE_AXIS));
-
-			consoleWindow.enterButton.setText("^");
-			consoleWindow.enterButton.setFont(consoleWindow.jta.getFont());
-			consoleWindow.enterButton.setBorder(BorderFactory
-					.createEmptyBorder(2, 8, 2, 8));
-			consoleWindow.enterButton
-					.addActionListener(e -> consoleWindow.input
-							.getKeyListeners()[0].keyPressed(new KeyEvent(
-							consoleWindow.input, 0, 0, 0, KeyEvent.VK_ENTER,
-							'\n')));
-			consoleWindow.inputButton.setText("I");
-			consoleWindow.inputButton.setFont(consoleWindow.jta.getFont());
-			consoleWindow.inputButton.setBorder(BorderFactory
-					.createEmptyBorder(2, 8, 2, 8));
-
-			consoleWindow.outputButton.setText("O");
-			consoleWindow.outputButton.setFont(consoleWindow.jta.getFont());
-			consoleWindow.outputButton.setBorder(BorderFactory
-					.createEmptyBorder(2, 8, 2, 8));
-			consoleWindow.outputButton.addMouseListener(new MouseAdapter() {
-				@Override
-				public void mousePressed(java.awt.event.MouseEvent e) {
-					JPopupMenu j = new JPopupMenu();
-					JMenuItem f;
-					for (FluffyListener fluffyListener : listeners) {
-						f = new JMenuItem(fluffyListener.name);
-						f.addActionListener(new ActionListener() {
-							@Override
-							public void actionPerformed(ActionEvent e) {
-								outputTo = listeners.indexOf(fluffyListener);
-								fluffyListener.println("Switched");
-							}
-						});
-						j.add(f);
-					}
-					// j.add(new JMenuItem("EGGS"));
-					j.show(consoleWindow.outputButton, e.getX(), e.getY());
-				}
-			});
-
-			consoleWindow.input.setFont(consoleWindow.jta.getFont());
-			consoleWindow.input.setBorder(BorderFactory.createEmptyBorder());
-			consoleWindow.input.setText("^");
-			consoleWindow.input.setPreferredSize(new Dimension(Short.MAX_VALUE,
-					24));
-			setColor(Color.GREEN, Color.BLACK);
-			consoleWindow.input.addKeyListener(new KeyListener() {
-				int index = -1;
-
-				@Override
-				public void keyPressed(KeyEvent e) {
-					if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-						System.out.println("> " + consoleWindow.input.getText());
-						if (consoleWindow.history.contains(consoleWindow.input
-								.getText())) {
-							consoleWindow.history.remove(consoleWindow.input
-									.getText());
-						}
-						index = -1;
-						consoleWindow.history.add(0,
-								consoleWindow.input.getText());
-						Command.issue(consoleWindow.input.getText(), true);
-						consoleWindow.input.setText("^");
-					}
-					if (e.getKeyCode() == KeyEvent.VK_UP) {
-						if (consoleWindow.history.size() > 0) {
-							if (consoleWindow.history.size() > index + 1) {
-								index++;
-							}
-							consoleWindow.input.setText(consoleWindow.history
-									.get(index));
-						}
-					}
-					if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-						if (consoleWindow.history.size() > 0) {
-							if (0 < index - 1) {
-								index--;
-								consoleWindow.input
-										.setText(consoleWindow.history
-												.get(index));
-							}
-						}
-					}
-				}
-
-				@Override
-				public void keyReleased(KeyEvent e) {}
-
-				@Override
-				public void keyTyped(KeyEvent e) {}
-			});
-
-			/* Add everything */
-
-			consoleWindow.inputBar.add(consoleWindow.input);
-			consoleWindow.inputBar.add(consoleWindow.enterButton);
-			consoleWindow.inputBar.add(consoleWindow.inputButton);
-			consoleWindow.inputBar.add(consoleWindow.outputButton);
-
-			consoleWindow.consoleWindow.add(consoleWindow.inputBar,
-					BorderLayout.SOUTH);
-			consoleWindow.consoleWindow.add(consoleWindow.jsp,
-					BorderLayout.CENTER);
-
-			/* Stuff thats not swingy */
-
-			consoleWindow.history = new ArrayList<String>();
-			frameActive = true;
-		}
 		consoleWindow.consoleWindow.setVisible(true);
+		consoleWindow.consoleWindow.getContentPane().repaint();
 	}
 
 	public static void startScanner() {
@@ -471,11 +496,63 @@ public class VD_FlConsole { /* The Fluffy console! Version 4! */
 			consoleWindow.consoleWindow.setVisible(true);
 		}
 	}
+
+	/**
+	 * Make a beep sound from your default audio device. This function does NOT
+	 * use your motherboard piezo (the one that beeps when your computer is
+	 * powered on).
+	 * 
+	 * @param ms
+	 *            Duration of the beep in Milliseconds
+	 * @param hz
+	 *            Frequency of the beep in Hertz
+	 * @param rate
+	 *            The sample rate. May produce a sine wave when it is equal to
+	 *            the frequency.
+	 */
+	public static void quickBeep(int ms, int hz, int rate) {
+		try {
+			Clip clip = AudioSystem.getClip();
+			AudioFormat audFormat = new AudioFormat(rate, 8, 1, true, false);
+
+			float value = rate / hz;
+
+			byte[] data = new byte[ms * rate];
+			for (int i = 0; i < data.length; i++) {
+				// System.out.println(((i % 9) == 1) ? (byte)-127 : (byte)127);
+				data[i] = ((i % value) < (value / 2)) ? (byte) -128
+						: (byte) 127;
+			}
+
+			clip.open(audFormat, data, 0, data.length);
+
+			clip.addLineListener(new LineListener() {
+				@Override
+				public void update(LineEvent event) {
+					if (event.getType() == LineEvent.Type.START) {
+						Timer t = new Timer(ms + 1, new ActionListener() {
+							@Override
+							public void actionPerformed(ActionEvent e) {
+								clip.close();
+							}
+						});
+						t.setRepeats(false);
+						t.start();
+					}
+				}
+			});
+
+			clip.start();
+		} catch (LineUnavailableException e) {
+			e.printStackTrace();
+		}
+	}
 }
 
 class FluffyListener implements Runnable {
 
-	public int index;
+	public Component visual;
+	public Component secondary;
 	public List<StringEvent> listeners;
 	public String name;
 	public String output;
@@ -483,7 +560,25 @@ class FluffyListener implements Runnable {
 	public InputStream stream;
 
 	/**
-	 * Create an Input stream listener
+	 * Create an Input stream listener with a custom visual.
+	 * 
+	 * @param stream
+	 *            The input stream to listen to
+	 * @param name
+	 *            The display name
+	 * @param visual
+	 *            A component used when this listener is selected
+	 */
+	public FluffyListener(InputStream stream, String n, Component visual) {
+		reader = new BufferedReader(new InputStreamReader(stream));
+		listeners = new ArrayList<StringEvent>();
+		name = n;
+		this.visual = visual;
+	}
+
+	/**
+	 * Create an Input stream listener with a default text visual. A string
+	 * event is added automatically.
 	 * 
 	 * @param stream
 	 *            The input stream to listen to
@@ -494,6 +589,28 @@ class FluffyListener implements Runnable {
 		reader = new BufferedReader(new InputStreamReader(stream));
 		listeners = new ArrayList<StringEvent>();
 		name = n;
+		secondary = new JTextArea();
+		((JTextArea) secondary).setEditable(false);
+		secondary.setFont(VD_FlConsole.terminusDerived);
+		visual = new JScrollPane(secondary);
+		((JScrollPane) visual).setBorder(BorderFactory.createEmptyBorder());
+
+		addListener(new StringEvent(n + "_textconsole") {
+			@Override
+			public void onLineAdded(String line, String total) {
+				((JTextArea) secondary).setText(total);
+				/*
+				 * System.err.println("B4: " + ((JTextArea)
+				 * secondary).getCaretPosition()); if (((JTextArea)
+				 * secondary).getCaretPosition() == ((JTextArea)
+				 * secondary).getRows()) ((JTextArea)
+				 * secondary).setCaretPosition(((JTextArea)
+				 * secondary).getDocument().getLength());
+				 * System.err.println(((JTextArea)
+				 * secondary).getCaretPosition());
+				 */
+			}
+		});
 	}
 
 	/**
@@ -512,7 +629,7 @@ class FluffyListener implements Runnable {
 	public void clear() {
 		output = "";
 		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).onLineAdded("", output, index);
+			listeners.get(i).onLineAdded("", output);
 		}
 	}
 
@@ -525,7 +642,7 @@ class FluffyListener implements Runnable {
 	public void print(Object x) {
 		output += x;
 		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).onLineAdded(x.toString(), output, index);
+			listeners.get(i).onLineAdded(x.toString(), output);
 		}
 	}
 
@@ -538,7 +655,7 @@ class FluffyListener implements Runnable {
 	public void println(Object x) {
 		output += x + "\n";
 		for (int i = 0; i < listeners.size(); i++) {
-			listeners.get(i).onLineAdded(x.toString(), output, index);
+			listeners.get(i).onLineAdded(x.toString(), output);
 		}
 	}
 
@@ -551,11 +668,12 @@ class FluffyListener implements Runnable {
 		try {
 			while ((line = reader.readLine()) != null) {
 				output += line + "\n";
-				for (int i = 0; i < listeners.size(); i++) {
-					listeners.get(i).onLineAdded(line, output, index);
+				for (StringEvent stringEvent : listeners) {
+					stringEvent.onLineAdded(line, output);
 				}
 			}
-		} catch (IOException e) { // Restart when pipe break error.
+		} catch (IOException e) {
+			// Restart when pipe break error... is this bad?
 			run();
 		}
 	}
@@ -563,11 +681,13 @@ class FluffyListener implements Runnable {
 }
 
 abstract class StringEvent {
+
 	public String name;
 
 	public StringEvent(String id) {
 		name = id;
 	}
 
-	public abstract void onLineAdded(String line, String total, int index);
+	public abstract void onLineAdded(String line, String total);
+
 }

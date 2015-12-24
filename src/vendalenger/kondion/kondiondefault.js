@@ -28,38 +28,13 @@ var Vector2d = Java.type("org.joml.Vector2d");
 var Vector3d = Java.type("org.joml.Vector3d");
 var Vector4d = Java.type("org.joml.Vector4d");
 
-var KObj_Board = Java.type("vendalenger.kondion.kobj.KObj_Board");
-var Scene = Java.type("vendalenger.kondion.kobj.KObj_Board");
+var GKO_Layer = Java.type("vendalenger.kondion.kobj.GKO_Layer");
+var GKO_Scene = Java.type("vendalenger.kondion.kobj.GKO_Scene");
+
+var RKO_Board = Java.type("vendalenger.kondion.kobj.RKO_Board");
 
 //^kdion.rungamedir (electricfence/kondion.json)
-var KJS = {
-	java: Java.type("vendalenger.kondion.KJS"),
-	kondion: Java.type("vendalenger.kondion.Kondion"),
-	kinput: Java.type("vendalenger.kondion.KInput"),
-	b: {
-		// Buttons go here
-	},
-	cam: {
-		freeCam: function(mode) {KJS.kondion.getCurrentCamera().setFreeMode(mode);},
-		bindCam: function(ent) {KJS.kondion.getCurrentCamera().bindToEntity(ent)}
-	},
-	g: {
-		setMouseGrab: function(g) {KJS.kinput.setMouseLock(g);}
-	},
-	i: {
-		buttonDown: function(b) {return KJS.kinput.buttonIsDown(b);},
-		keyboardDown: function(b) {return KJS.kinput.keyboardDown(b);},
-		mouseDown: function(b) {return KJS.kinput.mouseDown(b);}
-	},
-	o: {
-		
-	},
-	eggs: function() {
-		KJS.kondion.eggs();
-	}
-};
-
-var SCN;
+var KJS = Java.type("vendalenger.kondion.KJS")
 
 var patchObject = function(obj, patch) {
 	for (var aname in patch) {
@@ -69,6 +44,5 @@ var patchObject = function(obj, patch) {
 };
 
 var kondionInit = function() {
-	SCN = KJS.kondion.getCurrentScene();
 	delete kondionInit;
 }

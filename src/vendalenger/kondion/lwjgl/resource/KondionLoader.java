@@ -20,6 +20,8 @@ import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_RGBA8;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -58,6 +60,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,15 +73,17 @@ import org.lwjgl.BufferUtils;
 public class KondionLoader {
 
 	public static List<Object[]> queue;
-
 	public static HashMap<String, KondionTexture> textures;
 
+	private static KondionTexture missingTexture;
+	
 	/**
 	 * Initialize textures and queue
 	 */
 	public static void init() {
 		textures = new HashMap<String, KondionTexture>();
 		queue = new ArrayList<Object[]>();
+		missingTexture = null;
 	}
 
 	/**
@@ -86,16 +91,21 @@ public class KondionLoader {
 	 * shader are loaded.
 	 */
 	public static void load() {
+		
+		if (missingTexture == null) {
+			missingTexture = registerTexture(KondionLoader.class.getResourceAsStream("missingno.png"),
+					"Missing_Texture", GL_NEAREST, GL_NEAREST,
+					GL_REPEAT, GL_REPEAT, false);
+		}
 		for (int i = 0; i < queue.size(); i++) {
 			if ((boolean) queue.get(i)[0]) {
 				// its a shader
-
 			} else {
 				// its a texture
 				registerTexture((File) queue.get(i)[1],
 						(String) queue.get(i)[2], (int) queue.get(i)[3],
 						(int) queue.get(i)[4], (int) queue.get(i)[5],
-						(int) queue.get(i)[6]);
+						(int) queue.get(i)[6], true);
 			}
 		}
 	}
@@ -229,6 +239,109 @@ public class KondionLoader {
 		queue.add(new Object[] {false, image, id, minFilter, magFilter, wrapS,
 				wrapT});
 	}
+	
+
+	/**
+	 * 
+	 * @param image
+	 *            The path to the image file
+	 * @param id
+	 *            The string Id to create / replace
+	 * @param minFilter
+	 *            Min Filter use GL11.NEAREST of linear or anything
+	 * @param magFilter
+	 *            Mag Filter use GL11.NEAREST of linear or anything
+	 * @param wrapS
+	 * @param wrapT
+	 * @return
+	 */
+	public static KondionTexture registerTexture(InputStream image, String id,
+			int minFilter, int magFilter, int wrapS, int wrapT, boolean add) {
+		try {
+			// loading the image
+			BufferedImage i = ImageIO.read(image);
+
+			// flip the image
+			AffineTransform transform = AffineTransform.getScaleInstance(1f,
+					-1f);
+			transform.translate(0, -i.getHeight());
+			AffineTransformOp operation = new AffineTransformOp(transform,
+					AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+			i = operation.filter(i, null);
+
+			// Putting pixel data in a buffer
+			int[] pixels = new int[i.getWidth() * i.getHeight()];
+			i.getRGB(0, 0, i.getWidth(), i.getHeight(), pixels, 0, i.getWidth());
+			ByteBuffer buffer = BufferUtils.createByteBuffer(i.getWidth()
+					* i.getHeight() * 4);
+			for (int y = 0; y < i.getHeight(); y++) {
+				for (int x = 0; x < i.getWidth(); x++) {
+					int pixel = pixels[y * i.getWidth() + x];
+					buffer.put((byte) ((pixel >> 16) & 0xFF));
+					buffer.put((byte) ((pixel >> 8) & 0xFF));
+					buffer.put((byte) (pixel & 0xFF));
+					buffer.put((byte) ((pixel >> 24) & 0xFF));
+				}
+			}
+			buffer.flip();
+
+			// Creating the opengl texture
+			int tex = glGenTextures();
+			glBindTexture(GL_TEXTURE_2D, tex);
+
+			// set filters and wraps
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapS);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapT);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+
+			// generate mipmaps if required
+			boolean mipmap = (minFilter == GL_NEAREST_MIPMAP_NEAREST
+					|| minFilter == GL_NEAREST_MIPMAP_LINEAR
+					|| minFilter == GL_LINEAR_MIPMAP_NEAREST || minFilter == GL_LINEAR_MIPMAP_LINEAR);
+			if (mipmap) {
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 2);
+				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+			}
+
+			// put pixel data into texture
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, i.getWidth(),
+					i.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+
+			// Pack it up
+			KondionTexture kt = new KondionTexture(tex, i.getWidth(),
+					i.getHeight(), minFilter, magFilter, wrapS, wrapT, mipmap);
+
+			if (add) {
+				if (textures.containsKey(id)) {
+					System.out.println("Replacing texture: " + id);
+					System.out.println("    with <UNKNOWN PATH>");
+					textures.replace(id, kt);
+				} else {
+					System.out.println("Adding texture: " + id);
+					System.out.println("    from <UNKNOWN PATH>");
+					textures.put(id, kt);
+				}
+			} else {
+				System.out.println("Loaded texture: " + id);
+				System.out.println("    path <UNKNOWN PATH>");
+			}
+
+			// return stuff
+			return kt;
+		} catch (FileNotFoundException e) {
+			// else return nulls
+			System.err.println("Failed to load texture: " + id);
+			System.err.println("    in <UNKNOWN PATH>");
+			e.printStackTrace();
+			return null;
+		} catch (IOException e) {
+			System.err.println("Failed to load texture: " + id);
+			System.err.println("    in <UNKNOWN PATH>");
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
 	 * 
@@ -245,7 +358,7 @@ public class KondionLoader {
 	 * @return
 	 */
 	public static KondionTexture registerTexture(File image, String id,
-			int minFilter, int magFilter, int wrapS, int wrapT) {
+			int minFilter, int magFilter, int wrapS, int wrapT, boolean add) {
 		try {
 			// loading the image
 			FileInputStream in = new FileInputStream(image);
@@ -302,14 +415,19 @@ public class KondionLoader {
 			KondionTexture kt = new KondionTexture(tex, i.getWidth(),
 					i.getHeight(), minFilter, magFilter, wrapS, wrapT, mipmap);
 
-			if (textures.containsKey(id)) {
-				System.out.println("Replacing texture: " + id);
-				System.out.println("    with " + image.getCanonicalPath());
-				textures.replace(id, kt);
+			if (add) {
+				if (textures.containsKey(id)) {
+					System.out.println("Replacing texture: " + id);
+					System.out.println("    with " + image.getCanonicalPath());
+					textures.replace(id, kt);
+				} else {
+					System.out.println("Adding texture: " + id);
+					System.out.println("    from " + image.getCanonicalPath());
+					textures.put(id, kt);
+				}
 			} else {
-				System.out.println("Adding texture: " + id);
-				System.out.println("    from " + image.getCanonicalPath());
-				textures.put(id, kt);
+				System.out.println("Loaded texture: " + id);
+				System.out.println("    path " + image.getCanonicalPath());
 			}
 
 			// return stuff
@@ -326,5 +444,9 @@ public class KondionLoader {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static KondionTexture getMissingTexture() {
+		return missingTexture;
 	}
 }

@@ -134,7 +134,7 @@ public class Command {
 
 						KondionLoader.registerTexture(new File(args[1]),
 								args[0], GL11.GL_NEAREST, GL11.GL_NEAREST,
-								GL11.GL_CLAMP, GL11.GL_CLAMP);
+								GL11.GL_CLAMP, GL11.GL_CLAMP, true);
 						return null;
 					}
 				}, false);
@@ -638,8 +638,11 @@ public class Command {
 			}
 		} else {
 			try {
-				System.out.println(Kondion.getNashorn().eval(said));
+				VD_FlConsole.println(Kondion.getNashorn().eval(said));
 			} catch (ScriptException e) {
+				VD_FlConsole.println("Javascript error:");
+				VD_FlConsole.println(e.getCause());
+				VD_FlConsole.println("See System.err for more information");
 				e.printStackTrace();
 			}
 		}

@@ -132,8 +132,8 @@ public class KInput {
 
 	public static void regButton(String id, String name, int device, int key) {
 		buttonList.add(new KButton(id, name, device, key));
-		((ScriptObjectMirror) ((ScriptObjectMirror) Kondion.getNashorn().get(
-				"KJS")).get("b")).put(id, buttonList.size() - 1);
+		//((ScriptObjectMirror) ((ScriptObjectMirror) Kondion.getNashorn().get(
+		//		"KJS")).get("b")).put(id, buttonList.size() - 1);
 		// System.out.println(buttonList.toArray());
 	}
 

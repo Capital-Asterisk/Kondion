@@ -4,6 +4,6 @@ package vendalenger.kondion.materials;
  * 
  * 
  */
-public class KMat_SimpleTextured {
+public class KMat_MultiTexture {
 
 }

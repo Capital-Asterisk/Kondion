@@ -22,6 +22,7 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -47,7 +48,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
 import sun.font.Script;
-import vendalenger.kondion.kobj.Scene;
+import vendalenger.kondion.kobj.GKO_Scene;
 import vendalenger.kondion.lwjgl.Camera_;
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.TTT;
@@ -60,30 +61,31 @@ import argo.jdom.JsonRootNode;
 
 public class Kondion {
 
-	private static JFrame loadingScreen;
-
 	private static Camera_ currentCamera;
+	private static JFrame loadingScreen;
 	private static KondionGame game;
-	private static Scene currentScene;
 	private static ScriptEngine jsEngine;
 	private static Thread gameThread;
+	private static KondionWorld world;
 
+	private static float fps;
 	private static long ticks;
 	private static float delta;
 
+	public static boolean showPrespective = true;
+	public static boolean showHud = false;
+	
 	private static void gameLoop() {
-		// if (GLFW.glfwGetKey(Initializer.window, GLFW.) == GL_TRUE) {
-		// currentCamera.getEye().z += 0.1;
-		// }
-		currentCamera = new Camera_();
-		currentCamera.look(0, 0, 8, 0, 0, 0);
-		// currentScene.doGlBuffers();
-		
-		// DEBUG
-		currentScene = new Scene();
-		// END
 
+		currentCamera = new Camera_();
+		currentCamera.look(0, 0, 5, 0, 0, 0);
+		currentCamera.setFreeMode(true);
+
+		world = new KondionWorld();
+		
 		try {
+			jsEngine.put("World", world);
+			jsEngine.put("SCN", world.Scene);
 			((Invocable) jsEngine).invokeFunction("kondionInit");
 			((Invocable) jsEngine).invokeFunction("start");
 		} catch (NoSuchMethodException e) {
@@ -94,7 +96,7 @@ public class Kondion {
 
 		ticks = 0;
 
-		long time = 0;
+		long time = 0l;
 		long prevTime = 0l;
 
 		Window.setWindowVisible(true);
@@ -109,21 +111,24 @@ public class Kondion {
 
 			TTT.three();
 
-			glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+			glClearColor(world.clearColor.x, world.clearColor.y,
+					world.clearColor.z, world.clearColor.w);
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
-																// framebuffer
-			// currentCamera.gluLookAt();
-
-			/*for (int i = 0; i < currentScene.getRenders().size(); i++) {
-				currentScene.getRenders().get(i).render();
-				
-			}*/
+												// framebuffer
+			//currentCamera.gluLookAt();
+			
+			//glTranslatef(0, 0, 1);
+			//FlatDrawing.renderBillboard(1, 1, KondionLoader.textures.get("noah"));
+			
+			for (int i = 0; i < world.Layers.size(); i++) {
+				world.Layers.get(i).update();
+			}
 			
 			ticks++;
 			Window.update();
 			
+			fps = 1 / delta;
 			time = System.nanoTime() - prevTime;
-
 		}
 
 		Window.end();
@@ -134,12 +139,16 @@ public class Kondion {
 		return currentCamera;
 	}
 	
-	public static Scene getCurrentScene() {
-		return currentScene;
+	public static GKO_Scene getCurrentScene() {
+		return world.Scene;
 	}
 
 	public static KondionGame getGame() {
 		return game;
+	}
+	
+	public static float getFramerate() {
+		return fps;
 	}
 
 	public static float getDelta() {
@@ -189,6 +198,8 @@ public class Kondion {
 					Window.initGL(800, 600, false, false, g.getGameInfo()
 							.getStringValue("GameName"));
 					GLContext.createFromCurrent();
+					FlatDrawing.setup();
+					///FlatDrawing.
 					
 					jsEngine = new ScriptEngineManager()
 							.getEngineByName("nashorn");

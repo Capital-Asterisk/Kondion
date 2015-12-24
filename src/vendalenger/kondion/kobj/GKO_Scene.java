@@ -16,21 +16,15 @@
 
 package vendalenger.kondion.kobj;
 
-import vendalenger.kondion.objectbase.KObj_Node;
+import java.util.ArrayList;
 
-public class Layer extends KObj_Node {
+import vendalenger.kondion.objectbase.KObj_Node;
+import vendalenger.kondion.objectbase.KObj_Renderable;
+
+public class GKO_Scene extends KObj_Node {
 	
-	protected static final boolean pointer = false;
-	
-	public boolean physic;
-	public boolean render;
-	public boolean update;
-	
-	public Layer() {
-		physic = false;
-		render = false;
-		update = false;
-		parent = this;
+	public GKO_Scene() {
+		
 	}
 
 	@Override

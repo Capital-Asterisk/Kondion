@@ -24,6 +24,14 @@ public abstract class KObj_Renderable extends KObj_Oriented {
 	protected KondionTexture texture;
 	protected KMat_erial material;
 	
+	public KMat_erial getMaterial() {
+		return material;
+	}
+
+	public void setMaterial(KMat_erial material) {
+		this.material = material;
+	}
+
 	public abstract void render();
 	
 }

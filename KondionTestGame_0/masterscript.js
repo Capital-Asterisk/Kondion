@@ -7,17 +7,27 @@
  */
 
 var init = function() {
-	KJS.java.issueCommand("^eggs");
+	KJS.issueCommand("^eggs");
 	//^kdion.js (scene.addRenderable*(new KJS.r.Board*(*)*))
 };
 
 var start = function() {
-	KJS.g.setMouseGrab(true);
-	SCN.Apple = new KObj_Board();
-	SCN.Apple.Seeds = new KObj_Board();
-	SCN.Apple.Seeds.Poison = new KObj_Board();
+
+	//KJS.g.setMouseGrab(true);
 	
-	SCN.Foo = new KObj_Board();
-	SCN.Foo.Bar = new KObj_Board();
-	SCN.Foo.Bar.HelloWorld = new KObj_Board();
+	// Create a new render layer (GKO: Game Kondion Object)
+	World.Layers.add(new GKO_Layer(GKO_Layer.RENDER));
+	
+	// Create a board (RKO: Renderable Kondion Object)
+	SCN.Apple = new RKO_Board();
+	SCN.Apple.pos.z = -1;
+	
+	World.Layers[0].Apple = SCN.Apple;
+	
+	//SCN.Apple.Seeds = new RKO_Board();
+	//SCN.Apple.Seeds.Poison = new RKO_Board();
+	
+	//SCN.Foo = new RKO_Board();
+	//SCN.Foo.Bar = new RKO_Board();
+	//SCN.Foo.Bar.HelloWorld = new RKO_Board();
 };

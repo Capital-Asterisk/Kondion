@@ -16,12 +16,13 @@
 
 package vendalenger.kondion.objectbase;
 
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 public abstract class KObj_Oriented extends KObj_Node {
 	
 	public final Vector3f pos = new Vector3f();
 	public final Vector3f rot = new Vector3f();
-	
+	public final Matrix4f transform = new Matrix4f();
 	
 }

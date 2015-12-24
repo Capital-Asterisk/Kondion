@@ -55,6 +55,31 @@ public class FlatDrawing {
 	// private static ArrayList<int[]> canvasTextures = new ArrayList<int[]>();
 	private static FloatBuffer texCoords;
 
+	public static void renderBillboard(float width, float height) {
+		glPushMatrix();
+		glScalef(width, height, 0);
+
+		//setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
+		glVertexPointer(3, GL_FLOAT, 0, 0l);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_texCoords);
+		glTexCoordPointer(2, GL_FLOAT, 0, 0l);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glDrawArrays(GL_QUADS, 0, 4);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glPopMatrix();
+	}
+
+	
 	public static void renderBillboard(float width, float height,
 			KondionTexture t) {
 		glPushMatrix();
@@ -62,7 +87,7 @@ public class FlatDrawing {
 		glScalef(width, height, 0);
 		t.bind();
 
-		setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+		//setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glVertexPointer(3, GL_FLOAT, 0, 0l);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

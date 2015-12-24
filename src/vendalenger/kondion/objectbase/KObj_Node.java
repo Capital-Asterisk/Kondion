@@ -31,7 +31,7 @@ import org.joml.Vector3f;
 import com.sun.xml.internal.ws.util.StringUtils;
 
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.kobj.Scene;
+import vendalenger.kondion.kobj.GKO_Scene;
 
 
 public abstract class KObj_Node implements Map<String, KObj_Node> {
@@ -47,6 +47,7 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	public abstract void update();
 	
 	public KObj_Node() {
+		getClass().getName();
 		children = new ArrayList<KObj_Node>();
 		childNames = new ArrayList<String>();
 		name = getClass().getSimpleName();
@@ -67,10 +68,10 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	public String nameTree() {
 		String s = "****Tree for " + name + "****";
 		for (int i = 0; i < size(); i++) {
-			s += "\n";
-			s += childNames.get(i);
+			s += "\n" + "--> (" + children.get(i).getClass().getSimpleName()
+					+ ") " + childNames.get(i);
 			if (children.get(i).size() > 0) {
-				s = children.get(i).nameTree(s, 1);
+				s = children.get(i).nameTree(s, 3);
 			}
 		}
 		return s;
@@ -79,8 +80,9 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	public String nameTree(String current, int depth) {
 		for (int i = 0; i < size(); i++) {
 			current += "\n";
-			current += new String(new char[depth]).replace("\0", "-");
-			current += childNames.get(i);
+			current += new String(new char[depth - 1]).replace("\0", "--") + ">";
+			current += " (" + children.get(i).getClass().getSimpleName()
+					+ ") " + childNames.get(i);
 			if (children.get(i).size() > 0)
 				current = children.get(i).nameTree(current, depth + 1);
 		}
@@ -89,8 +91,9 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	
 	public String listChildren() {
 		String s = "****Children of " + name + "****";
-		for (String name : childNames) {
-			s += "\n-" + name;
+		for (int i = 0; i < childNames.size(); i++) {
+			s += "\n--> (" + children.get(i).getClass().getSimpleName()
+					+ ") " + childNames.get(i);
 		}
 		return s;
 	}

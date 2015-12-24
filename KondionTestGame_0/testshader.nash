@@ -20,5 +20,5 @@ float rand(vec2 co){
 }
 
 void main() {
-    gl_FragColor = texture2D(texture1, gl_TexCoord[0].st) - vec4(rand(vec2(gl_FragCoord)) / 2, rand(vec2(gl_FragCoord)) / 2, rand(vec2(gl_FragCoord)) / 2, 0.2);
+    gl_FragColor = texture2D(texture1, gl_TexCoord[0].st) - vec4(rand(vec2(gl_FragCoord)), rand(vec2(gl_FragCoord)), rand(vec2(gl_FragCoord)), 0.2);
 }
