@@ -14,7 +14,7 @@
  * the License.
  */
 
-package vendalenger.kondion.lwjgl;
+package vendalenger.kondion.kobj;
 
 import java.nio.FloatBuffer;
 
@@ -23,14 +23,18 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+
 import vendalenger.kondion.KInput;
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.lwjgl.TTT;
+import vendalenger.kondion.lwjgl.Window;
+import vendalenger.kondion.objectbase.KObj_Oriented;
 
 /*
  * Camera_ is a traditional name... my first 3d game had a class called Camera_.
  * it stored x, y, z, yaw, and pitch roll of the camera.
  */
-public class Camera_ {
+public class OKO_Camera_ extends KObj_Oriented {
 
 	// For Camera position and movement
 	private boolean freeMode = false;
@@ -39,7 +43,7 @@ public class Camera_ {
 	private float yaw, pitch, roll;
 
 	private Vector3f center;
-	private Vector3f eye;
+	//private Vector3f eye;
 	private Vector3f up;
 
 	private Matrix4f prespectiveMatrix;
@@ -57,7 +61,7 @@ public class Camera_ {
 	private Vector4f tempVector2;
 	private Vector4f tempVector3;
 
-	public Camera_() {
+	public OKO_Camera_() {
 
 		upDownLeftRight[0] = KInput.getButtonIndex("up");
 		upDownLeftRight[1] = KInput.getButtonIndex("down");
@@ -69,7 +73,7 @@ public class Camera_ {
 		roll = 0;
 
 		center = new Vector3f();
-		eye = new Vector3f();
+		//pos = new Vector3f();
 		up = new Vector3f();
 
 		prespectiveMatrix = new Matrix4f();
@@ -92,9 +96,9 @@ public class Camera_ {
 	public void aim(float y, float p) {
 		yaw = y;
 		pitch = p;
-		center.y = (float) Math.sin(p) + eye.y;
-		center.x = (float) (Math.cos(yaw) * Math.cos(p)) + eye.x;
-		center.z = (float) (Math.sin(yaw) * Math.cos(p)) + eye.z;
+		center.y = (float) Math.sin(p) + pos.y;
+		center.x = (float) (Math.cos(yaw) * Math.cos(p)) + pos.x;
+		center.z = (float) (Math.sin(yaw) * Math.cos(p)) + pos.z;
 	}
 
 	/*public void bindToEntity(Entity e) {
@@ -106,8 +110,8 @@ public class Camera_ {
 	 * Calculate yaw and pitch, center must be normal
 	 */
 	public void calculateAngle() {
-		yaw = (float) Math.atan2(center.z - eye.z, center.x - eye.x);
-		pitch = (float) Math.asin(center.y - eye.y);
+		yaw = (float) Math.atan2(center.z - pos.z, center.x - pos.x);
+		pitch = (float) Math.asin(center.y - pos.y);
 		// System.out.println(yaw + " " + pitch);
 	}
 
@@ -151,15 +155,6 @@ public class Camera_ {
 		return center;
 	}
 
-	/**
-	 * Get the eye (The position of the camera)
-	 * 
-	 * @return a Vector3f
-	 */
-	public Vector3f getEye() {
-		return eye;
-	}
-
 	public float getPitch() {
 		return pitch;
 	}
@@ -193,7 +188,7 @@ public class Camera_ {
 							(float) Math.toRadians(TTT.getPrefFov()),
 							((float) (Window.getWidth()) / (float) (Window
 									.getHeight())), 0.01f, 100.0f)
-					.lookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z,
+					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		} else {
 			prespectiveMatrix
@@ -202,7 +197,7 @@ public class Camera_ {
 							(float) Math.toRadians(fov),
 							((float) (Window.getWidth()) / (float) (Window
 									.getHeight())), 0.01f, 100.0f)
-					.lookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z,
+					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		}
 		GL11.glMultMatrix(fb);
@@ -229,7 +224,7 @@ public class Camera_ {
 	 */
 	public void look(float posx, float posy, float posz, float desx,
 			float desy, float desz) {
-		eye.set(posx, posy, posz);
+		pos.set(posx, posy, posz);
 		center.set(desx, desy, desz);
 		calculateUp();
 	}
@@ -238,9 +233,9 @@ public class Camera_ {
 	 * Center is normalized relative to eye.
 	 */
 	public void normalizeCenter() {
-		center.sub(eye, tempVector0);
+		center.sub(pos, tempVector0);
 		tempVector0.normalize();
-		tempVector0.add(eye, center);
+		tempVector0.add(pos, center);
 	}
 
 	public void setFreeMode(boolean b) {
@@ -262,6 +257,12 @@ public class Camera_ {
 	}
 
 	public void update() {
+		if (this.s != null) {
+			if (this.s.containsKey("onupdate")) {
+				this.s.callMember("onupdate");
+			}
+		}
+		
 		if (freeMode) {
 			calculateAngle();
 			tempVector0.set(0, 0, 0);
@@ -269,22 +270,22 @@ public class Camera_ {
 			//bind = null;
 			if (KInput.buttonIsDown(upDownLeftRight[0])) {
 				// forward
-				eye.x += (center.x - eye.x) * cameraSpeed;
-				eye.y += (center.y - eye.y) * cameraSpeed;
-				eye.z += (center.z - eye.z) * cameraSpeed;
+				pos.x += (center.x - pos.x) * cameraSpeed;
+				pos.y += (center.y - pos.y) * cameraSpeed;
+				pos.z += (center.z - pos.z) * cameraSpeed;
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[1])) {
 				// backwards
-				eye.x -= (center.x - eye.x) * cameraSpeed;
-				eye.y -= (center.y - eye.y) * cameraSpeed;
-				eye.z -= (center.z - eye.z) * cameraSpeed;
+				pos.x -= (center.x - pos.x) * cameraSpeed;
+				pos.y -= (center.y - pos.y) * cameraSpeed;
+				pos.z -= (center.z - pos.z) * cameraSpeed;
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[2])) {
 				// left
 				tempVector0.x = (float) Math.cos(yaw + Math.PI / 2);
 				tempVector0.y = (float) Math.sin(yaw + Math.PI / 2);
-				eye.x -= tempVector0.x * cameraSpeed;
-				eye.z -= tempVector0.y * cameraSpeed;
+				pos.x -= tempVector0.x * cameraSpeed;
+				pos.z -= tempVector0.y * cameraSpeed;
 				center.x -= tempVector0.x * cameraSpeed;
 				center.z -= tempVector0.y * cameraSpeed;
 			}
@@ -292,8 +293,8 @@ public class Camera_ {
 				// right
 				tempVector0.x = (float) Math.cos(yaw + Math.PI / 2);
 				tempVector0.y = (float) Math.sin(yaw + Math.PI / 2);
-				eye.x += tempVector0.x * cameraSpeed;
-				eye.z += tempVector0.y * cameraSpeed;
+				pos.x += tempVector0.x * cameraSpeed;
+				pos.z += tempVector0.y * cameraSpeed;
 				center.x += tempVector0.x * cameraSpeed;
 				center.z += tempVector0.y * cameraSpeed;
 			}

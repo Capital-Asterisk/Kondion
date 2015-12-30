@@ -32,9 +32,12 @@ var GKO_Layer = Java.type("vendalenger.kondion.kobj.GKO_Layer");
 var GKO_Scene = Java.type("vendalenger.kondion.kobj.GKO_Scene");
 
 var RKO_Board = Java.type("vendalenger.kondion.kobj.RKO_Board");
+var RKO_InfinitePlane = Java.type("vendalenger.kondion.kobj.RKO_InfinitePlane");
+
+var OKO_Camera_ = Java.type("vendalenger.kondion.kobj.OKO_Camera_");
 
 //^kdion.rungamedir (electricfence/kondion.json)
-var KJS = Java.type("vendalenger.kondion.KJS")
+//var KJS = Java.type("vendalenger.kondion.KJS")
 
 var patchObject = function(obj, patch) {
 	for (var aname in patch) {

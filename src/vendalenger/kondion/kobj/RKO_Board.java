@@ -1,6 +1,6 @@
 package vendalenger.kondion.kobj;
 
-import static org.lwjgl.opengl.GL11.glTranslatef;
+import static org.lwjgl.opengl.GL11.*;
 
 import java.io.File;
 
@@ -19,15 +19,18 @@ public class RKO_Board extends KObj_Renderable {
 	
 	@Override
 	public void render() {
+		glPushMatrix();
 		glTranslatef(pos.x, pos.y, pos.z);
 		//eggs.useProgram();
 		if (material != null)
 			material.bind();
 		//System.out.println("RENDER!");
+		FlatDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		FlatDrawing.renderBillboard(2, 2, KondionLoader.getMissingTexture());
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();
+		glPopMatrix();
 	}
 
 	@Override

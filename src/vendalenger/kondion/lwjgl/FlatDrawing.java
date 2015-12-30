@@ -59,7 +59,6 @@ public class FlatDrawing {
 		glPushMatrix();
 		glScalef(width, height, 0);
 
-		//setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glVertexPointer(3, GL_FLOAT, 0, 0l);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);

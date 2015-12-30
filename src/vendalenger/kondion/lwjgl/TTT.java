@@ -56,6 +56,7 @@ public class TTT {
 	 */
 
 	private static int prefFov = 50;
+	public static final float converter = 57.295779513f;
 
 	public static void addVect(List<Float> list, Vector3f v) {
 		list.add(v.x);

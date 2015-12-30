@@ -16,21 +16,43 @@
 
 package vendalenger.kondion;
 
+import javax.script.ScriptException;
+
+import jdk.internal.dynalink.beans.StaticClass;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+
 import org.joml.Vector3f;
 
 import vendalenger.port.Command;
 
 public class KJS {
+	
+	public final ScriptObjectMirror o;
+	public final StaticClass i;
+	
+	public KJS() throws ScriptException {
+		i = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.KInput\")");
+		o = (ScriptObjectMirror) Kondion.getNashorn().eval("{"
+				/*+ "  node: Java.type(\"vendalenger.kondion.objectbase.KObj_Node\"),"
+				+ "  oriented: Java.type(\"vendalenger.kondion.objectbase.KObj_Oriented\"),"
+				+ "  render: Java.type(\"vendalenger.kondion.objectbase.KObj_Renderable\"),"
+				+ "  solid: Java.type(\"vendalenger.kondion.objectbase.KObj_Solid\"),"
+				+ "  extend: function(from, with) {"
+				+ "    var java"
+				+ "  }"*/
+				+ "}");
 
-	public static void freeCam() {
+	}
+
+	public void freeCam() {
 		Kondion.getCurrentCamera().setFreeMode(true);
 	}
 
-	public static void issueCommand(String msg) {
+	public void issueCommand(String msg) {
 		Command.issue(msg, false);
 	}
 	
-	public static float fps() {
+	public float fps() {
 		return Kondion.getFramerate();
 	}
 }

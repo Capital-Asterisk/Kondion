@@ -11,6 +11,7 @@ import com.sun.scenario.effect.Color4f;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.kobj.GKO_Layer;
 import vendalenger.kondion.kobj.GKO_Scene;
+import vendalenger.kondion.kobj.OKO_Camera_;
 
 public class KondionWorld {
 
@@ -19,6 +20,7 @@ public class KondionWorld {
 	
 	public GKO_Scene Scene;
 	public ScriptObjectMirror s;
+	public OKO_Camera_ camera;
 	
 	public KondionWorld() {
 		clearColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);

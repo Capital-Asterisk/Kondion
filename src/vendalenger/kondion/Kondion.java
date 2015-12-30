@@ -48,8 +48,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GLContext;
 
 import sun.font.Script;
+import vendalenger.kondion.kobj.OKO_Camera_;
 import vendalenger.kondion.kobj.GKO_Scene;
-import vendalenger.kondion.lwjgl.Camera_;
 import vendalenger.kondion.lwjgl.FlatDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
@@ -61,12 +61,13 @@ import argo.jdom.JsonRootNode;
 
 public class Kondion {
 
-	private static Camera_ currentCamera;
+	private static OKO_Camera_ dummyCamera;
 	private static JFrame loadingScreen;
 	private static KondionGame game;
 	private static ScriptEngine jsEngine;
 	private static Thread gameThread;
 	private static KondionWorld world;
+	private static KJS kjs;
 
 	private static float fps;
 	private static long ticks;
@@ -76,12 +77,10 @@ public class Kondion {
 	public static boolean showHud = false;
 	
 	private static void gameLoop() {
-
-		currentCamera = new Camera_();
-		currentCamera.look(0, 0, 5, 0, 0, 0);
-		currentCamera.setFreeMode(true);
-
+		
 		world = new KondionWorld();
+
+		KInput.setMouseLock(true);
 		
 		try {
 			jsEngine.put("World", world);
@@ -105,7 +104,9 @@ public class Kondion {
 			prevTime = System.nanoTime();
 			delta = time / 1000000000.0f;
 
-			currentCamera.update();
+			KInput.update();
+			
+			//currentCamera.update();
 
 			// Rendering
 
@@ -135,8 +136,13 @@ public class Kondion {
 		System.exit(0);
 	}
 
-	public static Camera_ getCurrentCamera() {
-		return currentCamera;
+	public static OKO_Camera_ getCurrentCamera() {
+		// Something getters and setters are useful for
+		if (world.camera != null)
+			return world.camera;
+		else {
+			return dummyCamera;
+		}
 	}
 	
 	public static GKO_Scene getCurrentScene() {
@@ -278,7 +284,13 @@ public class Kondion {
 
 					jsEngine.eval(new FileReader(FileShortcuts.getChild(
 							g.getGameDir(), "masterscript.js")));
-
+					
+					dummyCamera = new OKO_Camera_();
+					dummyCamera.look(0, 0, 5, 0, 0, 0);
+					//dummyCamera.setFreeMode(true);
+					
+					kjs = new KJS();
+					jsEngine.put("KJS", kjs);
 					((Invocable) jsEngine).invokeFunction("init");
 					Window.update();
 					KondionLoader.load();
