@@ -35,6 +35,10 @@ public class RKO_Board extends KObj_Renderable {
 
 	@Override
 	public void update() {
-		
+		if (this.s != null) {
+			if (this.s.containsKey("onupdate")) {
+				this.s.callMember("onupdate");
+			}
+		}
 	}
 }

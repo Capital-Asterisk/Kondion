@@ -22,6 +22,9 @@ public class KondionWorld {
 	public ScriptObjectMirror s;
 	public OKO_Camera_ camera;
 	
+	public float zNear = 0.1f;
+	public float zFar = 100.0f;
+	
 	public KondionWorld() {
 		clearColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);
 		Layers = new ArrayList<GKO_Layer>();

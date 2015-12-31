@@ -18,11 +18,14 @@ import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class RKO_InfinitePlane extends KObj_Renderable {
 	
+	public int size;
+	
 	KondionShader eggs;
 	FloatBuffer buffer;
 	
 	public RKO_InfinitePlane() {
 		//eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
+		size = 10000;
 		buffer = null;
 	}
 	
@@ -31,6 +34,7 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
 		glPushMatrix();
+		//size += 400;
 		Matrix4f temp0 = new Matrix4f();
 		temp0.rotate(-rot.z / TTT.converter, 0, 0, 1);
 		temp0.rotate(-rot.y / TTT.converter, 0, 1, 0);
@@ -42,6 +46,8 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 		pos.mul(temp0, temp2);
 		//glTranslatef(pos.x, pos.y, pos.z);
 		//glTranslatef(0, -6, print("EGGS");	-5);
+		
+		Kondion.getWorld().zFar = Float.MAX_VALUE / 2 - 1;
 		glTranslatef(Kondion.getCurrentCamera().pos.x, Kondion.getCurrentCamera().pos.y, Kondion.getCurrentCamera().pos.z);
 		glRotatef(rot.z, 0, 0, 1);
 		glRotatef(rot.y, 0, 1, 0);
@@ -62,8 +68,14 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 		if (material != null)
 			material.bind();
 		//System.out.println("RENDER!");
-		FlatDrawing.setCoords(new float[] {200, 200, 0, 200, 0, 0, 200, 0});
-		FlatDrawing.renderBillboard(300, 300);
+		float addx = -(-temp1.x + temp2.x);
+		float addy = -(-temp1.y + temp2.y);
+		FlatDrawing.setCoords(new float[] {
+				size + addx, size + addy,
+				0 + addx, size + addy,
+				0 + addx, 0 + addy,
+				size + addx, 0 + addy});
+		FlatDrawing.renderBillboard(size, size);
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();
@@ -72,6 +84,10 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 
 	@Override
 	public void update() {
-		
+		if (this.s != null) {
+			if (this.s.containsKey("onupdate")) {
+				this.s.callMember("onupdate");
+			}
+		}
 	}
 }

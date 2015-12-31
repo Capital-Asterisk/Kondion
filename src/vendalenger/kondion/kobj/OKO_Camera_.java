@@ -60,6 +60,8 @@ public class OKO_Camera_ extends KObj_Oriented {
 	private Vector3f tempVector1;
 	private Vector4f tempVector2;
 	private Vector4f tempVector3;
+	
+	public float moveSpeed = 6.0f;
 
 	public OKO_Camera_() {
 
@@ -187,7 +189,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 					.perspective(
 							(float) Math.toRadians(TTT.getPrefFov()),
 							((float) (Window.getWidth()) / (float) (Window
-									.getHeight())), 0.01f, 100.0f)
+									.getHeight())), Kondion.getWorld().zNear, Kondion.getWorld().zFar)
 					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		} else {
@@ -196,7 +198,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 					.perspective(
 							(float) Math.toRadians(fov),
 							((float) (Window.getWidth()) / (float) (Window
-									.getHeight())), 0.01f, 100.0f)
+									.getHeight())), Kondion.getWorld().zNear, Kondion.getWorld().zFar)
 					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		}
@@ -266,7 +268,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 		if (freeMode) {
 			calculateAngle();
 			tempVector0.set(0, 0, 0);
-			cameraSpeed = Kondion.getDelta() * 6;
+			cameraSpeed = Kondion.getDelta() * moveSpeed;
 			//bind = null;
 			if (KInput.buttonIsDown(upDownLeftRight[0])) {
 				// forward

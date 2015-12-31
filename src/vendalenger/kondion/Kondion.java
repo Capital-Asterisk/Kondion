@@ -101,8 +101,10 @@ public class Kondion {
 		Window.setWindowVisible(true);
 		
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
+			
 			prevTime = System.nanoTime();
 			delta = time / 1000000000.0f;
+			ticks ++;
 
 			KInput.update();
 			
@@ -168,6 +170,10 @@ public class Kondion {
 	public static ScriptEngine getNashorn() {
 		return jsEngine;
 	}
+	
+	public static KondionWorld getWorld() {
+		return world;
+	}
 
 	public static void run(KondionGame g) {
 		new Thread(new Runnable() {
@@ -201,7 +207,7 @@ public class Kondion {
 			public void run() {
 				try {
 					Window.setNatives();
-					Window.initGL(800, 600, false, false, g.getGameInfo()
+					Window.initGL(1280, 720, false, false, g.getGameInfo()
 							.getStringValue("GameName"));
 					GLContext.createFromCurrent();
 					FlatDrawing.setup();

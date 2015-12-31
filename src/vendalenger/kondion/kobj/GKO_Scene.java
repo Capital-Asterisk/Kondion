@@ -29,7 +29,10 @@ public class GKO_Scene extends KObj_Node {
 
 	@Override
 	public void update() {
-		// TODO Auto-generated method stub
-		
+		if (this.s != null) {
+			if (this.s.containsKey("onupdate")) {
+				this.s.callMember("onupdate");
+			}
+		}
 	}
 }

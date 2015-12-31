@@ -16,8 +16,14 @@
 
 package vendalenger.kondion.objectbase;
 
+import org.joml.Matrix4f;
+
 public abstract class KObj_Solid extends KObj_Oriented {
 	
+	public final Matrix4f prevTransform;
 	
+	public KObj_Solid() {
+		prevTransform = new Matrix4f();
+	}
 	
 }
