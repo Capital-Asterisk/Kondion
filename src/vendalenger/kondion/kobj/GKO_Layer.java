@@ -65,7 +65,9 @@ public class GKO_Layer extends KObj_Node {
 				break;
 			case 2:
 				// Collisions first
-				
+				if (collisions) {
+					doCollisions();
+				}
 				// Update all the objects
 				for (KObj_Node kobj : children) {
 					kobj.update();
@@ -85,16 +87,26 @@ public class GKO_Layer extends KObj_Node {
 	}
 	
 	private void doCollisions() {
+		// Loop through children
 		for (int i = 0; i < children.size(); i++) {
+			// Is it solid?
 			if (children.get(i) instanceof KObj_Solid) {
+				// Does this make it faster?
 				currentA = (KObj_Solid) children.get(i);
+				// Loop through all children again
 				for (int j = 0; j < children.size(); j++) {
 					if (children.get(j) instanceof KObj_Solid) {
-						
+						currentB = (KObj_Solid) children.get(j);
+						// DO I COLLIDE WITH MYSELF?
+						if (currentA != currentB) {
+							currentA.collisionCheck(currentB);
+						}
 					}
 				}
 				
 				
+			} else {
+				// TODO warning?
 			}
 		}
 	}

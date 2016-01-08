@@ -6,8 +6,6 @@ import java.util.List;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
-import com.sun.scenario.effect.Color4f;
-
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.kobj.GKO_Layer;
 import vendalenger.kondion.kobj.GKO_Scene;

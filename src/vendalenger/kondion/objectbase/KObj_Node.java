@@ -125,7 +125,14 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 
 	@Override
 	public KObj_Node get(Object key) {
+		if (key instanceof Integer) {
+			return get((int) key);
+		}
 		return children.get(childNames.indexOf(key));
+	}
+	
+	public KObj_Node get(int key) {
+		return children.get(key);
 	}
 
 	@Override

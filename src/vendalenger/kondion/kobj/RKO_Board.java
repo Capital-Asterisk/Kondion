@@ -26,7 +26,7 @@ public class RKO_Board extends KObj_Renderable {
 			material.bind();
 		//System.out.println("RENDER!");
 		FlatDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
-		FlatDrawing.renderBillboard(2, 2, KondionLoader.getMissingTexture());
+		FlatDrawing.renderBillboard(1, 1, KondionLoader.getMissingTexture());
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();

@@ -17,7 +17,7 @@
 package vendalenger.kondion.lwjgl;
 
 import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -142,7 +142,8 @@ public class Window {
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
 		
-		System.out.println("GLFW Version: " + GLFW.glfwGetVersionString());
+		System.out.println("GLFW Version: " + glfwGetVersionString());
+		
 		//System.out.println("OpenGL Version: " + GL11.glGetString(GL11.GL_VERSION));
 
 		// TTT.Two();

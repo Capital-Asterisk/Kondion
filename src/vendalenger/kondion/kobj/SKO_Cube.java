@@ -7,12 +7,12 @@ import vendalenger.kondion.lwjgl.resource.KondionShader;
 import vendalenger.kondion.objectbase.KObj_Node;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
-public class SKO_Ground extends KObj_Solid {
+public class SKO_Cube extends KObj_Solid {
 	
 	KondionShader eggs;
 	FloatBuffer buffer;
 	
-	public SKO_Ground() {
+	public SKO_Cube() {
 		//eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 		buffer = null;
 	}
@@ -30,5 +30,4 @@ public class SKO_Ground extends KObj_Solid {
 	public void collisionCheck(KObj_Solid kobj) {
 		
 	}
-
 }

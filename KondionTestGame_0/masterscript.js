@@ -9,6 +9,7 @@
 var init = function() {
 	KJS.issueCommand("^eggs");
 	//^kdion.js (scene.addRenderable*(new KJS.r.Board*(*)*))
+	
 };
 
 var start = function() {
@@ -22,11 +23,12 @@ var start = function() {
 	SCN.Camera = new OKO_Camera_();
 	SCN.Camera.look(0, 0, 5, 0, 0, 0);
 	SCN.Camera.setFreeMode(true);
-	SCN.Camera.moveSpeed = 10;
+	
 	SCN.Camera.s = {
 		onupdate: function() {
 			//SCN.Ground.rot.x += 0.04;
 			//SCN.Ceil.rot.x += 0.04;
+			SCN.Camera.moveSpeed = 8;
 		}
 	}
 	
@@ -38,6 +40,7 @@ var start = function() {
 	//SCN.Apple.pos.z = -1;
 	SCN.Ground.rot.x = 90;
 	SCN.Ceil.rot.x = 0;
+	SCN.Ground.textureSize = 6;
 	SCN.Ground.pos.y = -4;
 	SCN.Ceil.pos.z = -10;
 	

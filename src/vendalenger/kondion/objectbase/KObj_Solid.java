@@ -16,6 +16,8 @@
 
 package vendalenger.kondion.objectbase;
 
+import java.util.List;
+
 import org.joml.Matrix4f;
 
 public abstract class KObj_Solid extends KObj_Oriented {
@@ -25,5 +27,7 @@ public abstract class KObj_Solid extends KObj_Oriented {
 	public KObj_Solid() {
 		prevTransform = new Matrix4f();
 	}
+
+	public abstract void collisionCheck(KObj_Solid kobj);
 	
 }

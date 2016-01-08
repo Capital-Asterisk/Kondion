@@ -16,11 +16,12 @@
 
 package vendalenger.kondion.lwjgl.resource;
 
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_LINEAR;
 import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
-import static org.lwjgl.opengl.GL11.GL_NEAREST;
 import static org.lwjgl.opengl.GL11.GL_REPEAT;
 import static org.lwjgl.opengl.GL11.GL_RGBA;
 import static org.lwjgl.opengl.GL11.GL_RGBA8;
@@ -94,7 +95,7 @@ public class KondionLoader {
 		
 		if (missingTexture == null) {
 			missingTexture = registerTexture(KondionLoader.class.getResourceAsStream("missingno.png"),
-					"Missing_Texture", GL_NEAREST, GL_NEAREST,
+					"Missing_Texture", GL_LINEAR, GL_NEAREST,
 					GL_REPEAT, GL_REPEAT, false);
 		}
 		for (int i = 0; i < queue.size(); i++) {

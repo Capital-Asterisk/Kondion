@@ -22,10 +22,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import javafx.application.Platform;
-import javafx.scene.input.Clipboard;
-import javafx.scene.input.ClipboardContent;
-
 import javax.script.ScriptException;
 
 import org.lwjgl.opengl.GL11;
@@ -145,7 +141,7 @@ public class Command {
 						+ "\nfile: file(s) - Files to copy") {
 			@Override
 			public String action(final String[] args) {
-				Platform.runLater(() -> {
+				/*Platform.runLater(() -> {
 					Clipboard sc = Clipboard.getSystemClipboard();
 					ClipboardContent cbc = new ClipboardContent();
 					ArrayList<String> files = new ArrayList<String>();
@@ -155,7 +151,7 @@ public class Command {
 					}
 					cbc.putFilesByPath(files);
 					sc.setContent(cbc);
-				});
+				});*/
 				return "";
 			}
 		}, false);
