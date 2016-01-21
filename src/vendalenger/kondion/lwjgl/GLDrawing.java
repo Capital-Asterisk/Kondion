@@ -16,7 +16,7 @@
 
 package vendalenger.kondion.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_COORD_ARRAY;
@@ -46,19 +46,49 @@ import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
 
-public class FlatDrawing {
+public class GLDrawing {
 
-	public static int vbo_texCoords;
-
-	public static int vbo_unitSquare;
+	private static int vbo_texCoords;
+	private static int vbo_unitSquare;
+	
+	private static int vbo_cube;
 
 	// private static ArrayList<int[]> canvasTextures = new ArrayList<int[]>();
 	private static FloatBuffer texCoords;
+	
+	public static void renderCube(float width, float height,
+			KondionTexture t) {
+		glPushMatrix();
+		glEnable(GL_TEXTURE_2D);
+		glScalef(width, height, 0);
+		t.bind();
+		
+		//setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+		
+		// floats are equal to 4 bytes
+		// "Interleaved Data"
+		
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
+		glVertexPointer(3, GL_FLOAT, 32, 0l); // First object
+		glNormalPointer(GL_FLOAT, 32, 12); // Second 
+		glTexCoordPointer(2, GL_FLOAT, 32, 24); // Third
 
-	public static void renderBillboard(float width, float height) {
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glDrawArrays(GL_TRIANGLES, 0, 16);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
+		glPopMatrix();
+	}
+
+	public static void renderQuad(float width, float height) {
 		glPushMatrix();
 		glScalef(width, height, 0);
-
+		
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glVertexPointer(3, GL_FLOAT, 0, 0l);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -79,7 +109,7 @@ public class FlatDrawing {
 	}
 
 	
-	public static void renderBillboard(float width, float height,
+	public static void renderQuad(float width, float height,
 			KondionTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
@@ -149,6 +179,9 @@ public class FlatDrawing {
 	}
 
 	public static void setup() {
+		
+		// Plane
+		
 		texCoords = BufferUtils.createFloatBuffer(8);
 		texCoords.put(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		texCoords.flip();
@@ -169,7 +202,32 @@ public class FlatDrawing {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glBufferData(GL_ARRAY_BUFFER, square, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+		// Cube
+		
+		FloatBuffer interleaved = BufferUtils.createFloatBuffer(24);
+		
+		// VERTEX/COORD/NORM in obj
+		// Vertex, Normal, TexCoord here
+		square.put(new float[] {
+				0.5f, -0.5f, 0.5f,
+				0.0f, -1.0f, 0.0f,
+				0.5f, 0.25f});
+		square.put(new float[] {
+				-0.5f, -0.5f, 0.5f,
+				0.0f, -1.0f, 0.0f,
+				0.5f, 0.5f});
+		square.put(new float[] {
+				-0.5f, -0.5f, -0.5f,
+				0.0f, -1.0f, 0.0f,
+				0.25f, 0.5f});
+		
+		square.flip();
 
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
+		glBufferData(GL_ARRAY_BUFFER, square, GL_STATIC_DRAW);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
 	}
 
 	public static void translate2D(float x, float y) {

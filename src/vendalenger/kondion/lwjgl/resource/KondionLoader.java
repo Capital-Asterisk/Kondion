@@ -77,6 +77,7 @@ public class KondionLoader {
 	public static HashMap<String, KondionTexture> textures;
 
 	private static KondionTexture missingTexture;
+	private static KondionTexture missingTexture_cube;
 	
 	/**
 	 * Initialize textures and queue
@@ -98,6 +99,9 @@ public class KondionLoader {
 					"Missing_Texture", GL_LINEAR, GL_NEAREST,
 					GL_REPEAT, GL_REPEAT, false);
 		}
+		registerTexture(KondionLoader.class.getResourceAsStream("uvcube.png"),
+				"Default_Cube", GL_LINEAR, GL_NEAREST,
+				GL_REPEAT, GL_REPEAT, true);
 		for (int i = 0; i < queue.size(); i++) {
 			if ((boolean) queue.get(i)[0]) {
 				// its a shader

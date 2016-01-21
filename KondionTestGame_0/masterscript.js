@@ -24,31 +24,38 @@ var start = function() {
 	SCN.Camera.look(0, 0, 5, 0, 0, 0);
 	SCN.Camera.setFreeMode(true);
 	
+	// Create a board (RKO: Renderable Kondion Object)
+	SCN.Apple = new RKO_Board();
+	SCN.Ground = new SKO_InfinitePlane();
+	//SCN.Ceil = new SKO_InfinitePlane();
+
+	//SCN.Apple.pos.z = -1;
+	//SCN.Ground.rot.x = 90;
+	//SCN.Ceil.rot.x = 0;
+	SCN.Ground.transform.rotateX(Math.PI / 2);
+	SCN.Ground.textureSize = 1;
+	//SCN.Ground.pos.y = -4;
+	//SCN.Ceil.pos.z = -10;
+	
+	World.Layers[0].Apple = SCN.Apple;
+	World.Layers[0].Ground = SCN.Ground;
+	//World.Layers[0].Ceil = SCN.Ceil;
+	World.Layers[1].EEE = SCN.Camera;
+	World.camera = SCN.Camera;
+	
 	SCN.Camera.s = {
 		onupdate: function() {
 			//SCN.Ground.rot.x += 0.04;
 			//SCN.Ceil.rot.x += 0.04;
-			SCN.Camera.moveSpeed = 8;
+			SCN.Camera.moveSpeed = 2;
 		}
 	}
 	
-	// Create a board (RKO: Renderable Kondion Object)
-	SCN.Apple = new RKO_Board();
-	SCN.Ground = new RKO_InfinitePlane();
-	SCN.Ceil = new RKO_InfinitePlane();
-
-	//SCN.Apple.pos.z = -1;
-	SCN.Ground.rot.x = 90;
-	SCN.Ceil.rot.x = 0;
-	SCN.Ground.textureSize = 6;
-	SCN.Ground.pos.y = -4;
-	SCN.Ceil.pos.z = -10;
-	
-	World.Layers[0].Apple = SCN.Apple;
-	World.Layers[0].Ground = SCN.Ground;
-	World.Layers[0].Ceil = SCN.Ceil;
-	World.Layers[1].EEE = SCN.Camera;
-	World.camera = SCN.Camera;
+	SCN.Apple.s = {
+		onupdate: function() {
+			SCN.Apple.transform.translate(0, 0.01, 0);
+		}
+	}
 	
 	//SCN.Apple.Seeds = new RKO_Board();
 	//SCN.Apple.Seeds.Poison = new RKO_Board();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Neal Nicdao
+ 																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																			* Copyright 2015 Neal Nicdao
  * 
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not
  * use this file except in compliance with the License. You may obtain a copy of
@@ -22,6 +22,8 @@ import vendalenger.kondion.objectbase.KObj_Node;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class GKO_Scene extends KObj_Node {
+	
+	
 	
 	public GKO_Scene() {
 		

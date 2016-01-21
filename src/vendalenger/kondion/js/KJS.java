@@ -14,7 +14,7 @@
  * the License.
  */
 
-package vendalenger.kondion;
+package vendalenger.kondion.js;
 
 import javax.script.ScriptException;
 
@@ -23,14 +23,24 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import org.joml.Vector3f;
 
+import vendalenger.kondion.Kondion;
 import vendalenger.port.Command;
 
 public class KJS {
 	
 	public final ScriptObjectMirror o;
 	public final StaticClass i;
+	public final StaticClass c;
+	public static final short ZYX = 0,
+			ZXY = 1,
+			YXZ = 2,
+			YZX = 3,
+			XYZ = 4,
+			XZY = 5;
 	
 	public KJS() throws ScriptException {
+		System.out.println("KJS initialization");
+		c = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.js.KJS\")");
 		i = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.KInput\")");
 		o = (ScriptObjectMirror) Kondion.getNashorn().eval("{"
 				/*+ "  node: Java.type(\"vendalenger.kondion.objectbase.KObj_Node\"),"

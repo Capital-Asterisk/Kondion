@@ -3,14 +3,18 @@ package vendalenger.kondion.kobj;
 import static org.lwjgl.opengl.GL11.*;
 
 import java.io.File;
+import java.nio.FloatBuffer;
 
-import vendalenger.kondion.lwjgl.FlatDrawing;
+import org.lwjgl.BufferUtils;
+
+import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class RKO_Board extends KObj_Renderable {
 	
+	private FloatBuffer buffer;
 	KondionShader eggs;
 	
 	public RKO_Board() {
@@ -19,14 +23,21 @@ public class RKO_Board extends KObj_Renderable {
 	
 	@Override
 	public void render() {
+		if (buffer == null)
+			buffer = BufferUtils.createFloatBuffer(16);
+		
+		buffer.clear();
+		actTransform.get(buffer);
+		
 		glPushMatrix();
-		glTranslatef(pos.x, pos.y, pos.z);
+		glLoadIdentity();
+		glMultMatrix(buffer);
 		//eggs.useProgram();
 		if (material != null)
 			material.bind();
 		//System.out.println("RENDER!");
-		FlatDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
-		FlatDrawing.renderBillboard(1, 1, KondionLoader.getMissingTexture());
+		GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+		GLDrawing.renderQuad(1, 1, KondionLoader.getMissingTexture());
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();
@@ -40,5 +51,11 @@ public class RKO_Board extends KObj_Renderable {
 				this.s.callMember("onupdate");
 			}
 		}
+	}
+
+	@Override
+	public void updateB() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.joml.Matrix4f;
 
-public abstract class KObj_Solid extends KObj_Oriented {
+public abstract class KObj_Solid extends KObj_Renderable {
 	
 	public final Matrix4f prevTransform;
 	

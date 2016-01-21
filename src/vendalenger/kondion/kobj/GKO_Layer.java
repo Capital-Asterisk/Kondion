@@ -16,8 +16,11 @@
 
 package vendalenger.kondion.kobj;
 
+import java.util.LinkedHashSet;
+
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.objectbase.KObj_Node;
+import vendalenger.kondion.objectbase.KObj_Oriented;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
@@ -39,6 +42,8 @@ public class GKO_Layer extends KObj_Node {
 	}
 	
 	public GKO_Layer(int t) {
+		LinkedHashSet<KObj_Renderable> f = new LinkedHashSet<KObj_Renderable>();
+		
 		if (t <= 3 && t >= 0)
 			type = t;
 		else
@@ -52,7 +57,35 @@ public class GKO_Layer extends KObj_Node {
 			// It seems there is a better way of
 			// doing this
 			
-			switch (type) {
+			// UpdateA first, with movement
+			for (KObj_Node kobj : children) {
+				kobj.update();
+			}
+			
+			// Then apply apply transformations
+			for (KObj_Node kobj : children) {
+				// Is it solid?
+				if (kobj instanceof KObj_Oriented)
+					((KObj_Oriented) kobj).applyTransform();
+				// else not an oriented
+			}
+			
+			// Then Collisions
+			if (collisions) {
+				doCollisions();
+			}
+			
+			// UpdateB all the objects, with detectors
+			// Render at the same time
+			for (KObj_Node kobj : children) {
+				if (kobj instanceof KObj_Oriented) {
+					((KObj_Oriented) kobj).updateB();
+					if (Kondion.showPrespective && kobj instanceof KObj_Renderable)
+						((KObj_Renderable) kobj).render();
+				}
+			}
+			
+			/*switch (type) {
 			case 1:
 				// Render all the objects (if they can)
 				if (Kondion.showPrespective) {
@@ -64,13 +97,28 @@ public class GKO_Layer extends KObj_Node {
 				}
 				break;
 			case 2:
-				// Collisions first
+				// UpdateA first, with movement
+				for (KObj_Node kobj : children) {
+					kobj.update();
+				}
+				
+				// Then apply apply transformations
+				for (KObj_Node kobj : children) {
+					// Is it solid?
+					if (kobj instanceof KObj_Oriented)
+						((KObj_Oriented) kobj).applyTransform();
+					// else not an oriented
+				}
+				
+				// Then Collisions
 				if (collisions) {
 					doCollisions();
 				}
-				// Update all the objects
+				
+				// UpdateB all the objects, with detectors
 				for (KObj_Node kobj : children) {
-					kobj.update();
+					if (kobj instanceof KObj_Oriented)
+						((KObj_Oriented) kobj).updateB();
 				}
 				break;
 			case 3:
@@ -82,12 +130,13 @@ public class GKO_Layer extends KObj_Node {
 					}
 				}
 				break;
-			}
+			}*/
 		}
 	}
 	
 	private void doCollisions() {
 		// Loop through children
+		
 		for (int i = 0; i < children.size(); i++) {
 			// Is it solid?
 			if (children.get(i) instanceof KObj_Solid) {
@@ -100,11 +149,10 @@ public class GKO_Layer extends KObj_Node {
 						// DO I COLLIDE WITH MYSELF?
 						if (currentA != currentB) {
 							currentA.collisionCheck(currentB);
+							//currentA.pos.z += 0.001f;
 						}
 					}
 				}
-				
-				
 			} else {
 				// TODO warning?
 			}

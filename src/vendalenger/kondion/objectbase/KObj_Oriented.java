@@ -21,8 +21,34 @@ import org.joml.Vector3f;
 
 public abstract class KObj_Oriented extends KObj_Node {
 	
-	public final Vector3f pos = new Vector3f();
-	public final Vector3f rot = new Vector3f();
+	//public static final int 
 	public final Matrix4f transform = new Matrix4f();
+	public final Matrix4f actTransform = new Matrix4f();
 	
+	public abstract void updateB();
+	
+	public void applyTransform() {
+		//transform.
+		actTransform.identity();
+		if (parent instanceof KObj_Oriented) {
+			((KObj_Oriented) parent).multiplyByAct(actTransform);
+		}
+		actTransform.mul(transform);
+	}
+	
+	public void multiplyByAct(Matrix4f h) {
+		h.mul(actTransform);
+	}
+	
+	public float getOffsetX() {
+		return transform.m30;
+	}
+	
+	public float getOffsetY() {
+		return transform.m31;
+	}
+	
+	public float getOffsetZ() {
+		return transform.m32;
+	}
 }

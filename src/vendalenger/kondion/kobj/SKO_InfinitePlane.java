@@ -1,33 +1,41 @@
 package vendalenger.kondion.kobj;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glRotatef;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.io.File;
 import java.nio.FloatBuffer;
+import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.lwjgl.FlatDrawing;
+import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
-import vendalenger.kondion.objectbase.KObj_Renderable;
+import vendalenger.kondion.objectbase.KObj_Node;
+import vendalenger.kondion.objectbase.KObj_Oriented;
+import vendalenger.kondion.objectbase.KObj_Solid;
 
-public class RKO_InfinitePlane extends KObj_Renderable {
+public class SKO_InfinitePlane extends KObj_Solid {
 	
+	private FloatBuffer buffer;
 	public int size;
 	public float textureSize;
+	private Matrix4f temp0;
 	
 	KondionShader eggs;
-	FloatBuffer buffer;
 	
-	public RKO_InfinitePlane() {
+	public SKO_InfinitePlane() {
 		eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 		size = 10000;
 		textureSize = 1f;
+		temp0 = new Matrix4f();
 		buffer = null;
 	}
 	
@@ -35,37 +43,26 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 	public void render() {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
-		glPushMatrix();
-		//size += 400;
-		Matrix4f temp0 = new Matrix4f();
-		temp0.rotate(-rot.z / TTT.converter, 0, 0, 1);
-		temp0.rotate(-rot.y / TTT.converter, 0, 1, 0);
-		temp0.rotate(-rot.x / TTT.converter, 1, 0, 0);
-		Vector3f temp1 = new Vector3f();
-		Vector3f temp2 = new Vector3f();
-		Kondion.getCurrentCamera().pos.mul(temp0, temp1);
-		//System.out.println("Distance: " + (temp2.z - temp1.z));
-		pos.mul(temp0, temp2);
-		//glTranslatef(pos.x, pos.y, pos.z);
-		//glTranslatef(0, -6, print("EGGS");	-5);
 		
-		Kondion.getWorld().zFar = Float.MAX_VALUE / 2 - 1;
+		Kondion.getWorld().zFar = Float.MAX_VALUE / 5 - 1;
+		
+		Vector3f temp1 = new Vector3f(); // Transformed camera position
+		Vector3f temp2 = new Vector3f(); // Transformed this position
+		Kondion.getCurrentCamera().pos.mul(actTransform.invert(temp0), temp1);
+		
+		temp2.mul(temp0);
+		
+		buffer.clear();
+		actTransform.get(buffer);
+		
+		
+		glPushMatrix();
+		glLoadIdentity();
+		//glTranslatef(0, 0, -temp1.z + temp2.z);
 		glTranslatef(Kondion.getCurrentCamera().pos.x, Kondion.getCurrentCamera().pos.y, Kondion.getCurrentCamera().pos.z);
-		glRotatef(rot.z, 0, 0, 1);
-		glRotatef(rot.y, 0, 1, 0);
-		glRotatef(rot.x, 1, 0, 0);
-		//glTranslatef(0, 0, (temp2.y - temp1.y));
+		glMultMatrix(buffer);
 		glTranslatef(0, 0, -temp1.z + temp2.z);
-		//glTranslatef(0, 0, 5);
-		//transform.identity();
-		//transform.lookAlong(rot, up);
-		//transform.translate(pos);
-		//buffer.clear();
-		//transform.get(buffer);
-		//buffer.rewind();
-		//buffer.position(15);
-		//glMultMatrix(buffer);
-		//glTranslatef(pos.x, pos.y, pos.z);
+		
 		//eggs.useProgram();
 		if (material != null)
 			material.bind();
@@ -74,13 +71,13 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 		float addy = -(-temp1.y + temp2.y) / textureSize;
 		addx %= textureSize;
 		addy %= textureSize;
-		FlatDrawing.setCoords(new float[] {
+		GLDrawing.setCoords(new float[] {
 				size / textureSize + addx, size / textureSize + addy,
 				addx, size / textureSize + addy,
 				addx, addy,
 				size / textureSize + addx, addy});
-		FlatDrawing.renderBillboard(size, size);
-		//KondionShader.unbind();
+		GLDrawing.renderQuad(size, size, KondionLoader.getMissingTexture());
+		System.out.println(textureSize);
 		if (material != null)
 			material.unbind();
 		glPopMatrix();
@@ -93,5 +90,16 @@ public class RKO_InfinitePlane extends KObj_Renderable {
 				this.s.callMember("onupdate");
 			}
 		}
+	}
+
+	@Override
+	public void collisionCheck(KObj_Solid kobj) {
+		
+	}
+
+	@Override
+	public void updateB() {
+		// TODO Auto-generated method stub
+		
 	}
 }

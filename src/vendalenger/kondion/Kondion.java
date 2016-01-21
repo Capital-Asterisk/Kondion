@@ -49,8 +49,9 @@ import org.lwjgl.opengl.GLContext;
 
 import sun.font.Script;
 import vendalenger.kondion.kobj.OKO_Camera_;
+import vendalenger.kondion.js.KJS;
 import vendalenger.kondion.kobj.GKO_Scene;
-import vendalenger.kondion.lwjgl.FlatDrawing;
+import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -210,7 +211,7 @@ public class Kondion {
 					Window.initGL(1280, 720, false, false, g.getGameInfo()
 							.getStringValue("GameName"));
 					GLContext.createFromCurrent();
-					FlatDrawing.setup();
+					GLDrawing.setup();
 					///FlatDrawing.
 					
 					jsEngine = new ScriptEngineManager()
@@ -284,7 +285,7 @@ public class Kondion {
 					}
 
 					System.out.println("Doing other stuff...");
-					FlatDrawing.setup();
+					GLDrawing.setup();
 
 					System.out.print("Loading game scripts...");
 

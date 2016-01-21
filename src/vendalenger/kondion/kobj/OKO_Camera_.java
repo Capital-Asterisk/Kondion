@@ -43,7 +43,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	private float yaw, pitch, roll;
 
 	private Vector3f center;
-	//private Vector3f eye;
+	public final Vector3f pos; // or eye
 	private Vector3f up;
 
 	private Matrix4f prespectiveMatrix;
@@ -75,7 +75,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 		roll = 0;
 
 		center = new Vector3f();
-		//pos = new Vector3f();
+		pos = new Vector3f();
 		up = new Vector3f();
 
 		prespectiveMatrix = new Matrix4f();
@@ -318,5 +318,11 @@ public class OKO_Camera_ extends KObj_Oriented {
 			normalizeCenter();
 			calculateUp();
 		}
+	}
+
+	@Override
+	public void updateB() {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -30,4 +30,16 @@ public class SKO_Cube extends KObj_Solid {
 	public void collisionCheck(KObj_Solid kobj) {
 		
 	}
+
+	@Override
+	public void render() {
+		// Draw a cube
+		
+	}
+
+	@Override
+	public void updateB() {
+		// TODO Auto-generated method stub
+		
+	}
 }
