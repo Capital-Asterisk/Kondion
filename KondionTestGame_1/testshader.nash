@@ -1,0 +1,24 @@
+// Kondion shader test. Both vert and frag in 1 file, good idea? or bad?
+
+#mode vert frag //Write the following onto both vert and frag
+
+#version 120
+
+#mode vert //Write only on vert
+
+void main() {
+	gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+	gl_TexCoord[0] = gl_MultiTexCoord0;
+}
+
+#mode frag //duh.
+
+uniform sampler2D texture1;
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+}
+
+void main() {
+    gl_FragColor = texture2D(texture1, gl_TexCoord[0].st) - vec4(rand(vec2(gl_FragCoord)), rand(vec2(gl_FragCoord)), rand(vec2(gl_FragCoord)), 0.2);
+}

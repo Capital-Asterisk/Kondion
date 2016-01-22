@@ -64,6 +64,14 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 		}
 		return (Scene) eggs;
 	}*/
+	public void defaultUpdate() {
+		if (this.s != null) {
+			this.s.setMember("obj", this);
+			if (this.s.containsKey("onupdate")) {
+				this.s.callMember("onupdate");
+			}
+		}
+	}
 	
 	public String nameTree() {
 		String s = "****Tree for " + name + "****";

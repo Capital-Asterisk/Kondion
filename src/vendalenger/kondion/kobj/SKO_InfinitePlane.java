@@ -48,9 +48,9 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		
 		Vector3f temp1 = new Vector3f(); // Transformed camera position
 		Vector3f temp2 = new Vector3f(); // Transformed this position
-		Kondion.getCurrentCamera().pos.mul(actTransform.invert(temp0), temp1);
+		Kondion.getCurrentCamera().pos.mulPoint(actTransform.invert(temp0), temp1);
 		
-		temp2.mul(temp0);
+		temp2.mulPoint(temp0);
 		
 		buffer.clear();
 		actTransform.get(buffer);
@@ -77,7 +77,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 				addx, addy,
 				size / textureSize + addx, addy});
 		GLDrawing.renderQuad(size, size, KondionLoader.getMissingTexture());
-		System.out.println(textureSize);
+		//System.out.println(textureSize);
 		if (material != null)
 			material.unbind();
 		glPopMatrix();
@@ -85,11 +85,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 
 	@Override
 	public void update() {
-		if (this.s != null) {
-			if (this.s.containsKey("onupdate")) {
-				this.s.callMember("onupdate");
-			}
-		}
+		defaultUpdate();
 	}
 
 	@Override

@@ -52,6 +52,8 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWvidmode;
 import org.lwjgl.opengl.GL11;
 
+import vendalenger.kondion.Kondion;
+
 public class Window {
 
 	private static GLFWKeyCallback keyCallback;
@@ -159,40 +161,47 @@ public class Window {
 		if (!path.endsWith(File.separator))
 			path += File.separator;
 		path += "lwjgl";
-
-		System.out.println("Today's Date: " + new Date().toString());
-		System.out.println("On directory: " + new File("").getAbsolutePath());
-		System.out.println("Detected OS: " + System.getProperty("os.name")
+		
+		System.out.println("-------------------SOME INFORMATION-----------------");
+		System.out.println("Kondion Version:  " + Kondion.version);
+		System.out.println("Today's Date:     " + new Date().toString());
+		System.out.println("On directory:     " + new File("").getAbsolutePath());
+		System.out.println("OS                " + System.getProperty("os.name")
 				+ " " + System.getProperty("os.version"));
-		System.out.println("Architecture: " + System.getProperty("os.arch"));
-		System.out.println("Data model: " + dataModel);
-		String os = System.getProperty("os.name").toLowerCase();
-		System.out.println("CPU Cores: "
+		System.out.println("Architecture:     " + System.getProperty("os.arch"));
+		System.out.println("Data model:       " + dataModel + " bit");
+		System.out.println("CPU Cores:        "
 				+ Runtime.getRuntime().availableProcessors());
+
+		String os = System.getProperty("os.name").toLowerCase();
 
 		/* Detect the Operating system then load the appropriate lwjgl natives */
 		if (os.contains("nix") || os.contains("aix") || os.contains("nux")) {
-			System.out.println("Loading Linux LWJGL Natives, finally.");
+			System.out.println("Natives to use:   Loading Linux LWJGL Natives, finally.");
 			path += "/linux";
 		} else if (os.toLowerCase().contains("win")) {
 			System.out
-					.println("Loading Windows LWJGL Natives. Windows is fine, but still. get a Linux.");
+					.println("Natives to use:   Loading Windows LWJGL Natives. Windows is fine, but still. get a Linux.");
 			path += "\\windows";
 		} else if (os.contains("mac")) {
 			System.out
-					.println("Loading Macintosh Apples LWJGL Natives and Linux is better that this expensible OS, so get a Linux.");
+					.println("Natives to use:   Loading Macintosh Apples LWJGL Natives and Linux is better that this expensible OS, so get a Linux.");
 			path += "/getalinux";
 		}
-
-		/* 64, or 32 bit? */
+		
+		// 64, or 32 bit?
 		if (dataModel.equals("64")) {
-			/* If amd64 */
+			// If amd64
 			path += File.separator + "x64";
 		} else {
-			/* If x86 or i386 */
+			// If x86 or i386
 			path += File.separator + "x86";
 		}
-		System.err.println(path);
+		
+		System.out.println("LWJGL Path:       " + path);
+		
+		System.out.println("----------------------------------------------------");
+		
 		System.setProperty("org.lwjgl.librarypath", path);
 	}
 

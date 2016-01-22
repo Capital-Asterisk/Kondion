@@ -96,11 +96,11 @@ public class KondionLoader {
 		
 		if (missingTexture == null) {
 			missingTexture = registerTexture(KondionLoader.class.getResourceAsStream("missingno.png"),
-					"Missing_Texture", GL_LINEAR, GL_NEAREST,
-					GL_REPEAT, GL_REPEAT, false);
+					"K_Missing", GL_LINEAR, GL_NEAREST,
+					GL_REPEAT, GL_REPEAT, true);
 		}
 		registerTexture(KondionLoader.class.getResourceAsStream("uvcube.png"),
-				"Default_Cube", GL_LINEAR, GL_NEAREST,
+				"K_Cube", GL_LINEAR, GL_NEAREST,
 				GL_REPEAT, GL_REPEAT, true);
 		for (int i = 0; i < queue.size(); i++) {
 			if ((boolean) queue.get(i)[0]) {

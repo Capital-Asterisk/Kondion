@@ -44,51 +44,54 @@ import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
+import com.sun.org.apache.xalan.internal.xsltc.cmdline.Transform;
+
+import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
 
 public class GLDrawing {
 
 	private static int vbo_texCoords;
 	private static int vbo_unitSquare;
-	
+
 	private static int vbo_cube;
 
 	// private static ArrayList<int[]> canvasTextures = new ArrayList<int[]>();
 	private static FloatBuffer texCoords;
-	
-	public static void renderCube(float width, float height,
-			KondionTexture t) {
+
+	public static void renderCube(float size, KondionTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
-		glScalef(width, height, 0);
+		glScalef(size, size, size);
 		t.bind();
-		
-		//setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
-		
+
+		// setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+
 		// floats are equal to 4 bytes
 		// "Interleaved Data"
-		
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
 		glVertexPointer(3, GL_FLOAT, 32, 0l); // First object
-		glNormalPointer(GL_FLOAT, 32, 12); // Second 
+		glNormalPointer(GL_FLOAT, 32, 12); // Second
 		glTexCoordPointer(2, GL_FLOAT, 32, 24); // Third
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-
-		glDrawArrays(GL_TRIANGLES, 0, 16);
+		
+		// System.out.print("EGGUS");
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
 		glPopMatrix();
 	}
 
 	public static void renderQuad(float width, float height) {
 		glPushMatrix();
 		glScalef(width, height, 0);
-		
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glVertexPointer(3, GL_FLOAT, 0, 0l);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -108,15 +111,13 @@ public class GLDrawing {
 		glPopMatrix();
 	}
 
-	
-	public static void renderQuad(float width, float height,
-			KondionTexture t) {
+	public static void renderQuad(float width, float height, KondionTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
 		glScalef(width, height, 0);
 		t.bind();
 
-		//setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+		// setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glVertexPointer(3, GL_FLOAT, 0, 0l);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -179,9 +180,9 @@ public class GLDrawing {
 	}
 
 	public static void setup() {
-		
+
 		// Plane
-		
+
 		texCoords = BufferUtils.createFloatBuffer(8);
 		texCoords.put(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		texCoords.flip();
@@ -202,32 +203,41 @@ public class GLDrawing {
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glBufferData(GL_ARRAY_BUFFER, square, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
+
 		// Cube
-		
-		FloatBuffer interleaved = BufferUtils.createFloatBuffer(24);
-		
+
+		FloatBuffer interleaved = BufferUtils.createFloatBuffer(288);
+
 		// VERTEX/COORD/NORM in obj
 		// Vertex, Normal, TexCoord here
-		square.put(new float[] {
-				0.5f, -0.5f, 0.5f,
-				0.0f, -1.0f, 0.0f,
-				0.5f, 0.25f});
-		square.put(new float[] {
-				-0.5f, -0.5f, 0.5f,
-				0.0f, -1.0f, 0.0f,
-				0.5f, 0.5f});
-		square.put(new float[] {
-				-0.5f, -0.5f, -0.5f,
-				0.0f, -1.0f, 0.0f,
-				0.25f, 0.5f});
 		
-		square.flip();
+		// Already calculated data for cube
+		interleaved.put(new float[] {0.5f, -0.5f, 0.5f, 0f, -1f, 0f, 0.5f, 0.250087f, -0.5f, -0.5f, 0.5f, 0f, -1f, 0f,
+				0.5f, 0.500043f, -0.5f, -0.5f, -0.5f, 0f, -1f, 0f, 0.250043f, 0.500043f, -0.5f, 0.5f, -0.5f, 0f, 1f, 0f,
+				0.250043f, 0.75f, -0.5f, 0.5f, 0.5f, 0f, 1f, 0f, 0.5f, 0.75f, 0.5f, 0.5f, 0.5f, 0f, 1f, 0f, 0.5f,
+				0.999957f, 0.5f, 0.5f, -0.5f, 1f, 0f, 0f, 0.999913f, 0.75f, 0.5f, 0.5f, 0.5f, 1f, 0f, 0f, 0.749956f,
+				0.75f, 0.5f, -0.5f, 0.5f, 1f, 0f, 0f, 0.749957f, 0.500044f, 0.5f, 0.5f, 0.5f, 0f, 0f, 1f, 0.749956f,
+				0.75f, -0.5f, 0.5f, 0.5f, 0f, 0f, 1f, 0.5f, 0.75f, -0.5f, -0.5f, 0.5f, 0f, 0f, 1f, 0.5f, 0.500043f,
+				-0.5f, -0.5f, 0.5f, -1f, 0f, 0f, 0.5f, 0.500043f, -0.5f, 0.5f, 0.5f, -1f, 0f, 0f, 0.5f, 0.75f, -0.5f,
+				0.5f, -0.5f, -1f, 0f, 0f, 0.250043f, 0.75f, 0.5f, -0.5f, -0.5f, 0f, 0f, -1f, 0.000087f, 0.500043f,
+				-0.5f, -0.5f, -0.5f, 0f, 0f, -1f, 0.250043f, 0.500043f, -0.5f, 0.5f, -0.5f, 0f, 0f, -1f, 0.250043f,
+				0.75f, 0.5f, -0.5f, -0.5f, 0f, -1f, 0f, 0.250044f, 0.250087f, 0.5f, -0.5f, 0.5f, 0f, -1f, 0f, 0.5f,
+				0.250087f, -0.5f, -0.5f, -0.5f, 0f, -1f, 0f, 0.250043f, 0.500043f, 0.5f, 0.5f, -0.5f, 0f, 1f, 0f,
+				0.250043f, 0.999957f, -0.5f, 0.5f, -0.5f, 0f, 1f, 0f, 0.250043f, 0.75f, 0.5f, 0.5f, 0.5f, 0f, 1f, 0f,
+				0.5f, 0.999957f, 0.5f, -0.5f, -0.5f, 1f, 0f, 0f, 0.999913f, 0.500044f, 0.5f, 0.5f, -0.5f, 1f, 0f, 0f,
+				0.999913f, 0.75f, 0.5f, -0.5f, 0.5f, 1f, 0f, 0f, 0.749957f, 0.500044f, 0.5f, -0.5f, 0.5f, 0f, 0f, 1f,
+				0.749957f, 0.500044f, 0.5f, 0.5f, 0.5f, 0f, 0f, 1f, 0.749956f, 0.75f, -0.5f, -0.5f, 0.5f, 0f, 0f, 1f,
+				0.5f, 0.500043f, -0.5f, -0.5f, -0.5f, -1f, 0f, 0f, 0.250043f, 0.500043f, -0.5f, -0.5f, 0.5f, -1f, 0f,
+				0f, 0.5f, 0.500043f, -0.5f, 0.5f, -0.5f, -1f, 0f, 0f, 0.250043f, 0.75f, 0.5f, 0.5f, -0.5f, 0f, 0f, -1f,
+				0.000087f, 0.75f, 0.5f, -0.5f, -0.5f, 0f, 0f, -1f, 0.000087f, 0.500043f, -0.5f, 0.5f, -0.5f, 0f, 0f,
+				-1f, 0.250043f, 0.75f});
+		interleaved.flip();
 
+		vbo_cube = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
-		glBufferData(GL_ARRAY_BUFFER, square, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, interleaved, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		
+
 	}
 
 	public static void translate2D(float x, float y) {

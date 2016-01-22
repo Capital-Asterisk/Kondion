@@ -1,8 +1,17 @@
 package vendalenger.kondion.kobj;
 
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMultMatrix;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
+
 import java.nio.FloatBuffer;
 import java.util.List;
 
+import org.lwjgl.BufferUtils;
+
+import vendalenger.kondion.lwjgl.GLDrawing;
+import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
 import vendalenger.kondion.objectbase.KObj_Node;
 import vendalenger.kondion.objectbase.KObj_Solid;
@@ -19,11 +28,7 @@ public class SKO_Cube extends KObj_Solid {
 
 	@Override
 	public void update() {
-		if (this.s != null) {
-			if (this.s.containsKey("onupdate")) {
-				this.s.callMember("onupdate");
-			}
-		}
+		defaultUpdate();
 	}
 
 	@Override
@@ -33,8 +38,23 @@ public class SKO_Cube extends KObj_Solid {
 
 	@Override
 	public void render() {
-		// Draw a cube
+		if (buffer == null)
+			buffer = BufferUtils.createFloatBuffer(16);
 		
+		buffer.clear();
+		actTransform.get(buffer);
+		
+		glPushMatrix();
+		glLoadIdentity();
+		glMultMatrix(buffer);
+		//eggs.useProgram();
+		if (material != null)
+			material.bind();
+		GLDrawing.renderCube(1, KondionLoader.textures.get("K_Cube"));
+		//KondionShader.unbind();
+		if (material != null)
+			material.unbind();
+		glPopMatrix();
 	}
 
 	@Override

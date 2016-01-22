@@ -61,6 +61,8 @@ import argo.jdom.JsonNode;
 import argo.jdom.JsonRootNode;
 
 public class Kondion {
+	
+	public static final String version = "0.0.2-ACACIA-DEV";
 
 	private static OKO_Camera_ dummyCamera;
 	private static JFrame loadingScreen;

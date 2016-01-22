@@ -35,9 +35,8 @@ public class RKO_Board extends KObj_Renderable {
 		//eggs.useProgram();
 		if (material != null)
 			material.bind();
-		//System.out.println("RENDER!");
 		GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
-		GLDrawing.renderQuad(1, 1, KondionLoader.getMissingTexture());
+		GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();
@@ -47,6 +46,7 @@ public class RKO_Board extends KObj_Renderable {
 	@Override
 	public void update() {
 		if (this.s != null) {
+			this.s.setMember("obj", this);
 			if (this.s.containsKey("onupdate")) {
 				this.s.callMember("onupdate");
 			}

@@ -259,11 +259,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	}
 
 	public void update() {
-		if (this.s != null) {
-			if (this.s.containsKey("onupdate")) {
-				this.s.callMember("onupdate");
-			}
-		}
+		defaultUpdate();
 		
 		if (freeMode) {
 			calculateAngle();
