@@ -16,18 +16,26 @@
 
 package vendalenger.kondion.objectbase;
 
-import java.util.List;
-
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public abstract class KObj_Solid extends KObj_Renderable {
 	
+	public boolean collide = false;
+	public boolean dynamic = false;
+	public boolean rotate = false;
+	
 	public final Matrix4f prevTransform;
+	public final Quaternionf rotVelocity;
+	public final Vector3f velocity;
 	
 	public KObj_Solid() {
 		prevTransform = new Matrix4f();
+		rotVelocity = new Quaternionf();
+		velocity = new Vector3f();
 	}
 
-	public abstract void collisionCheck(KObj_Solid kobj);
+	public abstract CollisionData collisionCheck(KObj_Solid kobj);
 	
 }

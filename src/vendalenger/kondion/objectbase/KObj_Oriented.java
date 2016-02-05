@@ -17,7 +17,6 @@
 package vendalenger.kondion.objectbase;
 
 import org.joml.Matrix4f;
-import org.joml.Vector3f;
 
 public abstract class KObj_Oriented extends KObj_Node {
 	

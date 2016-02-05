@@ -18,8 +18,6 @@ package vendalenger.kondion;
 
 import java.io.File;
 
-import javax.swing.JOptionPane;
-
 import vendalenger.port.Command;
 import vendalenger.port.VD_FlConsole;
 

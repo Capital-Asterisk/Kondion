@@ -16,13 +16,14 @@
 
 package vendalenger.kondion.kobj;
 
+import static org.lwjgl.opengl.GL11.glMultMatrixf;
+
 import java.nio.FloatBuffer;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
 
 import vendalenger.kondion.KInput;
 import vendalenger.kondion.Kondion;
@@ -202,7 +203,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		}
-		GL11.glMultMatrix(fb);
+		glMultMatrixf(fb);
 		// GL20.glUniformMatrix4(0, true, fb);
 	}
 

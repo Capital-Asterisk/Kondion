@@ -1,6 +1,9 @@
 package vendalenger.kondion.kobj;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMultMatrixf;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
+import static org.lwjgl.opengl.GL11.glPushMatrix;
 
 import java.io.File;
 import java.nio.FloatBuffer;
@@ -31,7 +34,7 @@ public class RKO_Board extends KObj_Renderable {
 		
 		glPushMatrix();
 		glLoadIdentity();
-		glMultMatrix(buffer);
+		glMultMatrixf(buffer);
 		//eggs.useProgram();
 		if (material != null)
 			material.bind();

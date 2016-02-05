@@ -42,13 +42,12 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_X;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Y;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_Z;
+import static org.lwjgl.glfw.GLFW.glfwSetInputMode;
 import static org.lwjgl.opengl.GL11.GL_TRUE;
 
 import java.nio.DoubleBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFW;
@@ -141,6 +140,7 @@ public class KInput {
 		mouseLocked = b;
 		if (b) {
 			// TODO: hide cursor
+			glfwSetInputMode(Window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 		} else {
 			// TODO: show cursor
 		}
@@ -167,6 +167,7 @@ public class KInput {
 		mouseX.clear();
 		mouseY.clear();
 		GLFW.glfwGetCursorPos(Window.getWindow(), mouseX, mouseY);
+		System.out.println(mouseX.get(0));
 		mouseDX = mouseX.get(0) - mousePX;
 		mouseDY = mouseY.get(0) - mousePY;
 		if (mouseLocked) {
@@ -175,6 +176,7 @@ public class KInput {
 					Window.getHeight() / 2);
 			mousePX = Window.getWidth() / 2;
 			mousePY = Window.getHeight() / 2;
+			
 		} else {
 			mousePX = mouseX.get(0);
 			mousePY = mouseY.get(0);

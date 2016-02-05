@@ -20,9 +20,6 @@ import javax.script.ScriptException;
 
 import jdk.internal.dynalink.beans.StaticClass;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
-import org.joml.Vector3f;
-
 import vendalenger.kondion.Kondion;
 import vendalenger.port.Command;
 
@@ -31,7 +28,8 @@ public class KJS {
 	public final ScriptObjectMirror o;
 	public final StaticClass i;
 	public final StaticClass c;
-	public static final short ZYX = 0,
+	public static final short
+			ZYX = 0,
 			ZXY = 1,
 			YXZ = 2,
 			YZX = 3,

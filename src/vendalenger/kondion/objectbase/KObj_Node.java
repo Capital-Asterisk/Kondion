@@ -23,15 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jdk.nashorn.api.scripting.AbstractJSObject;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
-import org.joml.Vector3f;
-
-import com.sun.xml.internal.ws.util.StringUtils;
-
-import vendalenger.kondion.Kondion;
-import vendalenger.kondion.kobj.GKO_Scene;
 
 
 public abstract class KObj_Node implements Map<String, KObj_Node> {

@@ -18,10 +18,11 @@ package vendalenger.kondion;
 
 import java.io.File;
 import java.io.IOException;
-import vendalenger.port.FileShortcuts;
+
 import argo.jdom.JdomParser;
 import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
+import vendalenger.port.FileShortcuts;
 
 public class KHacker {
 

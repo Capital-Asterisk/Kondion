@@ -22,7 +22,6 @@ import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_FALSE;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
-import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -42,23 +41,20 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
-import jdk.nashorn.api.scripting.ScriptObjectMirror;
-
+import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GLContext;
 
-import sun.font.Script;
-import vendalenger.kondion.kobj.OKO_Camera_;
+import argo.jdom.JsonNode;
+import argo.jdom.JsonRootNode;
 import vendalenger.kondion.js.KJS;
 import vendalenger.kondion.kobj.GKO_Scene;
+import vendalenger.kondion.kobj.OKO_Camera_;
 import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.port.FileShortcuts;
 import vendalenger.port.VD_FlConsole;
-import argo.jdom.JsonNode;
-import argo.jdom.JsonRootNode;
 
 public class Kondion {
 	
@@ -212,7 +208,7 @@ public class Kondion {
 					Window.setNatives();
 					Window.initGL(1280, 720, false, false, g.getGameInfo()
 							.getStringValue("GameName"));
-					GLContext.createFromCurrent();
+					GL.createCapabilities();
 					GLDrawing.setup();
 					///FlatDrawing.
 					

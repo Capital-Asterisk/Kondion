@@ -16,8 +16,7 @@
 
 package vendalenger.kondion.lwjgl;
 
-import static org.lwjgl.glfw.Callbacks.errorCallbackPrint;
-import static org.lwjgl.glfw.GLFW.*;
+import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
 import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
 import static org.lwjgl.glfw.GLFW.GLFW_RESIZABLE;
 import static org.lwjgl.glfw.GLFW.GLFW_VISIBLE;
@@ -25,7 +24,9 @@ import static org.lwjgl.glfw.GLFW.glfwCreateWindow;
 import static org.lwjgl.glfw.GLFW.glfwDefaultWindowHints;
 import static org.lwjgl.glfw.GLFW.glfwDestroyWindow;
 import static org.lwjgl.glfw.GLFW.glfwGetPrimaryMonitor;
+import static org.lwjgl.glfw.GLFW.glfwGetVersionString;
 import static org.lwjgl.glfw.GLFW.glfwGetVideoMode;
+import static org.lwjgl.glfw.GLFW.glfwHideWindow;
 import static org.lwjgl.glfw.GLFW.glfwInit;
 import static org.lwjgl.glfw.GLFW.glfwMakeContextCurrent;
 import static org.lwjgl.glfw.GLFW.glfwPollEvents;
@@ -34,7 +35,6 @@ import static org.lwjgl.glfw.GLFW.glfwSetKeyCallback;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowPos;
 import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
 import static org.lwjgl.glfw.GLFW.glfwShowWindow;
-import static org.lwjgl.glfw.GLFW.glfwHideWindow;
 import static org.lwjgl.glfw.GLFW.glfwSwapBuffers;
 import static org.lwjgl.glfw.GLFW.glfwSwapInterval;
 import static org.lwjgl.glfw.GLFW.glfwWindowHint;
@@ -43,14 +43,11 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.io.File;
-import java.nio.ByteBuffer;
 import java.util.Date;
 
-import org.lwjgl.glfw.GLFW;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
-import org.lwjgl.glfw.GLFWvidmode;
-import org.lwjgl.opengl.GL11;
+import org.lwjgl.glfw.GLFWVidMode;
 
 import vendalenger.kondion.Kondion;
 
@@ -106,7 +103,7 @@ public class Window {
 		windowWidth = width;
 		windowHeight = height;
 		GLFWErrorCallback errorCallback;
-		glfwSetErrorCallback(errorCallback = errorCallbackPrint(System.err));
+		glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
 		if (glfwInit() != GL_TRUE) {
 			throw new IllegalStateException(
 					"Error in initializing GLFW Error callback");
@@ -136,10 +133,10 @@ public class Window {
 		};
 		glfwSetKeyCallback(window, keyCallback);
 
-		ByteBuffer mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+		GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-		glfwSetWindowPos(window, (GLFWvidmode.width(mode) - width) / 2,
-				(GLFWvidmode.height(mode) - height) / 2);
+		glfwSetWindowPos(window, (mode.width() - width) / 2,
+				(mode.height() - height) / 2);
 
 		glfwMakeContextCurrent(window);
 		glfwSwapInterval(1);
@@ -173,9 +170,9 @@ public class Window {
 		System.out.println("CPU Cores:        "
 				+ Runtime.getRuntime().availableProcessors());
 
-		String os = System.getProperty("os.name").toLowerCase();
-
-		/* Detect the Operating system then load the appropriate lwjgl natives */
+		//String os = System.getProperty("os.name").toLowerCase();
+		/*
+		// Detect the Operating system then load the appropriate lwjgl natives
 		if (os.contains("nix") || os.contains("aix") || os.contains("nux")) {
 			System.out.println("Natives to use:   Loading Linux LWJGL Natives, finally.");
 			path += "/linux";
@@ -197,6 +194,9 @@ public class Window {
 			// If x86 or i386
 			path += File.separator + "x86";
 		}
+		*/
+		
+		path += File.separator + "natives";
 		
 		System.out.println("LWJGL Path:       " + path);
 		

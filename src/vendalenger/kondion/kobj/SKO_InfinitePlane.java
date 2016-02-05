@@ -1,13 +1,13 @@
 package vendalenger.kondion.kobj;
 
-import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glLoadIdentity;
+import static org.lwjgl.opengl.GL11.glMultMatrixf;
+import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
-import static org.lwjgl.opengl.GL11.glRotatef;
 import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.io.File;
 import java.nio.FloatBuffer;
-import java.util.List;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -15,11 +15,9 @@ import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.GLDrawing;
-import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
-import vendalenger.kondion.objectbase.KObj_Node;
-import vendalenger.kondion.objectbase.KObj_Oriented;
+import vendalenger.kondion.objectbase.CollisionData;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class SKO_InfinitePlane extends KObj_Solid {
@@ -60,7 +58,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		glLoadIdentity();
 		//glTranslatef(0, 0, -temp1.z + temp2.z);
 		glTranslatef(Kondion.getCurrentCamera().pos.x, Kondion.getCurrentCamera().pos.y, Kondion.getCurrentCamera().pos.z);
-		glMultMatrix(buffer);
+		glMultMatrixf(buffer);
 		glTranslatef(0, 0, -temp1.z + temp2.z);
 		
 		//eggs.useProgram();
@@ -89,8 +87,8 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	}
 
 	@Override
-	public void collisionCheck(KObj_Solid kobj) {
-		
+	public CollisionData collisionCheck(KObj_Solid kobj) {
+		return null;
 	}
 
 	@Override

@@ -16,10 +16,7 @@
 
 package vendalenger.kondion.kobj;
 
-import java.util.ArrayList;
-
 import vendalenger.kondion.objectbase.KObj_Node;
-import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class GKO_Scene extends KObj_Node {
 	

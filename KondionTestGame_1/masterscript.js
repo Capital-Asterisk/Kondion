@@ -39,13 +39,15 @@ var start = function() {
 	
 	for (var i = 0; i < 60; i++) {
 		var cube = new SKO_Cube();
+		cube.rotVelocity.rotateX(0.01);
+		cube.rotVelocity.rotateY(0.01);
 		cube.transform.translate((Math.random() - 0.5) * 100, Math.random() * 50, (Math.random() - 0.5) * 100);
 		cube.transform.rotateX(Math.random() * Math.PI * 2);
 		cube.transform.rotateY(Math.random() * Math.PI * 2);
 		cube.transform.rotateZ(Math.random() * Math.PI * 2);
 		cube.s = {
 			onupdate: function() {
-				this.obj.transform.translate(0.01, 0, 0);
+				//this.obj.transform.translate(0.01, 0, 0);
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('u'))) {
 					this.obj.transform.translate(1, 0, 0);
 				}
@@ -53,16 +55,16 @@ var start = function() {
 					this.obj.transform.translate(0.2, 0, 0);
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('k'))) {
-					this.obj.transform.rotateZ(0.03);
+					this.obj.rotVelocity.rotateZ(0.008);
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('i'))) {
-					this.obj.transform.rotateZ(-0.03);
+					this.obj.rotVelocity.rotateZ(-0.008);
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('j'))) {
-					this.obj.transform.rotateX(-0.03);
+					this.obj.rotVelocity.rotateX(-0.008);
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('l'))) {
-					this.obj.transform.rotateX(0.03);
+					this.obj.rotVelocity.rotateX(0.008);
 				}
 			}
 		}
