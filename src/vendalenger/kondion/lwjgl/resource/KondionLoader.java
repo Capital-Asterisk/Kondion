@@ -39,7 +39,7 @@ import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
 import static org.lwjgl.opengl.GL14.GL_GENERATE_MIPMAP;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
-import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
+import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
 import static org.lwjgl.opengl.GL20.glAttachShader;
 import static org.lwjgl.opengl.GL20.glCompileShader;
@@ -62,6 +62,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,15 +76,16 @@ public class KondionLoader {
 
 	public static List<Object[]> queue;
 	public static HashMap<String, KondionTexture> textures;
+	public static HashMap<String, KondionShader> shaders;
 
 	private static KondionTexture missingTexture;
-	private static KondionTexture missingTexture_cube;
 	
 	/**
 	 * Initialize textures and queue
 	 */
 	public static void init() {
 		textures = new HashMap<String, KondionTexture>();
+		shaders = new HashMap<String, KondionShader>();
 		queue = new ArrayList<Object[]>();
 		missingTexture = null;
 	}
@@ -102,6 +104,17 @@ public class KondionLoader {
 		registerTexture(KondionLoader.class.getResourceAsStream("uvcube.png"),
 				"K_Cube", GL_LINEAR, GL_NEAREST,
 				GL_REPEAT, GL_REPEAT, true);
+		
+		shaders.put("K_Strange", loadShader(
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/strange.frag"),
+				"Thee strange shader with egg uniforms"));
+		
+		shaders.put("K_FlatCol", loadShader(
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.frag"),
+				"K_FlatCol"));
+		
 		for (int i = 0; i < queue.size(); i++) {
 			if ((boolean) queue.get(i)[0]) {
 				// its a shader
@@ -114,6 +127,61 @@ public class KondionLoader {
 			}
 		}
 	}
+	
+	public static KondionShader loadShader(InputStream vert, InputStream frag, String name) {
+		// create a null object
+		KondionShader shader = null;
+		
+		try {
+			// Create readers to read vert and frag files (or whatever)
+			BufferedReader readV = new BufferedReader(new InputStreamReader(vert));
+			BufferedReader readF = new BufferedReader(new InputStreamReader(frag));
+			
+			// Not using string builders is error. Encoding stuff...
+			StringBuilder vertSB = new StringBuilder();
+			StringBuilder fragSB = new StringBuilder();
+			
+			String line;
+			
+			// Read both files, append to string builders
+			while ((line = readV.readLine()) != null) {
+				vertSB.append(line + "\n");
+			}
+			
+			// is this very inefficient?
+			while ((line = readF.readLine()) != null) {
+				fragSB.append(line + "\n");
+			}
+			
+			// Close them, because I have to
+			readV.close();
+			readF.close();
+			
+			int program = glCreateProgram();
+			int vertShader = newShader(GL_VERTEX_SHADER, vertSB.toString(),
+					name + " (VERTEX)");
+			int fragShader = newShader(GL_FRAGMENT_SHADER, fragSB.toString(),
+					name + " (FRAGMENT)");
+			glAttachShader(program, vertShader);
+			glAttachShader(program, fragShader);
+			int loc = glGetUniformLocation(program, "texture1");
+			glUniform1i(loc, 0);
+			//glUnifor
+			
+			glLinkProgram(program);
+
+			shader = new KondionShader(vertShader, fragShader, program);
+			
+		} catch (IOException e) {
+			System.err.println("Error loading shader: " + name);
+			e.printStackTrace();
+		} catch (NullPointerException e) {
+			System.err.println("Error loading shader: " + name);
+			e.printStackTrace();
+		}
+		
+		return shader;
+	}
 
 	/**
 	 * Load a nash. (sh on nash already means shader)
@@ -121,6 +189,7 @@ public class KondionLoader {
 	 * @param nash
 	 *            The .nash shader file being loaded.
 	 */
+	@Deprecated
 	public static KondionShader loadNashShader(File nash) {
 		boolean mode_vert = false;
 		boolean mode_frag = false;

@@ -16,14 +16,16 @@
 
 package vendalenger.kondion.lwjgl.resource;
 
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
 import org.lwjgl.opengl.ARBShaderObjects;
 
 public class KondionShader {
 
 	private int frag;
-
-	private int prog;
 	private int vert;
+	
+	private int prog;
 
 	public KondionShader(int v, int f, int p) {
 		vert = v;
@@ -31,6 +33,14 @@ public class KondionShader {
 		prog = p;
 	}
 
+	public int uniformLocation(CharSequence name) {
+		return glGetUniformLocation(prog, name);
+	}
+	
+	public static void uniform1i(int location, int value) {
+		glUniform1i(location, value);
+	}
+	
 	public void useProgram() {
 		ARBShaderObjects.glUseProgramObjectARB(prog);
 	}

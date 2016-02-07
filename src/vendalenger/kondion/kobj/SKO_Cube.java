@@ -13,6 +13,9 @@ import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.materials.KMat_FlatColor;
+import vendalenger.kondion.materials.KMat_MultiTexture;
+import vendalenger.kondion.materials.KMat_Strange;
 import vendalenger.kondion.objectbase.CollisionData;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
@@ -23,6 +26,7 @@ public class SKO_Cube extends KObj_Solid {
 	
 	public SKO_Cube() {
 		//eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
+		material = new KMat_FlatColor();
 		buffer = null;
 	}
 
@@ -34,7 +38,7 @@ public class SKO_Cube extends KObj_Solid {
 		//rotVelocity.x *= 0.992;
 		//rotVelocity.y *= 0.992;
 		//rotVelocity.z *= 0.992;
-		velocity.y = -0.3f;
+		//velocity.y = -0.3f;
 		rotVelocity.normalize();
 		transform.m30 += velocity.x * Kondion.getDelta();
 		transform.m31 += velocity.y * Kondion.getDelta();
@@ -66,6 +70,7 @@ public class SKO_Cube extends KObj_Solid {
 		if (material != null)
 			material.bind();
 		GLDrawing.renderCube(1, KondionLoader.textures.get("K_Cube"));
+		//GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();

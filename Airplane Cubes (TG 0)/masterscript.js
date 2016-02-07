@@ -31,7 +31,6 @@ var start = function() {
 	SCN.Ground.transform.rotateX(Math.PI / 2);
 	SCN.Ground.textureSize = 1;
 	
-	
 	//World.Layers[0].Apple = SCN.Apple;
 	World.Layers[0].Ground = SCN.Ground;
 	World.Layers[1].EEE = SCN.Camera;

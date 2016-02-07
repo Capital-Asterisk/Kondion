@@ -17,6 +17,8 @@ import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.materials.KMat_FlatColor;
+import vendalenger.kondion.materials.KMat_Strange;
 import vendalenger.kondion.objectbase.CollisionData;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
@@ -30,7 +32,6 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	KondionShader eggs;
 	
 	public SKO_InfinitePlane() {
-		eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 		size = 10000;
 		textureSize = 1f;
 		temp0 = new Matrix4f();
@@ -43,6 +44,8 @@ public class SKO_InfinitePlane extends KObj_Solid {
 			buffer = BufferUtils.createFloatBuffer(16);
 		
 		Kondion.getWorld().zFar = Float.MAX_VALUE / 5 - 1;
+		Kondion.getWorld().zNear = 0.1f;
+		
 		
 		Vector3f temp1 = new Vector3f(); // Transformed camera position
 		Vector3f temp2 = new Vector3f(); // Transformed this position
@@ -64,6 +67,8 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		//eggs.useProgram();
 		if (material != null)
 			material.bind();
+		else
+			material = new KMat_FlatColor();
 		//System.out.println("RENDER!");
 		float addx = -(-temp1.x + temp2.x) / textureSize;
 		float addy = -(-temp1.y + temp2.y) / textureSize;

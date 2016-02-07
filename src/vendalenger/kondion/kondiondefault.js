@@ -28,7 +28,7 @@ var Vector2d = Java.type("org.joml.Vector2d");
 var Vector3d = Java.type("org.joml.Vector3d");
 var Vector4d = Java.type("org.joml.Vector4d");
 
-var GKO_Layer = Java.type("vendalenger.kondion.kobj.GKO_Layer");
+var GKO_RenderPass = Java.type("vendalenger.kondion.kobj.GKO_RenderPass");
 var GKO_Scene = Java.type("vendalenger.kondion.kobj.GKO_Scene");
 
 var OKO_Camera_ = Java.type("vendalenger.kondion.kobj.OKO_Camera_");

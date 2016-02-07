@@ -1,0 +1,33 @@
+
+// ftp://gaia.ecs.csus.edu/usr/clevengr/155/old/fall11/LectureNotes/Fall11/14ProceduralTexturingLectureNotes.pdf
+
+vec4 color1 = vec4(0.4, 1.0, 0.0, 1.0);
+vec4 color2 = vec4(0.06, 0.06, 0.06, 1.0);
+int size = 1024;
+int stride = 1;
+varying vec4 texCoord;
+
+void main(){
+	vec4 texColor ;
+	//determine the texture row and column referenced by (s,t)
+	int row, col ;
+	float s = texCoord.s;
+	float t = texCoord.t;
+	if (s<0.0) col = 0 ;
+	else if (s>=4.0) col = 3 ;
+	else col = floor(s*size);
+	if (t<0) row = 0 ;
+	else if (t>=4) row = 3 ;
+	else row = floor(t*size);
+	//find the super-row/col containing the texel
+	int superRow = row/stride ;
+	int superCol = col/stride ;
+	//check the sum of the super-row/col; if it's even then use color1
+	int sum = superRow + superCol ;
+	if ( mod(sum,2) == 0 ) texColor = color1;
+	else texColor = color2;
+	//output the texture color
+	gl_FragColor = texColor;
+    //gl_FragColor = vec4(sin(float(eggs) / 200), mod(floor(gl_FragCoord.x / 10), 2), 1, 1.0);
+}
+

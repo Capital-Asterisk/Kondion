@@ -167,7 +167,7 @@ public class KInput {
 		mouseX.clear();
 		mouseY.clear();
 		GLFW.glfwGetCursorPos(Window.getWindow(), mouseX, mouseY);
-		System.out.println(mouseX.get(0));
+		//System.out.println(mouseX.get(0));
 		mouseDX = mouseX.get(0) - mousePX;
 		mouseDY = mouseY.get(0) - mousePY;
 		if (mouseLocked) {

@@ -161,6 +161,14 @@ public class Kondion {
 	public static float getDelta() {
 		return delta;
 	}
+	
+	/**
+	 * This number is added to every frame.
+	 * @return
+	 */
+	public static long getFrame() {
+		return ticks;
+	}
 
 	public static Thread getGameThread() {
 		return gameThread;

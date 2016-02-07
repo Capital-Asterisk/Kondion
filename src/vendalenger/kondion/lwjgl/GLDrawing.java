@@ -43,11 +43,16 @@ import static org.lwjgl.opengl.GL15.glBufferData;
 import static org.lwjgl.opengl.GL15.glBufferSubData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.port.FileShortcuts;
 
 public class GLDrawing {
 
@@ -71,8 +76,8 @@ public class GLDrawing {
 		// "Interleaved Data"
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
 		glVertexPointer(3, GL_FLOAT, 32, 0l); // First object
-		glNormalPointer(GL_FLOAT, 32, 12); // Second
-		glTexCoordPointer(2, GL_FLOAT, 32, 24); // Third
+		glNormalPointer(GL_FLOAT, 32, 12l); // Second
+		glTexCoordPointer(2, GL_FLOAT, 32, 24l); // Third
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
@@ -90,10 +95,11 @@ public class GLDrawing {
 
 	public static void renderQuad(float width, float height) {
 		glPushMatrix();
-		glScalef(width, height, 0);
+		glScalef(width, height, 1);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
-		glVertexPointer(3, GL_FLOAT, 0, 0l);
+		glVertexPointer(3, GL_FLOAT, 24, 0l); // First object
+		glNormalPointer(GL_FLOAT, 24, 12l); // Second
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_texCoords);
@@ -101,11 +107,13 @@ public class GLDrawing {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		glDrawArrays(GL_QUADS, 0, 4);
+		glDrawArrays(GL_QUADS, 0, 8);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		glPopMatrix();
@@ -114,12 +122,12 @@ public class GLDrawing {
 	public static void renderQuad(float width, float height, KondionTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
-		glScalef(width, height, 0);
+		glScalef(width, height, 1);
 		t.bind();
 
-		// setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
-		glVertexPointer(3, GL_FLOAT, 0, 0l);
+		glVertexPointer(3, GL_FLOAT, 24, 0l); // First object
+		glNormalPointer(GL_FLOAT, 24, 12l); // Second
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_texCoords);
@@ -127,11 +135,13 @@ public class GLDrawing {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		glDrawArrays(GL_QUADS, 0, 4);
+		glDrawArrays(GL_QUADS, 0, 8);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		glPopMatrix();
@@ -140,11 +150,11 @@ public class GLDrawing {
 	public static void renderBillboardRec(float width, float height) {
 		glPushMatrix();
 		glDisable(GL_TEXTURE_2D);
-		glScalef(width, height, 0);
+		glScalef(width, height, 1);
 
-		setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
-		glVertexPointer(3, GL_FLOAT, 0, 0l);
+		glVertexPointer(3, GL_FLOAT, 24, 0l); // First object
+		glNormalPointer(GL_FLOAT, 24, 12l); // Second
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_texCoords);
@@ -152,11 +162,13 @@ public class GLDrawing {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-		glDrawArrays(GL_QUADS, 0, 4);
+		glDrawArrays(GL_QUADS, 0, 8);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 
 		glPopMatrix();
@@ -192,11 +204,16 @@ public class GLDrawing {
 		glBufferData(GL_ARRAY_BUFFER, texCoords, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-		FloatBuffer square = BufferUtils.createFloatBuffer(12);
+		// Interleaved Vertex, Normal
+		FloatBuffer square = BufferUtils.createFloatBuffer(24);
 		square.put(new float[] {0.5f, 0.5f, 0.0f});
+		square.put(new float[] {0.0f, 0.0f, 1.0f});
 		square.put(new float[] {-0.5f, 0.5f, 0.0f});
+		square.put(new float[] {0.0f, 0.0f, 1.0f});
 		square.put(new float[] {-0.5f, -0.5f, 0.0f});
+		square.put(new float[] {0.0f, 0.0f, 1.0f});
 		square.put(new float[] {0.5f, -0.5f, 0.0f});
+		square.put(new float[] {0.0f, 0.0f, 1.0f});
 		square.flip();
 		vbo_unitSquare = glGenBuffers();
 
@@ -210,34 +227,44 @@ public class GLDrawing {
 
 		// VERTEX/COORD/NORM in obj
 		// Vertex, Normal, TexCoord here
-		
-		// Already calculated data for cube
-		interleaved.put(new float[] {0.5f, -0.5f, 0.5f, 0f, -1f, 0f, 0.5f, 0.250087f, -0.5f, -0.5f, 0.5f, 0f, -1f, 0f,
-				0.5f, 0.500043f, -0.5f, -0.5f, -0.5f, 0f, -1f, 0f, 0.250043f, 0.500043f, -0.5f, 0.5f, -0.5f, 0f, 1f, 0f,
-				0.250043f, 0.75f, -0.5f, 0.5f, 0.5f, 0f, 1f, 0f, 0.5f, 0.75f, 0.5f, 0.5f, 0.5f, 0f, 1f, 0f, 0.5f,
-				0.999957f, 0.5f, 0.5f, -0.5f, 1f, 0f, 0f, 0.999913f, 0.75f, 0.5f, 0.5f, 0.5f, 1f, 0f, 0f, 0.749956f,
-				0.75f, 0.5f, -0.5f, 0.5f, 1f, 0f, 0f, 0.749957f, 0.500044f, 0.5f, 0.5f, 0.5f, 0f, 0f, 1f, 0.749956f,
-				0.75f, -0.5f, 0.5f, 0.5f, 0f, 0f, 1f, 0.5f, 0.75f, -0.5f, -0.5f, 0.5f, 0f, 0f, 1f, 0.5f, 0.500043f,
-				-0.5f, -0.5f, 0.5f, -1f, 0f, 0f, 0.5f, 0.500043f, -0.5f, 0.5f, 0.5f, -1f, 0f, 0f, 0.5f, 0.75f, -0.5f,
-				0.5f, -0.5f, -1f, 0f, 0f, 0.250043f, 0.75f, 0.5f, -0.5f, -0.5f, 0f, 0f, -1f, 0.000087f, 0.500043f,
-				-0.5f, -0.5f, -0.5f, 0f, 0f, -1f, 0.250043f, 0.500043f, -0.5f, 0.5f, -0.5f, 0f, 0f, -1f, 0.250043f,
-				0.75f, 0.5f, -0.5f, -0.5f, 0f, -1f, 0f, 0.250044f, 0.250087f, 0.5f, -0.5f, 0.5f, 0f, -1f, 0f, 0.5f,
-				0.250087f, -0.5f, -0.5f, -0.5f, 0f, -1f, 0f, 0.250043f, 0.500043f, 0.5f, 0.5f, -0.5f, 0f, 1f, 0f,
-				0.250043f, 0.999957f, -0.5f, 0.5f, -0.5f, 0f, 1f, 0f, 0.250043f, 0.75f, 0.5f, 0.5f, 0.5f, 0f, 1f, 0f,
-				0.5f, 0.999957f, 0.5f, -0.5f, -0.5f, 1f, 0f, 0f, 0.999913f, 0.500044f, 0.5f, 0.5f, -0.5f, 1f, 0f, 0f,
-				0.999913f, 0.75f, 0.5f, -0.5f, 0.5f, 1f, 0f, 0f, 0.749957f, 0.500044f, 0.5f, -0.5f, 0.5f, 0f, 0f, 1f,
-				0.749957f, 0.500044f, 0.5f, 0.5f, 0.5f, 0f, 0f, 1f, 0.749956f, 0.75f, -0.5f, -0.5f, 0.5f, 0f, 0f, 1f,
-				0.5f, 0.500043f, -0.5f, -0.5f, -0.5f, -1f, 0f, 0f, 0.250043f, 0.500043f, -0.5f, -0.5f, 0.5f, -1f, 0f,
-				0f, 0.5f, 0.500043f, -0.5f, 0.5f, -0.5f, -1f, 0f, 0f, 0.250043f, 0.75f, 0.5f, 0.5f, -0.5f, 0f, 0f, -1f,
-				0.000087f, 0.75f, 0.5f, -0.5f, -0.5f, 0f, 0f, -1f, 0.000087f, 0.500043f, -0.5f, 0.5f, -0.5f, 0f, 0f,
-				-1f, 0.250043f, 0.75f});
+		try {
+			// Already calculated data for cube
+			interleaved.put(fromResource(GLDrawing.class.getResourceAsStream("/vendalenger/models/cube")));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		interleaved.flip();
 
 		vbo_cube = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
 		glBufferData(GL_ARRAY_BUFFER, interleaved, GL_STATIC_DRAW);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+	}
+	
+	/**
+	 * 
+	 * @param is Input data
+	 * @return
+	 * @throws IOException
+	 */
+	public static float[] fromResource(InputStream is) throws IOException {
+		
+		BufferedReader br = new BufferedReader(new InputStreamReader(is));
+		String line = "";
+		String longstring = "";
+		while ((line = br.readLine()) != null) {
+			longstring += line;
+		}
+		br.close();
+		
+		String[] split = longstring.split(",");
+		float[] eggs = new float[split.length];
+		
+		for (int i = 0; i < split.length; i++) {
+			eggs[i] = Float.valueOf(split[i]);
+		}
+		
+		return eggs;
 	}
 
 	public static void translate2D(float x, float y) {
