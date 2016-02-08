@@ -25,6 +25,7 @@ public class SKO_Cube extends KObj_Solid {
 	FloatBuffer buffer;
 	
 	public SKO_Cube() {
+		super();
 		//eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 		material = new KMat_FlatColor();
 		buffer = null;
@@ -56,7 +57,7 @@ public class SKO_Cube extends KObj_Solid {
 	}
 
 	@Override
-	public void render() {
+	public void render(int type) {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
 		

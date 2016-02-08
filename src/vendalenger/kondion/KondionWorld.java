@@ -12,7 +12,7 @@ import vendalenger.kondion.kobj.OKO_Camera_;
 
 public class KondionWorld {
 
-	public final List<GKO_RenderPass> Layers;
+	public final List<GKO_RenderPass> passes;
 	public final Vector4f clearColor;
 	
 	public GKO_Scene Scene;
@@ -24,7 +24,7 @@ public class KondionWorld {
 	
 	public KondionWorld() {
 		clearColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);
-		Layers = new ArrayList<GKO_RenderPass>();
+		passes = new ArrayList<GKO_RenderPass>();
 		Scene = new GKO_Scene();
 	}
 	

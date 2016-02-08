@@ -122,9 +122,7 @@ public class Kondion {
 			//glTranslatef(0, 0, 1);
 			//FlatDrawing.renderBillboard(1, 1, KondionLoader.textures.get("noah"));
 			
-			for (int i = 0; i < world.Layers.size(); i++) {
-				world.Layers.get(i).update();
-			}
+			world.Scene.update();
 			
 			ticks++;
 			Window.update();

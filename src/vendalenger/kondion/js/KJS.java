@@ -51,6 +51,10 @@ public class KJS {
 				+ "}");
 
 	}
+	
+	public long currentTick() {
+		return Kondion.getFrame();
+	}
 
 	public void freeCam() {
 		Kondion.getCurrentCamera().setFreeMode(true);

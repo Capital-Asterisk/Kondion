@@ -16,13 +16,24 @@
 
 package vendalenger.kondion.objectbase;
 
+import vendalenger.kondion.Kondion;
+import vendalenger.kondion.kobj.GKO_RenderPass;
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
 import vendalenger.kondion.materials.KMat_erial;
+
 
 public abstract class KObj_Renderable extends KObj_Oriented {
 	
 	protected KondionTexture texture;
 	protected KMat_erial material;
+	
+	public KObj_Renderable() {
+		for (GKO_RenderPass rp : Kondion.getWorld().passes) {
+			if (rp.auto) {
+				rp.addItem(this);
+			}
+		}
+	}
 	
 	public KMat_erial getMaterial() {
 		return material;
@@ -32,6 +43,6 @@ public abstract class KObj_Renderable extends KObj_Oriented {
 		this.material = material;
 	}
 
-	public abstract void render();
+	public abstract void render(int type);
 	
 }

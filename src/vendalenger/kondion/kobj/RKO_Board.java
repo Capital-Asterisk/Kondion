@@ -25,7 +25,7 @@ public class RKO_Board extends KObj_Renderable {
 	}
 	
 	@Override
-	public void render() {
+	public void render(int type) {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
 		

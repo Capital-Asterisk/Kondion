@@ -36,16 +36,20 @@ import vendalenger.kondion.objectbase.KObj_Oriented;
  * it stored x, y, z, yaw, and pitch roll of the camera.
  */
 public class OKO_Camera_ extends KObj_Oriented {
+	
+	public static final int
+		FORWARD = 0,
+		TRACK = 1,
+		FREE = 2;
 
 	// For Camera position and movement
-	private boolean freeMode = false;
+	private int mode = 0;
 	private int fov = 50;
 	private float cameraSpeed = 0.2f;
 	private float yaw, pitch, roll;
 
-	private Vector3f center;
-	public final Vector3f pos; // or eye
-	private Vector3f up;
+	private final Vector3f center;
+	private final Vector3f up;
 
 	private Matrix4f prespectiveMatrix;
 
@@ -60,7 +64,6 @@ public class OKO_Camera_ extends KObj_Oriented {
 	private Vector3f tempVector0;
 	private Vector3f tempVector1;
 	private Vector4f tempVector2;
-	private Vector4f tempVector3;
 	
 	public float moveSpeed = 6.0f;
 
@@ -76,7 +79,6 @@ public class OKO_Camera_ extends KObj_Oriented {
 		roll = 0;
 
 		center = new Vector3f();
-		pos = new Vector3f();
 		up = new Vector3f();
 
 		prespectiveMatrix = new Matrix4f();
@@ -84,70 +86,44 @@ public class OKO_Camera_ extends KObj_Oriented {
 		tempVector0 = new Vector3f();
 		tempVector1 = new Vector3f();
 		tempVector2 = new Vector4f();
-		tempVector3 = new Vector4f();
 		tempMatrix = new Matrix4f();
 	}
-
-	/**
-	 * Aim towards angle, you can use setRoll();
-	 * 
-	 * @param y
-	 *            Yaw
-	 * @param p
-	 *            Pitch
-	 */
+	
 	public void aim(float y, float p) {
 		yaw = y;
 		pitch = p;
-		center.y = (float) Math.sin(p) + pos.y;
-		center.x = (float) (Math.cos(yaw) * Math.cos(p)) + pos.x;
-		center.z = (float) (Math.sin(yaw) * Math.cos(p)) + pos.z;
+		transform.setRotationYXZ(y, p, 0);
+		//transform.setLookAt(transform.m30, transform.m31, transform.m32,
+		//		0, 0, -1, 0, 1, 0);
+		//transform.rotateY(y);
+		//transform.rotateX(p);
+		//calculateCenter();
 	}
-
-	/*public void bindToEntity(Entity e) {
-		bind = e;
-		freeMode = false;
-	}*/
 
 	/**
 	 * Calculate yaw and pitch, center must be normal
 	 */
-	public void calculateAngle() {
-		yaw = (float) Math.atan2(center.z - pos.z, center.x - pos.x);
-		pitch = (float) Math.asin(center.y - pos.y);
-		// System.out.println(yaw + " " + pitch);
+	private void calculateAngles() {
+		tempVector0.set(0, 0, -1);
+		tempVector0.mulPoint(transform);
+		System.out.println(tempVector0.z - transform.m32);
+		yaw = (float) Math.atan2(tempVector0.z - transform.m32, tempVector0.x - transform.m30);
+		pitch = (float) Math.asin(tempVector0.y - transform.m31);
 	}
-
-	/**
-	 * Sets up vector to up relative to the camera and roll
-	 */
-	public void calculateUp() {
-		// TODO add up calculations
-		/*
-		 * tempMatrix.setIdentity(); tempVector1.set(1.0f, 0.0f, 0.0f); //
-		 * rotate the x (pitch) Vector3f.sub(center, eye, tempVector0); // set
-		 * tv0 relative center tempVector2.set(tempVector0.x, tempVector0.y,
-		 * tempVector0.z); System.out.println(tempVector2.x + " " +
-		 * tempVector2.y + " " + tempVector2.z); tempMatrix.rotate(90.0f,
-		 * tempVector1); // rotate matrix pitch up
-		 * Matrix4f.transform(tempMatrix, tempVector2, tempVector2); // make tv2
-		 * pitch up //tempVector2.normalise(); // paranoia up.set(tempVector2.x,
-		 * tempVector2.y, tempVector2.z); // well... im upset...
-		 */
-		// set template up vector
-		tempVector2.set(0.0f, 1.0f, 0.0f, 1.0f);
-		tempMatrix.identity();
-		tempVector1.set(0.0f, 0.0f, 1.0f); // set rotate mode to z axis
-		tempMatrix.rotate(roll, tempVector1); // rotate it
-		tempMatrix.transform(tempVector2); // rotate tv2
-		// set up to tv2
-		// very upsetting...
-		up.set(tempVector2.x, tempVector2.y, tempVector2.z);
+	
+	private void calculateCenter() {
+		center.set(0, 0, -1);
+		center.mulPoint(actTransform);
 	}
-
-	/*public Entity getBindEntity() {
-		return bind;
-	}*/
+	
+	private void calculateUp() {
+		// Very upsetting eh??
+		up.set(0, 1, 0);
+		up.mulPoint(actTransform);
+		up.x -= actTransform.m30;
+		up.y -= actTransform.m31;
+		up.z -= actTransform.m32;
+	}
 
 	/**
 	 * Get the center (The xyz of where you want to look)
@@ -157,15 +133,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	public Vector3f getCenter() {
 		return center;
 	}
-
-	public float getPitch() {
-		return pitch;
-	}
-
-	public float getRoll() {
-		return roll;
-	}
-
+	
 	/**
 	 * Get the up vector (A normal vector pointing up relative to the camera)
 	 * 
@@ -191,7 +159,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 							(float) Math.toRadians(TTT.getPrefFov()),
 							((float) (Window.getWidth()) / (float) (Window
 									.getHeight())), Kondion.getWorld().zNear, Kondion.getWorld().zFar)
-					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
+					.lookAt(actTransform.m30, actTransform.m31, actTransform.m32, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		} else {
 			prespectiveMatrix
@@ -200,23 +168,15 @@ public class OKO_Camera_ extends KObj_Oriented {
 							(float) Math.toRadians(fov),
 							((float) (Window.getWidth()) / (float) (Window
 									.getHeight())), Kondion.getWorld().zNear, Kondion.getWorld().zFar)
-					.lookAt(pos.x, pos.y, pos.z, center.x, center.y, center.z,
+					.lookAt(actTransform.m30, actTransform.m31, actTransform.m32, center.x, center.y, center.z,
 							up.x, up.y, up.z).get(fb);
 		}
 		glMultMatrixf(fb);
 		// GL20.glUniformMatrix4(0, true, fb);
 	}
 
-	public boolean isFree() {
-		return freeMode;
-	}
-
-	public void lockRotation(Vector3f rot) {
-		rotLock = rot;
-	}
-
 	/**
-	 * Point towards a vector. Eye is unchanged.
+	 * Point towards a vector. Eye is unchanged. Only works in track mode.
 	 */
 	public void look(float desx, float desy, float desz) {
 		center.set(desx, desy, desz);
@@ -227,22 +187,31 @@ public class OKO_Camera_ extends KObj_Oriented {
 	 */
 	public void look(float posx, float posy, float posz, float desx,
 			float desy, float desz) {
-		pos.set(posx, posy, posz);
+		actTransform.m30 = posx;
+		actTransform.m31 = posy;
+		actTransform.m32 = posz;
 		center.set(desx, desy, desz);
-		calculateUp();
 	}
 
 	/**
 	 * Center is normalized relative to eye.
 	 */
 	public void normalizeCenter() {
-		center.sub(pos, tempVector0);
+		tempVector1.set(actTransform.m30, actTransform.m31, actTransform.m32);
+		center.sub(tempVector1, tempVector0);
 		tempVector0.normalize();
-		tempVector0.add(pos, center);
+		tempVector0.add(tempVector1, center);
 	}
 
 	public void setFreeMode(boolean b) {
-		freeMode = b;
+		if (b && mode != FREE) {
+			mode = FREE;
+		}
+	}
+	
+	public Vector3f getEye() {
+		tempVector1.set(actTransform.m30, actTransform.m31, actTransform.m32);
+		return tempVector1;
 	}
 
 	/**
@@ -261,65 +230,50 @@ public class OKO_Camera_ extends KObj_Oriented {
 
 	public void update() {
 		defaultUpdate();
-		
-		if (freeMode) {
-			calculateAngle();
+		mode = FREE;
+		//System.out.println("Up");
+		if (mode == FREE) {
+			
+			//calculateAngles();
+			//calculateCenter();
+			
+			yaw = (float) (yaw - KInput.getMouseDX() / 300);
+			yaw %= Math.PI * 2;
+			
+			pitch = (float) (pitch - KInput.getMouseDY() / 300);
+			pitch = (float) Math.min(Math.max(pitch, -Math.PI / 2), Math.PI / 2);
+			
+			aim(yaw, pitch);
+			
 			tempVector0.set(0, 0, 0);
 			cameraSpeed = Kondion.getDelta() * moveSpeed;
 			//bind = null;
 			if (KInput.buttonIsDown(upDownLeftRight[0])) {
 				// forward
-				pos.x += (center.x - pos.x) * cameraSpeed;
-				pos.y += (center.y - pos.y) * cameraSpeed;
-				pos.z += (center.z - pos.z) * cameraSpeed;
+				transform.translate(0.0f, 0.0f, -cameraSpeed);
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[1])) {
 				// backwards
-				pos.x -= (center.x - pos.x) * cameraSpeed;
-				pos.y -= (center.y - pos.y) * cameraSpeed;
-				pos.z -= (center.z - pos.z) * cameraSpeed;
+				transform.translate(0.0f, 0.0f, cameraSpeed);
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[2])) {
 				// left
-				tempVector0.x = (float) Math.cos(yaw + Math.PI / 2);
-				tempVector0.y = (float) Math.sin(yaw + Math.PI / 2);
-				pos.x -= tempVector0.x * cameraSpeed;
-				pos.z -= tempVector0.y * cameraSpeed;
-				center.x -= tempVector0.x * cameraSpeed;
-				center.z -= tempVector0.y * cameraSpeed;
+				transform.translate(-cameraSpeed, 0.0f, 0.0f);
 			}
 			if (KInput.buttonIsDown(upDownLeftRight[3])) {
 				// right
-				tempVector0.x = (float) Math.cos(yaw + Math.PI / 2);
-				tempVector0.y = (float) Math.sin(yaw + Math.PI / 2);
-				pos.x += tempVector0.x * cameraSpeed;
-				pos.z += tempVector0.y * cameraSpeed;
-				center.x += tempVector0.x * cameraSpeed;
-				center.z += tempVector0.y * cameraSpeed;
+				transform.translate(cameraSpeed, 0.0f, 0.0f);
 			}
-		}/* else if (bind != null) {
-			eye.x = bind.getPosition().x;
-			eye.y = bind.getPosition().y;
-			eye.z = bind.getPosition().z;
-		}*/
-		if (rotLock != null) {
-			yaw = rotLock.x;
-			pitch = rotLock.y;
-			roll = rotLock.z;
-			aim(yaw, pitch);
-		} else {
-			aim((float) (yaw + KInput.getMouseDX() / 300),
-					(float) (pitch - KInput.getMouseDY() / 300));
-		}
-		if (true) {
-			normalizeCenter();
-			calculateUp();
+			
+			System.out.println(yaw);
 		}
 	}
 
 	@Override
 	public void updateB() {
-		// TODO Auto-generated method stub
-		
+		//if (mode == FORWARD) {
+			calculateCenter();
+			calculateUp();
+		//}
 	}
 }

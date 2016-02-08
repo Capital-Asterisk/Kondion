@@ -32,6 +32,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	KondionShader eggs;
 	
 	public SKO_InfinitePlane() {
+		super();
 		size = 10000;
 		textureSize = 1f;
 		temp0 = new Matrix4f();
@@ -39,7 +40,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	}
 	
 	@Override
-	public void render() {
+	public void render(int type) {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
 		
@@ -49,7 +50,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		
 		Vector3f temp1 = new Vector3f(); // Transformed camera position
 		Vector3f temp2 = new Vector3f(); // Transformed this position
-		Kondion.getCurrentCamera().pos.mulPoint(actTransform.invert(temp0), temp1);
+		Kondion.getCurrentCamera().getEye().mulPoint(actTransform.invert(temp0), temp1);
 		
 		temp2.mulPoint(temp0);
 		
@@ -60,7 +61,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		glPushMatrix();
 		glLoadIdentity();
 		//glTranslatef(0, 0, -temp1.z + temp2.z);
-		glTranslatef(Kondion.getCurrentCamera().pos.x, Kondion.getCurrentCamera().pos.y, Kondion.getCurrentCamera().pos.z);
+		glTranslatef(Kondion.getCurrentCamera().actTransform.m30, Kondion.getCurrentCamera().actTransform.m31, Kondion.getCurrentCamera().actTransform.m32);
 		glMultMatrixf(buffer);
 		glTranslatef(0, 0, -temp1.z + temp2.z);
 		

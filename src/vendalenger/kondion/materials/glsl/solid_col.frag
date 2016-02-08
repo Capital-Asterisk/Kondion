@@ -26,7 +26,7 @@ void main(){
     //gl_FragColor = vec4(normal, 1.0);
     
     if (fog != 0) {
-	    final = mix(vec3(1.0, 1.0, 1.0), final, clamp(1.0 / exp(length(viewPos) * 0.0006), 0.0, 1.0));
+	    final = mix(vec3(1.0, 1.0, 1.0), final, clamp(1.0 / exp(length(viewPos) * 0.001), 0.0, 1.0));
     }
     
     gl_FragColor = vec4(final, 1.0);
