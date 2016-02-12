@@ -31,7 +31,9 @@ public abstract class KObj_Oriented extends KObj_Node {
 		actTransform.identity();
 		if (parent instanceof KObj_Oriented) {
 			((KObj_Oriented) parent).multiplyByAct(actTransform);
+			
 		}
+		//System.out.println("PARENT: " + parent);
 		actTransform.mul(transform);
 	}
 	

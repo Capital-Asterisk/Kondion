@@ -21,6 +21,7 @@ public class KondionWorld {
 	
 	public float zNear = 0.001f;
 	public float zFar = 100.0f;
+	public float fogIntensity = 0.0f;
 	
 	public KondionWorld() {
 		clearColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);

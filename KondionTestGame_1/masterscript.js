@@ -18,10 +18,6 @@ var start = function() {
 	
 	// Create a new render layer (GKO: Game Kondion Object)
 	World.passes.add(new GKO_RenderPass());
-
-	SCN.Camera = new OKO_Camera_();
-	SCN.Camera.look(0, 0, 5, 0, 0, 0);
-	SCN.Camera.setFreeMode(true);
 	
 	SCN.Ground = new SKO_InfinitePlane();
 	SCN.rounGd = new SKO_InfinitePlane();
@@ -32,13 +28,67 @@ var start = function() {
 	
 	SCN.rounGd.transform.rotateX(Math.PI / 2);
 	SCN.rounGd.textureSize = 1;
-	SCN.rounGd.transform.translate(0, 0, -30);
+	SCN.rounGd.transform.translate(0, 0, -200);
 	
 	//World.Layers[0].Apple = SCN.Apple;
-	World.camera = SCN.Camera;
 	
-	for (var i = 0; i < 666; i++) {
+	var plane = new SKO_Cube();
+	//plane.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
+	//plane.transform.rotateX(Math.random() * Math.PI * 2);
+	//plane.transform.rotateY(Math.random() * Math.PI * 2);
+	//plane.transform.rotateZ(Math.random() * Math.PI * 2);
+	camera = new OKO_Camera_();
+	camera.transform.translate(0, 0, 0);
+	camera.transform.rotateY(-3.14159 / 2);
+	camera.mode = 0;
+	plane.s = {
+		speed: 0,
+		onupdate: function() {
+			//this.obj.transform.translate(0.01, 0, 0);
+			//this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
+			camera.moveSpeed = 20;
+			} else {
+			camera.moveSpeed = 8;
+			}
+			this.speed += KJS.i.keyboardDown(KJS.i.toGLFWCode('q')) ? 0 : 0.009;
+			this.speed -= KJS.i.keyboardDown(KJS.i.toGLFWCode('e')) ? 0 : 0.009;
+			//this.obj.rotVelocity.w *= 1.07;
+			//this.obj.rotVelocity.normalize();
+			
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p'))) {
+			camera.transform.translate(0, 0.02, 0.08)
+			}
+			if (this.obj.transform.m31 < 0) {
+				this.obj.transform.m31 = 0;
+				//this.obj.transform.reflection(0, 1, 0, 0);
+				//this.obj.transform.reflection(0, 1, 0, 1);
+			}
+		   
+			this.obj.transform.translate(this.speed, 0, 0);
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('k'))) {
+				this.obj.rotVelocity.rotateZ(0.006);
+			}
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('i'))) {
+				this.obj.rotVelocity.rotateZ(-0.006);
+			}
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('j'))) {
+				this.obj.rotVelocity.rotateX(-0.006);
+			}
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('l'))) {
+				this.obj.rotVelocity.rotateX(0.006);
+			}
+		}
+	};
+	//SCN.camera = camera;
+	plane.camera = camera;
+	World.camera = camera;
+	SCN.plane = plane;
+	//SCN.Camera.look(0, 0, 5, 0, 0, 0);
+	
+	for (var i = 0; i < 111; i++) {
 		var cube = new SKO_Cube();
+		cube.morecube = new SKO_Cube();
 		cube.rotVelocity.rotateX(0.01);
 		cube.rotVelocity.rotateY(0.01);
 		cube.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
@@ -48,44 +98,23 @@ var start = function() {
 		cube.s = {
 			onupdate: function() {
 				//this.obj.transform.translate(0.01, 0, 0);
-				if (this.obj.transform.m31 < 0)
+				this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
+				if (this.obj.transform.m31 < 0) {
 					this.obj.transform.m31 = 0;
-				if (this.obj.transform.m31 > 30)
-					this.obj.transform.m31 = 30;
-				this.obj.transform.translate(0.2, 0, 0);
-				this.obj.rotVelocity.rotateX((Math.random() - 0.5) / 20);
-				this.obj.rotVelocity.rotateY((Math.random() - 0.5) / 20);
-				this.obj.rotVelocity.rotateZ((Math.random() - 0.5) / 20);
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('k'))) {
-					this.obj.rotVelocity.rotateZ(0.008);
 				}
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('i'))) {
-					this.obj.rotVelocity.rotateZ(-0.008);
-				}
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('j'))) {
-					this.obj.rotVelocity.rotateX(-0.008);
-				}
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('l'))) {
-					this.obj.rotVelocity.rotateX(0.008);
-				}
+				if (this.obj.transform.m31 > 200)
+					this.obj.transform.m31 = 200;
+				this.obj.transform.translate(0.04, 0, 0);
+				this.obj.rotVelocity.rotateX((Math.random() - 0.5) / 60);
+				this.obj.rotVelocity.rotateY((Math.random() - 0.5) / 60);
+				this.obj.rotVelocity.rotateZ((Math.random() - 0.5) / 60);
 			}
 		}
+		cube.morecube.transform.translate(0, 1, 0);
 		SCN["CUBE_" + i] = cube;
 	}
 	
-	SCN.Camera.s = {
-		onupdate: function() {
-			//SCN.rounGd.rotateX(Math.sin(KJS.currentTick()) / 5);
-			//SCN.Ground.rotateX(Math.sin(KJS.currentTick()) / 5);
-			//SCN.Ground.transform.rotateZ(Math.PI / 1024);
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
-				SCN.Camera.moveSpeed = 20;
-				SCN.Camera.transform.translate(0, 0.02, 0);
-			} else {
-				SCN.Camera.moveSpeed = 8;
-			}
-		}
-	}
 	
+	World.fogIntensity = 0.003;
 	World.clearColor.set(1, 1, 1, 1);
 };

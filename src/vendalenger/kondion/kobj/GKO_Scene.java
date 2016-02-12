@@ -33,6 +33,29 @@ public class GKO_Scene extends KObj_Node {
 	public GKO_Scene() {
 		
 	}
+	
+	private void immaEatYourChildren(KObj_Node child) {
+		((KObj_Oriented) child).applyTransform();
+		for (KObj_Node or : child.values()) {
+			if (or instanceof KObj_Oriented)
+				immaEatYourChildren(or);
+		}
+	}
+	
+	private void immaWulaYourChildren(KObj_Node child) {
+		child.update();
+		for (KObj_Node or : child.values()) {
+				immaWulaYourChildren(or);
+		}
+	}
+	
+	private void immaGulaYourChildren(KObj_Node child) {
+		((KObj_Oriented) child).updateB();
+		for (KObj_Node or : child.values()) {
+			if (or instanceof KObj_Oriented)
+				immaGulaYourChildren(or);
+		}
+	}
 
 	@Override
 	public void update() {
@@ -44,14 +67,17 @@ public class GKO_Scene extends KObj_Node {
 			
 			// UpdateA first, with movement
 			for (KObj_Node kobj : children) {
-				kobj.update();
+				immaWulaYourChildren(kobj);
+				// else not an oriented
 			}
 			
 			// Then apply apply transformations
 			for (KObj_Node kobj : children) {
 				// Is it solid?
-				if (kobj instanceof KObj_Oriented)
-					((KObj_Oriented) kobj).applyTransform();
+				if (kobj instanceof KObj_Oriented) {
+					immaEatYourChildren(kobj);
+					//System.out.println("neat " + kobj);
+				}
 				// else not an oriented
 			}
 			
@@ -62,8 +88,11 @@ public class GKO_Scene extends KObj_Node {
 			
 			// UpdateB all the objects, with detectors
 			for (KObj_Node kobj : children) {
-				if (kobj instanceof KObj_Oriented)
-					((KObj_Oriented) kobj).updateB();
+				// Is it solid?
+				if (kobj instanceof KObj_Oriented) {
+					immaGulaYourChildren(kobj);
+				}
+				// else not an oriented
 			}
 			
 			// Render at the same time

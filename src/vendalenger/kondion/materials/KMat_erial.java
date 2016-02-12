@@ -6,7 +6,7 @@ public interface KMat_erial {
 	 * This is called before drawing the renderable.
 	 * @return 0 for successful
 	 */
-	public int bind();
+	public int bind(int type);
 	
 	/**
 	 * This is called
@@ -19,5 +19,10 @@ public interface KMat_erial {
 	 * @return 0 for successful
 	 */
 	public int unbind();
+	
+	/**
+	 * Override the fog, reset on bind();
+	 */
+	public void fogOverride(float fog);
 	
 }

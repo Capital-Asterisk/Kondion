@@ -47,7 +47,6 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		Kondion.getWorld().zFar = Float.MAX_VALUE / 5 - 1;
 		Kondion.getWorld().zNear = 0.1f;
 		
-		
 		Vector3f temp1 = new Vector3f(); // Transformed camera position
 		Vector3f temp2 = new Vector3f(); // Transformed this position
 		Kondion.getCurrentCamera().getEye().mulPoint(actTransform.invert(temp0), temp1);
@@ -67,7 +66,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		
 		//eggs.useProgram();
 		if (material != null)
-			material.bind();
+			material.bind(type);
 		else
 			material = new KMat_FlatColor();
 		//System.out.println("RENDER!");

@@ -37,10 +37,6 @@ public class KondionShader {
 		return glGetUniformLocation(prog, name);
 	}
 	
-	public static void uniform1i(int location, int value) {
-		glUniform1i(location, value);
-	}
-	
 	public void useProgram() {
 		ARBShaderObjects.glUseProgramObjectARB(prog);
 	}

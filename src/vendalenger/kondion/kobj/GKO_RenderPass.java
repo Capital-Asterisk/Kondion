@@ -36,6 +36,7 @@ public class GKO_RenderPass extends KObj_Node {
 	
 	public GKO_RenderPass() {
 		items = new ArrayList<KObj_Renderable>();
+		type = 0;
 	}
 	
 	public void addItem(KObj_Renderable f) {

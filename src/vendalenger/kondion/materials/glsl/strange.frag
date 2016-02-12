@@ -8,7 +8,7 @@ float rand(vec2 co){
 }
 
 void main() {
-	int amt = 8;
+	int amt = 256;
 	if (fuk == 1)
     	gl_FragColor = vec4(sin(float(eggs) / 200),
     	rand(vec2(floor(texCoord.s * amt + eggs) / amt, floor(texCoord.t * amt + eggs) / amt)),

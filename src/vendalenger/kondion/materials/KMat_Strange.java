@@ -1,6 +1,7 @@
 package vendalenger.kondion.materials;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -23,13 +24,13 @@ public class KMat_Strange implements KMat_erial {
 	}
 
 	public void setFUK(boolean a) {
-		KondionShader.uniform1i(fuk, a ? 1 : 0);
+		glUniform1i(fuk, a ? 1 : 0);
 	}
 	
 	@Override
-	public int bind() {
+	public int bind(int type) {
 		shader.useProgram();
-		KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
+		glUniform1i(eggs, (int) Kondion.getFrame());
 		return 0;
 	}
 
@@ -43,5 +44,11 @@ public class KMat_Strange implements KMat_erial {
 	public int unbind() {
 		shader.unbind();
 		return 0;
+	}
+
+	@Override
+	public void fogOverride(float fog) {
+		// TODO Auto-generated method stub
+		
 	}
 }

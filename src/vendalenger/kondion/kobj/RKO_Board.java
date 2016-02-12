@@ -37,7 +37,7 @@ public class RKO_Board extends KObj_Renderable {
 		glMultMatrixf(buffer);
 		//eggs.useProgram();
 		if (material != null)
-			material.bind();
+			material.bind(type);
 		GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 		GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();

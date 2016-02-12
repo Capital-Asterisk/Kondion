@@ -26,6 +26,7 @@ public class SKO_Cube extends KObj_Solid {
 	
 	public SKO_Cube() {
 		super();
+		pointer = false;
 		//eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 		material = new KMat_FlatColor();
 		buffer = null;
@@ -35,16 +36,17 @@ public class SKO_Cube extends KObj_Solid {
 	public void update() {
 		defaultUpdate();
 		transform.rotate(rotVelocity);
-		rotVelocity.w *= 1.02f;
+		//rotVelocity.w *= 1.02f;
 		//rotVelocity.x *= 0.992;
 		//rotVelocity.y *= 0.992;
 		//rotVelocity.z *= 0.992;
-		//velocity.y = -0.3f;
+		//velocity.y = -4.3f;
 		rotVelocity.normalize();
 		transform.m30 += velocity.x * Kondion.getDelta();
 		transform.m31 += velocity.y * Kondion.getDelta();
 		transform.m32 += velocity.z * Kondion.getDelta();
 		//rotVelocity.
+		
 	}
 	
 
@@ -69,7 +71,9 @@ public class SKO_Cube extends KObj_Solid {
 		glMultMatrixf(buffer);
 		//eggs.useProgram();
 		if (material != null)
-			material.bind();
+			material.bind(type);
+		if (fogIntensity > 0.0f)
+			material.fogOverride(fogIntensity);
 		GLDrawing.renderCube(1, KondionLoader.textures.get("K_Cube"));
 		//GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();

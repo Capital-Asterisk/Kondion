@@ -24,10 +24,12 @@ import vendalenger.kondion.materials.KMat_erial;
 
 public abstract class KObj_Renderable extends KObj_Oriented {
 	
+	public float fogIntensity;
 	protected KondionTexture texture;
 	protected KMat_erial material;
 	
 	public KObj_Renderable() {
+		fogIntensity = 0.0f;
 		for (GKO_RenderPass rp : Kondion.getWorld().passes) {
 			if (rp.auto) {
 				rp.addItem(this);

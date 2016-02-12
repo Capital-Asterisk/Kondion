@@ -1,6 +1,8 @@
 package vendalenger.kondion.materials;
 
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL20.*;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -14,12 +16,13 @@ public class KMat_FlatColor implements KMat_erial {
 	
 	private KondionShader shader;
 	private float r, g, b, a;
-	private int eggs = 0;
+	private int uni_type, uni_fog;
 	private boolean alpha;
 	
 	public KMat_FlatColor() {
 		shader = KondionLoader.shaders.get("K_FlatCol");
-		eggs = shader.uniformLocation("eggs");
+		uni_type = shader.uniformLocation("type");
+		uni_fog = shader.uniformLocation("fog");
 	}
 	
 	/**
@@ -76,9 +79,12 @@ public class KMat_FlatColor implements KMat_erial {
 	}
 
 	@Override
-	public int bind() {
+	public int bind(int type) {
+		
 		shader.useProgram();
-		KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
+		//KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
+		glUniform1f(uni_fog, Kondion.getWorld().fogIntensity);
+		glUniform1i(uni_type, type);
 		return 0;
 	}
 
@@ -92,5 +98,10 @@ public class KMat_FlatColor implements KMat_erial {
 	public int unbind() {
 		shader.unbind();
 		return 0;
+	}
+
+	@Override
+	public void fogOverride(float fog) {
+		glUniform1f(uni_fog, fog);
 	}
 }

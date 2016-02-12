@@ -43,7 +43,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 		FREE = 2;
 
 	// For Camera position and movement
-	private int mode = 0;
+	public int mode = 0;
 	private int fov = 50;
 	private float cameraSpeed = 0.2f;
 	private float yaw, pitch, roll;
@@ -230,7 +230,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 
 	public void update() {
 		defaultUpdate();
-		mode = FREE;
+		//mode = FREE;
 		//System.out.println("Up");
 		if (mode == FREE) {
 			
@@ -264,13 +264,12 @@ public class OKO_Camera_ extends KObj_Oriented {
 				// right
 				transform.translate(cameraSpeed, 0.0f, 0.0f);
 			}
-			
-			System.out.println(yaw);
 		}
 	}
 
 	@Override
 	public void updateB() {
+		//System.out.println("wulawula");
 		//if (mode == FORWARD) {
 			calculateCenter();
 			calculateUp();

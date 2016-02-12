@@ -11,7 +11,7 @@ public class KMat_SingleTextured implements KMat_erial  {
 	}
 
 	@Override
-	public int bind() {
+	public int bind(int type) {
 		// TODO Auto-generated method stub
 		return 0;
 	}
@@ -26,5 +26,11 @@ public class KMat_SingleTextured implements KMat_erial  {
 	public int unbind() {
 		// TODO Auto-generated method stub
 		return 0;
+	}
+
+	@Override
+	public void fogOverride(float fog) {
+		// TODO Auto-generated method stub
+		
 	}
 }
