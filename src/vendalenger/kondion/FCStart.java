@@ -30,11 +30,16 @@ public class FCStart {
 	 *            Command line arguments, what else?
 	 */
 	public static void main(String args[]) {
-		VD_FlConsole.initConsole(600, 400, Boolean.parseBoolean(args[0]));
-		Command.commandSetup();
-		VD_FlConsole.showConsole();
+            boolean fluffy = false;
+            if (args.length != 0) {
+                fluffy = Boolean.parseBoolean(args[0]);
+            }
+               
+            VD_FlConsole.initConsole(600, 400, fluffy);
+            Command.commandSetup();
+            VD_FlConsole.showConsole();
 
-		/* Run the startup script */
-		Command.fcis(new File("startup.fcis"), "startup");
+            /* Run the startup script */
+            Command.fcis(new File("startup.fcis"), "startup");
 	}
 }

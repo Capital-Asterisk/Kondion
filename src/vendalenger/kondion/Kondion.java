@@ -68,9 +68,10 @@ public class Kondion {
 	private static KondionWorld world;
 	private static KJS kjs;
 
+	private static int width = 0, height = 0;
+	private static float delta;
 	private static float fps;
 	private static long ticks;
-	private static float delta;
 
 	public static boolean showPrespective = true;
 	public static boolean showHud = false;
@@ -212,7 +213,16 @@ public class Kondion {
 			public void run() {
 				try {
 					Window.setNatives();
-					Window.initGL(1280, 720, false, false, g.getGameInfo()
+					
+					if (width * height == 0) {
+						// No width or height has been specified
+						//width = 1280;
+						//height = 720;
+						width = 800;
+						height = 600;
+					}
+					
+					Window.initGL(width, height, false, false, g.getGameInfo()
 							.getStringValue("GameName"));
 					GL.createCapabilities();
 					GLDrawing.setup();

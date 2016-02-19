@@ -266,13 +266,19 @@ public class OKO_Camera_ extends KObj_Oriented {
 			}
 		}
 	}
+	
+	@Override
+	public void applyTransform() {
+		super.applyTransform();
+		calculateCenter();
+		calculateUp();
+	}
 
 	@Override
 	public void updateB() {
 		//System.out.println("wulawula");
 		//if (mode == FORWARD) {
-			calculateCenter();
-			calculateUp();
+			
 		//}
 	}
 }

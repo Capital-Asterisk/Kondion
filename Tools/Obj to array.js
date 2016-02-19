@@ -1,6 +1,7 @@
 // Make objs into arrays
 // Used for KONDION
 // Paste into chrome js console
+// Also this doesn't work
 // -Capital_Asterisk
 
 var data = window.prompt("Eggs here", "").split("\n");

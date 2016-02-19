@@ -28,7 +28,19 @@ import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class GKO_RenderPass extends KObj_Node {
 	
+	public static final int
+		DEFAULT		= 0,
+		DIFFUSE		= 1,
+		DEPTH		= 2,
+		NORMALS		= 3,
+		BRIGHTNESS	= 4,
+		HDR			= 5,
+		CUSTOM		= 9,
+		DEFERRED	= 10,
+		HRD_RESULT	= 11;
+	
 	private List<KObj_Renderable> items;
+	private boolean framebuffered = false;
 	public boolean disable = false;
 	public boolean auto = true;
 	public int type;
@@ -37,6 +49,11 @@ public class GKO_RenderPass extends KObj_Node {
 	public GKO_RenderPass() {
 		items = new ArrayList<KObj_Renderable>();
 		type = 0;
+	}
+	
+	public GKO_RenderPass(int t) {
+		items = new ArrayList<KObj_Renderable>();
+		type = t;
 	}
 	
 	public void addItem(KObj_Renderable f) {

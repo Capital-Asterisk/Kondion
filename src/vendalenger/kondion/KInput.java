@@ -16,7 +16,7 @@
 
 package vendalenger.kondion;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_B;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_C;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
@@ -143,6 +143,7 @@ public class KInput {
 			glfwSetInputMode(Window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_DISABLED);
 		} else {
 			// TODO: show cursor
+			glfwSetInputMode(Window.getWindow(), GLFW.GLFW_CURSOR, GLFW.GLFW_CURSOR_NORMAL);
 		}
 
 	}
@@ -158,7 +159,12 @@ public class KInput {
 		if (Character.isLetter(c)) {
 			return aToZ[(Character.toUpperCase(c)) - 65];
 		} else {
-			return 0;
+			switch (c) {
+				case ' ':
+					return GLFW_KEY_SPACE;
+				default:
+					return 0;
+			}
 		}
 	}
 

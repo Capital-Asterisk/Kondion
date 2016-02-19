@@ -27,14 +27,14 @@ public class GKO_Scene extends KObj_Node {
 	private KObj_Solid currentA;
 	private KObj_Solid currentB;
 	
-	public boolean collisions = false;
+	public boolean collisions = true;
 	public boolean disable = false;
 	
 	public GKO_Scene() {
 		
 	}
 	
-	private void immaEatYourChildren(KObj_Node child) {
+	protected static void immaEatYourChildren(KObj_Node child) {
 		((KObj_Oriented) child).applyTransform();
 		for (KObj_Node or : child.values()) {
 			if (or instanceof KObj_Oriented)
@@ -42,14 +42,14 @@ public class GKO_Scene extends KObj_Node {
 		}
 	}
 	
-	private void immaWulaYourChildren(KObj_Node child) {
+	protected static void immaWulaYourChildren(KObj_Node child) {
 		child.update();
 		for (KObj_Node or : child.values()) {
 				immaWulaYourChildren(or);
 		}
 	}
 	
-	private void immaGulaYourChildren(KObj_Node child) {
+	protected static void immaGulaYourChildren(KObj_Node child) {
 		((KObj_Oriented) child).updateB();
 		for (KObj_Node or : child.values()) {
 			if (or instanceof KObj_Oriented)
@@ -65,7 +65,7 @@ public class GKO_Scene extends KObj_Node {
 			// It seems there is a better way of
 			// doing this
 			
-			// UpdateA first, with movement
+			// UpdateA first, with movement and js
 			for (KObj_Node kobj : children) {
 				immaWulaYourChildren(kobj);
 				// else not an oriented
