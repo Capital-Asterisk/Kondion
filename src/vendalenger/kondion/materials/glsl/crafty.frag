@@ -1,3 +1,5 @@
+#version 120
+
 uniform int eggs;
 
 varying vec4 texCoord;

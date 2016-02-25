@@ -24,8 +24,11 @@ import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class SKO_Cube extends KObj_Solid {
 	
-	KondionShader eggs;
-	FloatBuffer buffer;
+	private FloatBuffer buffer;
+	private Matrix4f temp0 = new Matrix4f();
+	private Vector3f temp1 = new Vector3f();
+	private Vector3f temp2 = new Vector3f();
+	private Vector3f temp3 = new Vector3f();
 	
 	public SKO_Cube() {
 		super();
@@ -44,7 +47,7 @@ public class SKO_Cube extends KObj_Solid {
 			//rotVelocity.x *= 0.992;
 			//rotVelocity.y *= 0.992;
 			//rotVelocity.z *= 0.992;
-			velocity.y -= Kondion.getDelta() * 10;
+			velocity.y -= Kondion.getDelta() * 9.806;
 			rotVelocity.normalize();
 			transform.m30 += velocity.x * Kondion.getDelta();
 			transform.m31 += velocity.y * Kondion.getDelta();
@@ -57,16 +60,15 @@ public class SKO_Cube extends KObj_Solid {
 
 	@Override
 	public CollisionData collisionCheck(KObj_Solid kobj) {
-                Matrix4f temp0 = new Matrix4f();
-                Vector3f temp1 = new Vector3f();
-                Vector3f temp2 = new Vector3f();
+                
                 float f;
 		if (kobj instanceof SKO_InfinitePlane) {
                     //actTransform.
                     temp1.set(actTransform.m30, actTransform.m31, actTransform.m32);
                     //temp1.mulPoint(actTransform);
                     temp1.mulPoint(kobj.actTransform.invert(temp0), temp2);
-                    f = temp2.z;
+                    f = temp2.z - 0.5f;
+                    
                     //System.out.println("eee: " + f);
                     if (f < 0) {
                         // get up
@@ -77,13 +79,17 @@ public class SKO_Cube extends KObj_Solid {
                         temp1.mulPoint(temp0);
                         temp1.sub(temp0.m30, temp0.m31, temp0.m32);
                         
-                        System.out.println(temp1.x + " " + temp1.y + " " + temp1.z + " " + Kondion.getFrame());
+                        //System.out.println(temp1.x + " " + temp1.y + " " + temp1.z + " " + Kondion.getFrame());
                         transform.m30 -= f * temp2.x;
                         transform.m31 += f * temp2.y;
                         transform.m32 -= f * temp2.z;
                         velocity.x *= Math.abs(temp1.x);
                         velocity.y *= Math.abs(temp1.y);
                         velocity.z *= Math.abs(temp1.z);
+                        
+                        if (s.containsKey("collide")) {
+            				s.callMember("collide", kobj, temp2);
+            			}
                     }
                     
 		}

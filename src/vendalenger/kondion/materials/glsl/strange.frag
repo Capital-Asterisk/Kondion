@@ -1,3 +1,5 @@
+#version 120
+
 uniform int eggs = 0;
 uniform int fuk = 1;
 

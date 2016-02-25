@@ -47,6 +47,7 @@ import org.joml.Vector3f;
 
 import poly2Tri.Triangulation;
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.kobj.OKO_Camera_;
 
 public class TTT {
 
@@ -263,14 +264,18 @@ public class TTT {
 		list.add(d.z);
 	}
 
+	public static void three() {
+		three(Kondion.getCurrentCamera());
+	}
+	
 	/**
 	 * Set to 3d mode
 	 */
-	public static void three() {
+	public static void three(OKO_Camera_ cam) {
 		glViewport(0, 0, Window.getWidth(), Window.getHeight());
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
-		Kondion.getCurrentCamera().gluLookAt();
+		cam.gluLookAt();
 		// GLU.gluPerspective(fov,
 		// ((float) (Window.getWidth()) / (float) (Window.getHeight())),
 		// 0.1f, 200.0f);

@@ -114,10 +114,7 @@ public class Kondion {
 
 			TTT.three();
 
-			glClearColor(world.clearColor.x, world.clearColor.y,
-					world.clearColor.z, world.clearColor.w);
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the
-												// framebuffer
+			
 			//currentCamera.gluLookAt();
 			
 			//glTranslatef(0, 0, 1);
@@ -179,6 +176,11 @@ public class Kondion {
 	
 	public static KondionWorld getWorld() {
 		return world;
+	}
+	
+	public static void setSize(int w, int h) {
+		width = w;
+		height = h;
 	}
 
 	public static void run(KondionGame g) {

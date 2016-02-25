@@ -59,6 +59,8 @@ public class GKO_Scene extends KObj_Node {
 
 	@Override
 	public void update() {
+
+		Kondion.getNashorn().put("delta", Kondion.getDelta());
 		defaultUpdate();
 		
 		if (!disable) {
@@ -99,6 +101,8 @@ public class GKO_Scene extends KObj_Node {
 			for (GKO_RenderPass rp : Kondion.getWorld().passes) {
 				rp.render();
 			}
+			
+			Kondion.getWorld().composite();
 		}
 		
 	}

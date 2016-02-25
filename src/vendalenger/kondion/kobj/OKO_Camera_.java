@@ -152,6 +152,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	 */
 	public void gluLookAt() {
 		FloatBuffer fb = BufferUtils.createFloatBuffer(16);
+		//System.out.println("eggs");
 		if (fov < 1) {
 			prespectiveMatrix
 					.identity()

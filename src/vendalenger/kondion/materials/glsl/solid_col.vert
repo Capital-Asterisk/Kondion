@@ -1,3 +1,5 @@
+#version 120
+
 // A cute vertex shader with many purposes
 
 varying vec3 normal;
@@ -7,7 +9,7 @@ varying mat4 cuteMatrix;
 
 
 float rand(vec2 co){
-    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 5434);
+    return fract(sin(dot(co.xy, vec2(12.9898, 78.233))) * 5434);
 }
 
 void main(){

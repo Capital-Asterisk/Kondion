@@ -1,3 +1,5 @@
+#version 120
+
 uniform int type;
 uniform float fog;
 
@@ -20,12 +22,17 @@ void main(){
 		float s = floor(texCoord.s * 200) / 200;
 		float t = floor(texCoord.t * 200) / 200;
 		float b = 0;
-		float eggs = dot(normalize(cuteMatrix * vec4(normal, 0.0)), -vec3(0.0, -1.0, 0.0));
+		float eggs = dot(normalize(cuteMatrix * vec4(normal, 0.0)), -vec4(0.0, -1.0, 0.0, 0.0));
 		b += (eggs + 1) / 2;
-	    final = texture2D(texture1, texCoord.st) * vec3(b, b, b);
+	    final = vec3(texture2D(texture1, texCoord.st).xyz) * vec3(b, b, b);
 	    if (fog != 0.0) {
 		    final = mix(vec3(1.0, 1.0, 1.0), final, clamp(1.0 / exp(length(viewPos) * fog), 0.0, 1.0));
 	    }
+    } else if (type == 2) {
+    	float val = length(viewPos) / 30;
+    	final.x = val * 0.3;
+    	final.y = val * 0.3;
+    	final.z = val;
     }
     
     gl_FragColor = vec4(final, 1.0);
