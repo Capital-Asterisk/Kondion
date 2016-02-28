@@ -66,7 +66,7 @@ public class Kondion {
 	private static ScriptEngine jsEngine;
 	private static Thread gameThread;
 	private static KondionWorld world;
-	private static KJS kjs;
+	public static KJS kjs;
 
 	private static int width = 0, height = 0;
 	private static float delta;

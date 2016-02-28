@@ -13,12 +13,19 @@ var init = function() {
 
 var start = function() {
 
-	KJS.i.setMouseLock(true);
+	KJS.i.setMouseLock(false);
 
 	// Create a new render layer (GKO: Game Kondion Object)
 	World.passes.add(new GKO_RenderPass());
 	World.passes.add(new GKO_RenderPass());
-	World.passes[1].type = 2;
+	//World.passes.add(new GKO_RenderPass());
+	//World.passes.add(new GKO_RenderPass());
+	//World.passes.add(new GKO_RenderPass());
+	//World.passes.add(new GKO_RenderPass());
+	//World.passes.add(new GKO_RenderPass());
+	//World.passes.add(new GKO_RenderPass());
+	//World.passes[1].type = 2;
+	//World.passes[2].type = 2;
 
 	SCN.rounGd = new SKO_InfinitePlane();
 	SCN.Ground = new SKO_InfinitePlane();
@@ -28,11 +35,11 @@ var start = function() {
 	//SCN.Apple.transform.translate(0, 2, 0);
 	SCN.Ground.transform.rotateX(-Math.PI / 2);
 	SCN.Ground.textureSize = 2;
-	SCN.Ground.transform.translate(0, 0, 1);
+	SCN.Ground.transform.translate(0, 0, 0);
 
 	SCN.rounGd.transform.rotateX(Math.PI / 2);
 	SCN.rounGd.textureSize = 2;
-	SCN.rounGd.transform.translate(0, 0, -20);
+	SCN.rounGd.transform.translate(0, 0, -200);
 
 	SCN.Wallz.transform.translate(0, 0, -40);
 	SCN.Wallz.textureSize = 8;
@@ -46,13 +53,14 @@ var start = function() {
 	//World.Layers[0].Apple = SCN.Apple;
 
 	var plane = new SKO_Cube();
-	//plane.drag = new SKO_Cube();
-	//plane.drag.transform.translate(0, 1, 0);
-	//plane.drag.transform.scale(0.2, 0.2, 0.2);
-	//plane.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
-	//plane.transform.rotateX(Math.random() * Math.PI * 2);
-	//plane.transform.rotateY(Math.random() * Math.PI * 2);
-	//plane.transform.rotateZ(Math.random() * Math.PI * 2);
+	//plane.transform.m30 = 6000000;
+	plane.drag = new SKO_Cube();
+	plane.drag.transform.translate(0.1, 0.8, 0);
+	plane.drag.transform.scale(0.6, 0.05, 0.05);
+	//plane.drag.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
+	//plane.drag.transform.rotateX(Math.random() * Math.PI * 2);
+	//plane.drag.transform.rotateY(Math.random() * Math.PI * 2);
+	//plane.drag.transform.rotateZ(Math.random() * Math.PI * 2);
 	camera = new OKO_Camera_();
 	camera.transform.translate(0, 1, 0);
 	camera.transform.rotateY(-3.14159 / 2);
@@ -62,11 +70,13 @@ var start = function() {
 		bob: 0,
 		y: 0,
 		p: 0,
+		mss: 0,
+		falling: false,
 		collide: function(kobj, normal) {
-			print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
+			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
+			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 		},
 		onupdate: function() {
-		
 			SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 300);
 		
 			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
@@ -75,38 +85,52 @@ var start = function() {
 				camera.moveSpeed = 8;
 			}
 			
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
-				if (this.obj.velocity.y < 0)
-					this.obj.velocity.y = 5;
-			}
-
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p'))) {
-				camera.transform.translate(0, 0.02, 0.08)
-			}
-
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('s'))) {
-				//this.obj.rotVelocity.rotateZ(0.006);
-				this.speed = Math.max(this.speed - delta * 9, -5);
-				this.bob -= this.speed / 24;
-			} else if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w'))) {
-				//this.obj.rotVelocity.rotateZ(-0.006);
-				this.speed = Math.min(this.speed + delta * 9, 6 + KJS.i.keyboardDown(KJS.i.toGLFWCode('q')) * 10);
-				this.bob += this.speed / 24;
-			} else  {
-				this.speed *= 0.8
+			//print(this.obj.actTransform.m30);
+			//print(Math.floor(this.speed * 3.6) + "km/h");
+			
+			if (!this.falling) {
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+					if (this.obj.velocity.y < 0) {
+						this.obj.velocity.y = 5;
+						this.speed *= 1.2;
+					}
+				}
+	
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p'))) {
+					camera.transform.translate(0, 0.02, 0.08)
+				}
+	
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('s'))) {
+					//this.obj.rotVelocity.rotateZ(0.006);
+					this.speed = Math.max(this.speed - delta * 9, -5);
+					this.bob -= this.speed / 24;
+				} else if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w'))) {
+					//this.obj.rotVelocity.rotateZ(-0.006);
+					this.speed = Math.min(this.speed + delta * 9, 6 + KJS.i.keyboardDown(KJS.i.toGLFWCode('q')) * 10);
+					this.bob += this.speed / 24;
+				} else  {
+					this.speed *= 0.8
+				}
 			}
 			
-			this.infl = Math.abs(this.speed / 5);
+			this.infl = Math.min(Math.abs(this.speed / 5), 2) * !this.falling;
 			
 			camera.transform.identity();
 			camera.transform.translate(0, 1 + Math.abs(Math.cos(this.bob / 2) / 24) * this.infl, Math.sin(-this.bob / 2) / 24 * this.infl);
 			
 			
-			this.y += (-KJS.i.getMouseDX() / 100);
-			this.p += (-KJS.i.getMouseDY() / 100);
+			this.y = (this.y + (-KJS.i.getMouseDX() / 100)) % (Math.PI * 2);
+			this.p = Math.max(Math.min(Math.PI / 2, this.p + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2);
 			this.obj.camera.transform.setRotationYXZ(-Math.PI / 2, this.p, 0);
 			this.obj.transform.setRotationYXZ(this.y, 0, 0);
 			this.obj.transform.translate(this.speed * delta, 0, 0);
+			
+			this.mss = 0;
+			this.falling = true;
+		},
+		onupdateb: function() {
+			this.falling = this.mss > -0.6;
+			//print(this.falling);
 		}
 	}
 	SCN.car = plane;
@@ -114,7 +138,7 @@ var start = function() {
 	World.camera = camera;
 	//SCN.Camera.look(0, 0, 5, 0, 0, 0);
 
-	for (var i = 0; i < 6; i++) {
+	for (var i = 0; i < 80; i++) {
 		var cube = new SKO_Cube();
 		cube.morecube = new SKO_Cube();
 		//cube.rotVelocity.rotateX(0.01);
@@ -141,4 +165,8 @@ var start = function() {
 	World.fogIntensity = 0.0001;
 	World.clearColor.set(0, 0, 0, 1);
 	World.skyColor.set(1, 1, 1, 1);
+	World.compMode = KJS.DEBUG;
+	World.compositor = function(ctx, passes) {
+	
+	}
 };

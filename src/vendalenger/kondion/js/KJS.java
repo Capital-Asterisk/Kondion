@@ -26,9 +26,18 @@ import vendalenger.port.Command;
 public class KJS {
 	
 	public final ScriptObjectMirror o;
+	public final ScriptObjectMirror d;
 	public final StaticClass i;
 	public final StaticClass c;
-	public static final short
+	public final short
+			SINGLE = 0,
+			COMPOSITE = 1,
+			DEBUG = 	2,
+			HORSPLIT = 	3,
+			VERTSPLIT = 4,
+			QUADSPLIT = 5,
+			VR = 		6;
+	public final short
 			ZYX = 0,
 			ZXY = 1,
 			YXZ = 2,
@@ -40,15 +49,13 @@ public class KJS {
 		System.out.println("KJS initialization");
 		c = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.js.KJS\")");
 		i = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.KInput\")");
-		o = (ScriptObjectMirror) Kondion.getNashorn().eval("{"
-				/*+ "  node: Java.type(\"vendalenger.kondion.objectbase.KObj_Node\"),"
-				+ "  oriented: Java.type(\"vendalenger.kondion.objectbase.KObj_Oriented\"),"
-				+ "  render: Java.type(\"vendalenger.kondion.objectbase.KObj_Renderable\"),"
-				+ "  solid: Java.type(\"vendalenger.kondion.objectbase.KObj_Solid\"),"
-				+ "  extend: function(from, with) {"
-				+ "    var java"
-				+ "  }"*/
+		Kondion.getNashorn().eval("var thisislong = {"
+				+ "example_poop: \"neat\","
+				+ "example_pole: \"neat\""
 				+ "}");
+		d = (ScriptObjectMirror) Kondion.getNashorn().eval("thisislong");
+		Kondion.getNashorn().eval("var thisisabitlong = {}");
+		o = (ScriptObjectMirror) Kondion.getNashorn().eval("thisisabitlong");
 
 	}
 	

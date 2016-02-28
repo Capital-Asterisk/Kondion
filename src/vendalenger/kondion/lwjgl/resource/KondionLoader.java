@@ -35,7 +35,7 @@ import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glGenTextures;
 import static org.lwjgl.opengl.GL11.glTexImage2D;
-import static org.lwjgl.opengl.GL11.glTexParameteri;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL12.GL_TEXTURE_MAX_LEVEL;
 import static org.lwjgl.opengl.GL14.GL_GENERATE_MIPMAP;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
@@ -56,6 +56,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -64,6 +65,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +75,11 @@ import java.util.List;
 import javax.imageio.ImageIO;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.stb.STBTruetype;
+
+import lwjgl.IOUtil;
+import vendalenger.kondion.lwjgl.GLDrawing;
 
 public class KondionLoader {
 
@@ -93,9 +102,10 @@ public class KondionLoader {
 	/**
 	 * Load the queue. All the textures and shaders queued in queueTexture /
 	 * shader are loaded.
+	 * 
 	 */
 	public static void load() {
-		
+		// TODO Revise loading system, only specified resources are loaded
 		if (missingTexture == null) {
 			missingTexture = registerTexture(KondionLoader.class.getResourceAsStream("missingno.png"),
 					"K_Missing", GL_LINEAR, GL_NEAREST,
@@ -114,7 +124,35 @@ public class KondionLoader {
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.frag"),
 				"K_FlatCol"));
-		
+		// Default font informal loading (Ubuntu Mono)
+		//STBTruetype
+		System.out.println("EGGSU");
+		try {
+			// TODO put into function some time
+			//InputStream is = KondionLoader.class.getResourceAsStream("/vendalenger/kondion/lwjgl/resource/UbuntuMono-R.ttf");
+			//byte[] friendlyArray = new byte[is.available()];
+			//is.read(friendlyArray);
+			//ByteBuffer bloat = ByteBuffer.wrap(friendlyArray);
+			ByteBuffer bloat = IOUtil.ioResourceToByteBuffer("vendalenger/kondion/lwjgl/resource/UbuntuMono-R.ttf", 205748);
+			ByteBuffer porn = BufferUtils.createByteBuffer(512 * 512);
+			System.out.println(bloat.remaining());
+			STBTTBakedChar.Buffer stbttseemsneat = STBTTBakedChar.mallocBuffer(96);
+			STBTruetype.stbtt_BakeFontBitmap(bloat, 32, porn, 512, 512, 32, stbttseemsneat);
+			
+			int tex = glGenTextures();
+			glBindTexture(GL_TEXTURE_2D, tex);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+			glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, 512,
+					512, 0, GL_ALPHA, GL_UNSIGNED_BYTE, porn);
+			glBindTexture(GL_TEXTURE_2D, 0);
+			
+			GLDrawing.setDefaultFont(stbttseemsneat, 32, tex);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println("EGGSUS");
 		for (int i = 0; i < queue.size(); i++) {
 			if ((boolean) queue.get(i)[0]) {
 				// its a shader
@@ -377,7 +415,7 @@ public class KondionLoader {
 				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAX_LEVEL, 2);
 				glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 			}
-
+			
 			// put pixel data into texture
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, i.getWidth(),
 					i.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);

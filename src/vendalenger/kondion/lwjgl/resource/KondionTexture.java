@@ -19,7 +19,9 @@ package vendalenger.kondion.lwjgl.resource;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
 import static org.lwjgl.opengl.GL11.glBindTexture;
 
-public class KondionTexture {
+import vendalenger.kondion.js.JSDrawable;
+
+public class KondionTexture implements JSDrawable {
 
 	private int imageWidth, imageHeight;
 

@@ -43,6 +43,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL21;
 
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.js.JSDrawable;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
@@ -52,7 +53,7 @@ import vendalenger.kondion.objectbase.KObj_Oriented;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
-public class GKO_RenderPass extends KObj_Node {
+public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	
 	public static final int
 		DEFAULT		= 0,
@@ -99,6 +100,10 @@ public class GKO_RenderPass extends KObj_Node {
 	
 	public void addItem(KObj_Renderable f) {
 		items.add(f);
+	}
+	
+	public OKO_Camera_ getCamera() {
+		return cameraOverride ? camera : Kondion.getCurrentCamera();
 	}
 
 	public void render() {
@@ -159,7 +164,7 @@ public class GKO_RenderPass extends KObj_Node {
 				if (kobj instanceof KObj_Oriented) {
 					((KObj_Oriented) kobj).updateB();
 					if (Kondion.showPrespective && kobj instanceof KObj_Renderable)
-						((KObj_Renderable) kobj).render(type);
+						((KObj_Renderable) kobj).render(type, this);
 				}
 			}
 			glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
@@ -177,5 +182,10 @@ public class GKO_RenderPass extends KObj_Node {
 	@Override
 	public void update() {
 		defaultUpdate();
+	}
+
+	@Override
+	public void bind() {
+		glBindTexture(GL_TEXTURE_2D, texId);
 	}
 }

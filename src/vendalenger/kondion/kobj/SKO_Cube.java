@@ -4,6 +4,7 @@ import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMultMatrixf;
 import static org.lwjgl.opengl.GL11.glPopMatrix;
 import static org.lwjgl.opengl.GL11.glPushMatrix;
+import static org.lwjgl.opengl.GL11.glTranslatef;
 
 import java.nio.FloatBuffer;
 import org.joml.Matrix4f;
@@ -98,16 +99,19 @@ public class SKO_Cube extends KObj_Solid {
 	}
 
 	@Override
-	public void render(int type) {
+	public void render(int type, GKO_RenderPass pass) {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
+
+		glPushMatrix();
+		glLoadIdentity();
+		
+		glTranslatef(-pass.getCamera().actTransform.m30, -pass.getCamera().actTransform.m31, -pass.getCamera().actTransform.m32);
 		
 		buffer.clear();
 		actTransform.get(buffer);
-		
-		glPushMatrix();
-		glLoadIdentity();
 		glMultMatrixf(buffer);
+		
 		//eggs.useProgram();
 		if (material != null)
 			material.bind(type);
@@ -123,7 +127,6 @@ public class SKO_Cube extends KObj_Solid {
 
 	@Override
 	public void updateB() {
-		// TODO Auto-generated method stub
-		
+		defaultUpdateB();
 	}
 }

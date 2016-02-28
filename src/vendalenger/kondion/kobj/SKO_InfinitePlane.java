@@ -40,11 +40,11 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	}
 	
 	@Override
-	public void render(int type) {
+	public void render(int type, GKO_RenderPass pass) {
 		if (buffer == null)
 			buffer = BufferUtils.createFloatBuffer(16);
 		
-		Kondion.getWorld().zFar = Float.MAX_VALUE / 5 - 1;
+		Kondion.getWorld().zFar = Float.MAX_VALUE / 20 - 1;
 		Kondion.getWorld().zNear = 0.1f;
 		
 		Vector3f temp1 = new Vector3f(); // Transformed camera position
@@ -53,14 +53,12 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		
 		temp2.mulPoint(temp0);
 		
-		buffer.clear();
-		actTransform.get(buffer);
-		
-		
 		glPushMatrix();
 		glLoadIdentity();
 		//glTranslatef(0, 0, -temp1.z + temp2.z);
-		glTranslatef(Kondion.getCurrentCamera().actTransform.m30, Kondion.getCurrentCamera().actTransform.m31, Kondion.getCurrentCamera().actTransform.m32);
+		//glTranslatef(pass.getCamera().actTransform.m30, pass.getCamera().actTransform.m31, pass.getCamera().actTransform.m32);
+		buffer.clear();
+		actTransform.get(buffer);
 		glMultMatrixf(buffer);
 		glTranslatef(0, 0, -temp1.z + temp2.z);
 		
@@ -79,7 +77,10 @@ public class SKO_InfinitePlane extends KObj_Solid {
 				addx, size / textureSize + addy,
 				addx, addy,
 				size / textureSize + addx, addy});
-		GLDrawing.renderQuad(size, size, KondionLoader.getMissingTexture());
+		//if (material == null)
+			GLDrawing.renderQuad(size, -size, KondionLoader.getMissingTexture());
+		//else
+			//GLDrawing.renderQuad(size, -size);
 		//System.out.println(textureSize);
 		if (material != null)
 			material.unbind();

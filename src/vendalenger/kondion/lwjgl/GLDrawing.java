@@ -16,7 +16,7 @@
 
 package vendalenger.kondion.lwjgl;
 
-import static org.lwjgl.opengl.GL11.GL_FLOAT;
+import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL11.GL_NORMAL_ARRAY;
 import static org.lwjgl.opengl.GL11.GL_QUADS;
 import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
@@ -50,15 +50,23 @@ import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 
 import org.lwjgl.BufferUtils;
+import org.lwjgl.stb.STBTTAlignedQuad;
+import org.lwjgl.stb.STBTTBakedChar;
+import org.lwjgl.stb.STBTTPackedchar;
+import org.lwjgl.stb.STBTruetype;
 
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.materials.KMat_Strange;
 import vendalenger.port.FileShortcuts;
 
 public class GLDrawing {
+	
+	private static STBTTBakedChar.Buffer dfont_buffer;
+	private static int dfont_height;
+	private static int dfont_id;
 
 	private static int vbo_texCoords;
 	private static int vbo_unitSquare;
-
 	private static int vbo_cube;
 
 	// private static ArrayList<int[]> canvasTextures = new ArrayList<int[]>();
@@ -95,7 +103,7 @@ public class GLDrawing {
 
 	public static void renderQuad(float width, float height) {
 		glPushMatrix();
-		glScalef(width, height, 1);
+		glScalef(width, -height, 1);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
 		glVertexPointer(3, GL_FLOAT, 24, 0l); // First object
@@ -122,7 +130,7 @@ public class GLDrawing {
 	public static void renderQuad(float width, float height, KondionTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
-		glScalef(width, height, 1);
+		glScalef(width, -height, 1);
 		t.bind();
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo_unitSquare);
@@ -173,6 +181,40 @@ public class GLDrawing {
 
 		glPopMatrix();
 	}
+	
+	private static FloatBuffer x, y;
+	private static STBTTAlignedQuad chr;
+	private static char c;
+	public static void drawText(String text) {
+		x.put(0, 0.0f);
+		y.put(0, 0.0f);
+		
+		glBindTexture(GL_TEXTURE_2D, dfont_id);
+		// although deprecated?
+		glBegin(GL_QUADS);
+		for (int i = 0; i < text.length(); i++) {
+			c = text.charAt(i);
+			
+			//STBTruetype.stbtt_GetBakedQuad(dfont_buffer, 512, 512, c - 32, x, y, chr, 1);
+			STBTruetype.stbtt_GetBakedQuad(dfont_buffer, 512, 512, c - 32, x, y, chr, 1);
+			
+			glTexCoord2f(chr.s0(), chr.t0());
+			glVertex2f(chr.x0(), chr.y0());
+
+			glTexCoord2f(chr.s1(), chr.t0());
+			glVertex2f(chr.x1(), chr.y0());
+
+			glTexCoord2f(chr.s1(), chr.t1());
+			glVertex2f(chr.x1(), chr.y1());
+
+			glTexCoord2f(chr.s0(), chr.t1());
+			glVertex2f(chr.x0(), chr.y1());
+			
+		}
+		
+		glEnd();
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 
 	public static void rotate2D(float ang) {
 		glRotatef(ang, 0, 0, 1);
@@ -190,8 +232,18 @@ public class GLDrawing {
 		glBufferSubData(GL_ARRAY_BUFFER, 0, texCoords); // wrong
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
-
+	
+	public static void setDefaultFont(STBTTBakedChar.Buffer data, int height, int fontId) {
+		dfont_buffer = data;
+		dfont_height = height;
+		dfont_id = fontId;
+	}
+	
 	public static void setup() {
+		
+		x = BufferUtils.createFloatBuffer(1);
+		y = BufferUtils.createFloatBuffer(1);
+		chr = STBTTAlignedQuad.malloc();
 
 		// Plane
 

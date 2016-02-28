@@ -290,6 +290,8 @@ public class TTT {
 		glDepthFunc(GL_LEQUAL);
 		glClearDepth(10.0f);
 	}
+	
+	
 
 	/** 2D mode */
 	/*

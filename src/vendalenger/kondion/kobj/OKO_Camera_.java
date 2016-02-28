@@ -119,10 +119,11 @@ public class OKO_Camera_ extends KObj_Oriented {
 	private void calculateUp() {
 		// Very upsetting eh??
 		up.set(0, 1, 0);
-		up.mulPoint(actTransform);
-		up.x -= actTransform.m30;
-		up.y -= actTransform.m31;
-		up.z -= actTransform.m32;
+		up.mulDirection(actTransform);
+		//up.mulPoint(actTransform);
+		//up.x -= actTransform.m30;
+		//up.y -= actTransform.m31;
+		//up.z -= actTransform.m32;
 	}
 
 	/**
@@ -160,7 +161,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 							(float) Math.toRadians(TTT.getPrefFov()),
 							((float) (Window.getWidth()) / (float) (Window
 									.getHeight())), Kondion.getWorld().zNear, Kondion.getWorld().zFar)
-					.lookAt(actTransform.m30, actTransform.m31, actTransform.m32, center.x, center.y, center.z,
+					.lookAt(0, 0, 0, center.x - actTransform.m30, center.y - actTransform.m31, center.z - actTransform.m32,
 							up.x, up.y, up.z).get(fb);
 		} else {
 			prespectiveMatrix
@@ -169,7 +170,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 							(float) Math.toRadians(fov),
 							((float) (Window.getWidth()) / (float) (Window
 									.getHeight())), Kondion.getWorld().zNear, Kondion.getWorld().zFar)
-					.lookAt(actTransform.m30, actTransform.m31, actTransform.m32, center.x, center.y, center.z,
+					.lookAt(0, 0, 0, center.x - actTransform.m30, center.y - actTransform.m31, center.z - actTransform.m32,
 							up.x, up.y, up.z).get(fb);
 		}
 		glMultMatrixf(fb);

@@ -45,6 +45,6 @@ public abstract class KObj_Renderable extends KObj_Oriented {
 		this.material = material;
 	}
 
-	public abstract void render(int type);
+	public abstract void render(int type, GKO_RenderPass pass);
 	
 }

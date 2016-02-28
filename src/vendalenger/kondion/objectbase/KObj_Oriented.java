@@ -36,6 +36,15 @@ public abstract class KObj_Oriented extends KObj_Node {
 		actTransform.mul(transform);
 	}
 	
+	public void defaultUpdateB() {
+		if (this.s != null) {
+			this.s.setMember("obj", this);
+			if (this.s.containsKey("onupdateb")) {
+				this.s.callMember("onupdateb");
+			}
+		}
+	}
+	
 	public void multiplyByAct(Matrix4f h) {
 		h.mul(actTransform);
 	}
