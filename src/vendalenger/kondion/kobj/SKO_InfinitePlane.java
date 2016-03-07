@@ -18,6 +18,7 @@ import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
 import vendalenger.kondion.materials.KMat_FlatColor;
+import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.materials.KMat_Strange;
 import vendalenger.kondion.objectbase.CollisionData;
 import vendalenger.kondion.objectbase.KObj_Solid;
@@ -66,7 +67,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		if (material != null)
 			material.bind(type);
 		else
-			material = new KMat_FlatColor();
+			material = new KMat_Monotexture();
 		//System.out.println("RENDER!");
 		float addx = -(-temp1.x + temp2.x) / textureSize;
 		float addy = -(-temp1.y + temp2.y) / textureSize;

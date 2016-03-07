@@ -98,9 +98,9 @@ public class GKO_Scene extends KObj_Node {
 			}
 			
 			// Render at the same time
-			for (GKO_RenderPass rp : Kondion.getWorld().passes) {
+			/*for (GKO_RenderPass rp : Kondion.getWorld().passes) {
 				rp.render();
-			}
+			}*/
 			
 			Kondion.getWorld().composite();
 		}

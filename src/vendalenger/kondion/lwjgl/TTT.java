@@ -16,7 +16,12 @@
 
 package vendalenger.kondion.lwjgl;
 
+import static org.lwjgl.opengl.EXTFramebufferObject.GL_FRAMEBUFFER_EXT;
+import static org.lwjgl.opengl.EXTFramebufferObject.glBindFramebufferEXT;
 import static org.lwjgl.opengl.GL11.GL_BLEND;
+import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
+import static org.lwjgl.opengl.GL11.GL_CULL_FACE;
+import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_LEQUAL;
 import static org.lwjgl.opengl.GL11.GL_MODELVIEW;
@@ -25,11 +30,15 @@ import static org.lwjgl.opengl.GL11.GL_POINT_SMOOTH;
 import static org.lwjgl.opengl.GL11.GL_PROJECTION;
 import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
 import static org.lwjgl.opengl.GL11.glBlendFunc;
+import static org.lwjgl.opengl.GL11.glClear;
+import static org.lwjgl.opengl.GL11.glClearColor;
 import static org.lwjgl.opengl.GL11.glClearDepth;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
+import static org.lwjgl.opengl.GL11.glDisable;
 import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11.glLoadIdentity;
 import static org.lwjgl.opengl.GL11.glMatrixMode;
+import static org.lwjgl.opengl.GL11.glOrtho;
 import static org.lwjgl.opengl.GL11.glViewport;
 
 import java.awt.geom.Area;
@@ -44,9 +53,11 @@ import javax.swing.JOptionPane;
 import org.joml.Matrix3f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import poly2Tri.Triangulation;
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.KondionWorld;
 import vendalenger.kondion.kobj.OKO_Camera_;
 
 public class TTT {
@@ -291,7 +302,21 @@ public class TTT {
 		glClearDepth(10.0f);
 	}
 	
-	
+	public static void two() {
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
+		glClearColor(Kondion.getWorld().clearColor.x, Kondion.getWorld().clearColor.y,
+				Kondion.getWorld().clearColor.z, Kondion.getWorld().clearColor.w);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glOrtho(0, Window.getWidth(), Window.getHeight(),
+				0, 6.0f, -6.0f);
+		glMatrixMode(GL_MODELVIEW);
+		//glScalef(1.0f, -1.0f, 1.0f);
+		GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+	}
 
 	/** 2D mode */
 	/*

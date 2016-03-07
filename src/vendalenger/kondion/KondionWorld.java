@@ -56,40 +56,40 @@ public class KondionWorld {
 	
 	public void composite() {
 		//passes.get(0).
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, 0);
-		glClearColor(clearColor.x, clearColor.y,
-				clearColor.z, clearColor.w);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-		glMatrixMode(GL_PROJECTION);
-		glLoadIdentity();
-		glOrtho(0, Window.getWidth(), Window.getHeight(),
-				0, 6.0f, -6.0f);
-		glMatrixMode(GL_MODELVIEW);
-		//glScalef(1.0f, -1.0f, 1.0f);
-		GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
-		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_CULL_FACE);
 		
+		int j = 0;
 		//System.out.println("FPS: " + Kondion.getFramerate() + " # of render passes: " + passes.size());
 		switch (compMode) {
 			case 1:
-				if (compositor != null && compositor.isFunction()) {
-					
-					compositor.call(ctx, passes);
-				}
+				if (compositor != null && compositor.isFunction())
+					compositor.call(this, ctx, passes);
+				
 			break;
 			case 2:
 				// Debug mode
-				System.out.println("# of render passes: " + passes.size() + " FPS: " + Kondion.getFramerate());
-				int j = (int) Math.ceil(Math.sqrt(passes.size() + 1));
+				for (int i = 0; i < passes.size(); i++) {
+					passes.get(i).render();
+				}
+				TTT.two();
+				//System.out.println("# of render passes: " + passes.size() + " FPS: " + Kondion.getFramerate());
+				j = (int) Math.ceil(Math.sqrt(passes.size() + 1));
 				for (int i = 0; i < passes.size() + 1; i++) {
 					
+					//TTT.two(clearColor);
 					glLoadIdentity();
 					glTranslatef((i % j) * (Window.getWidth() / j) + (Window.getWidth() / j / 2),
 							(int)(i / j) * (Window.getHeight() / j) + (Window.getHeight() / j / 2), 0.0f);
+					
 					if (passes.size() != i) {
 						glBindTexture(GL_TEXTURE_2D, passes.get(i).getTextureId());
 						GLDrawing.renderQuad(Window.getWidth() / j, Window.getHeight() / j);
+						glTranslatef(-(Window.getWidth() / j / 2 - 4), -(Window.getHeight() / j / 2), 0.0f);
+						glScalef(1.0f / j, 1.0f / j, 1.0f);
+						glTranslatef(0.0f, 32, 0.0f);
+						GLDrawing.drawText("Render Mode: " + passes.get(i).getType());
+						glTranslatef(0.0f, 32, 0.0f);
+						GLDrawing.drawText(passes.get(i).itemCount() + " objects");
+						
 					} else if (Kondion.kjs.d != null) {
 						OperatingSystemMXBean b = ManagementFactory.getPlatformMXBean(OperatingSystemMXBean.class);
 						glTranslatef(-(Window.getWidth() / j / 2 - 4), -(Window.getHeight() / j / 2), 0.0f);
@@ -121,6 +121,10 @@ public class KondionWorld {
 			case 3:
 				// Horizontal Split (Right and left)
 				if (passes.size() >= 2) {
+					passes.get(0).render();
+					passes.get(1).render();
+					TTT.two();
+					
 					glBindTexture(GL_TEXTURE_2D, passes.get(0).getTextureId());
 					glTranslatef(Window.getWidth() / 4, Window.getHeight() / 2, 0.0f);
 					GLDrawing.renderQuad(Window.getWidth() / 2, Window.getHeight());
@@ -133,6 +137,10 @@ public class KondionWorld {
 			case 4:
 				// Vertical Split (Top and Bot)
 				if (passes.size() >= 2) {
+					passes.get(0).render();
+					passes.get(1).render();
+					TTT.two();
+					
 					glBindTexture(GL_TEXTURE_2D, passes.get(0).getTextureId());
 					glTranslatef(Window.getWidth() / 2, Window.getHeight() / 4, 0.0f);
 					GLDrawing.renderQuad(Window.getWidth(), Window.getHeight() / 2);
@@ -143,9 +151,21 @@ public class KondionWorld {
 				}
 			break;
 			case 5:
-				// Quad split 1, 2, 3, 4 (text wise)
-				// Round up to nearest square
-				
+				// Split
+				//System.out.println("# of render passes: " + passes.size() + " FPS: " + Kondion.getFramerate());
+				j = (int) Math.ceil(Math.sqrt(passes.size() + 1));
+				for (int i = 0; i < passes.size() + 1; i++) {
+					
+					glLoadIdentity();
+					glTranslatef((i % j) * (Window.getWidth() / j) + (Window.getWidth() / j / 2),
+							(int)(i / j) * (Window.getHeight() / j) + (Window.getHeight() / j / 2), 0.0f);
+					
+					if (passes.size() != i) {
+						glBindTexture(GL_TEXTURE_2D, passes.get(i).getTextureId());
+						GLDrawing.renderQuad(Window.getWidth() / j, Window.getHeight() / j);
+						glTranslatef(-(Window.getWidth() / j / 2 - 4), -(Window.getHeight() / j / 2), 0.0f);
+					}
+				}
 			break;
 			case 6:
 				// Stereoscopic 3d
@@ -154,6 +174,8 @@ public class KondionWorld {
 				// anaglyph etc...
 			default:
 				// Draw first single pass
+				passes.get(0).render();
+				TTT.two();
 				
 				glBindTexture(GL_TEXTURE_2D, passes.get(0).getTextureId());
 				glTranslatef(Window.getWidth() / 2, Window.getHeight() / 2, 0.0f);

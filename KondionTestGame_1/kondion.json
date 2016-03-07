@@ -27,6 +27,7 @@
 	"Graphics": {
 		"human": ["living/human.png", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"eggs": ["maps/noah.png", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"neat": ["kaytrav.png", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"noah": ["maps/ktt.png", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
 	},
 	"Audio": {

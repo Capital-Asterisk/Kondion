@@ -28,11 +28,15 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.EXTFramebufferObject.*;
 
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.EXTFramebufferObject;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
@@ -55,65 +59,46 @@ import vendalenger.kondion.objectbase.KObj_Oriented;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
-public class GKO_RenderPass extends KObj_Node implements JSDrawable {
+public class GKO_DeferredPass extends GKO_RenderPass {
 	
-	public static final int
-		DEFAULT		= 0,
-		DIFFUSE		= 1,
-		DEPTH		= 2,
-		NORMALS		= 3,
-		BRIGHTNESS	= 4,
-		HDR			= 5,
-		DEFERRED	= 10,
-		GUI			= 20;
+	//protected int texId = 0;
+	// texId is result
+	// drbId is unused
+	protected int briId = 0; // Brightness
+	protected int depId = 0; // Depth texture
+	protected int dffId = 0; // Diffuse texture
+	protected int nrmId = 0; // Normal texture
+	protected IntBuffer ducks;
+	protected List<RKO_Light> lights;
 	
-	protected List<KObj_Renderable> items;
-	protected boolean framebuffered = false;
-	protected boolean ready = false;
-	protected boolean typechanged = false;
-	protected int type;
-	protected int id;
-	protected int drbId = 0; // Renderbuffer
-	protected int fboId = 0; // Framebuffer
-	protected int texId = 0; // Texture (type)
-	public OKO_Camera_ camera;
-	public boolean disable = false;
-	public boolean auto = true;
-	public boolean cameraOverride = false;
-	public boolean sizeOverride = false;
-	public int width, height;
-	
-	public GKO_RenderPass() {
-		this(0, 0, true, null);
+	public GKO_DeferredPass() {
+		this(0, true);
 	}
 	
-	public GKO_RenderPass(int id) {
-		this(id, 0, true, null);
+	public GKO_DeferredPass(int id) {
+		this(id, true);
 	}
 	
-	public GKO_RenderPass(int id, int t) {
-		this(id, t, true, null);
-	}
-	
-	public GKO_RenderPass(int id, int t, boolean a) {
-		this(id, t, a, null);
-	}
-	
-	public GKO_RenderPass(int id, int t, boolean a, GKO_RenderPass depth) {
+	public GKO_DeferredPass(int id, boolean a) {
 		items = new ArrayList<KObj_Renderable>();
-		type = t;
+		type = 30;
 		this.id = id;
 		this.auto = a;
+		ducks = BufferUtils.createIntBuffer(2);
+		//ducks.put
+		ducks.put(GL_COLOR_ATTACHMENT0_EXT);
+		ducks.put(GL_COLOR_ATTACHMENT1_EXT);
+		
 		if (a)
 			scan();
 	}
 	
-	public int itemCount() {
-		return items.size();
-	}
-	
 	public int getTextureId() {
 		return texId;
+	}
+	
+	public int getDepthId() {
+		return 0;
 	}
 	
 	public int getType() {
@@ -122,24 +107,22 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	
 	public void consider(KObj_Renderable f) {
 		if ((id | f.getId()) == id)
-			items.add(f);
+			if (f instanceof RKO_Light)
+				lights.add((RKO_Light) f);
+			else
+				items.add(f);
 	}
 	
-	public void forceAdd(KObj_Renderable f) {
-		items.add(f);
+	public void forceAddLight(RKO_Light f) {
+		lights.add(f);
 	}
 	
 	public void setType(int t) {
-		type = t;
-		typechanged = true;
+		System.err.println("Type is unused in DeferredPass");
 	}
 	
 	public void scan() {
-		
-	}
-	
-	public OKO_Camera_ getCamera() {
-		return cameraOverride ? camera : Kondion.getCurrentCamera();
+		super.scan();
 	}
 
 	public void render() {
@@ -148,26 +131,28 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 			width = Window.getWidth();
 			height = Window.getHeight();
 		}
-		if (typechanged) {
-			glDeleteTextures(texId);
-			GL30.glDeleteRenderbuffers(drbId);
-			reFB();
-			typechanged = false;
-		}
 		if (!ready) {
 			if (!framebuffered) {
-				fboId = glGenFramebuffersEXT();
 				reFB();
 				framebuffered = true;
 			}
 			//glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
 			//		GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, drbId);
 			ready = EXTFramebufferObject.glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
-			System.out.println("Create Buffers for Render Pass");
 			
 		} else {
 			if (Kondion.showPrespective) {
+				//System.out.println("b4: " + ducks.remaining());
+				
+				
+				//System.out.println("after: " + ducks.remaining());
+				
 				glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+				ducks.position(0);
+				GL20.glDrawBuffers(ducks);
+				
+				//System.out.println(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
+				//System.out.println(GL_FRAMEBUFFER_COMPLETE_EXT);
 				glClearColor(Kondion.getWorld().skyColor.x, Kondion.getWorld().skyColor.y,
 						Kondion.getWorld().skyColor.z, Kondion.getWorld().skyColor.w);
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -178,63 +163,50 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 					TTT.three();
 				
 				glPushMatrix();
-				new KMat_Monotexture().bind(type);
+				new KMat_Monotexture().bind(30);
 				KondionLoader.textures.get("neat").bind();
 				glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
 				Kondion.km.draw();
 				glPopMatrix();
 				
 				for (KObj_Renderable kobj : items) {
-					kobj.render(type, this);
+					kobj.render(30, this);
 				}
 			}
-			//glDisable(GL_DEPTH_TEST);
-			/*for (KObj_Renderable kobj : items) {
-				if (kobj instanceof KObj_Oriented) {
-					((KObj_Oriented) kobj).updateB();
-					if (Kondion.showPrespective && kobj instanceof KObj_Renderable)
-						((KObj_Renderable) kobj).render(type);
-				}
-			}*/
 		}
 	}
 
-	private void reFB() {
-		
-		drbId = glGenRenderbuffersEXT();
-		texId = glGenTextures();//KondionLoader.getMissingTexture().getTextureId();
-		
-		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
-		
-		//GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texId);
-		
-		
-		if (type != DEPTH) {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width,
-					height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (java.nio.ByteBuffer)
-					null); // Create the texture data
-			
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-					GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
-					texId, 0);
-			
-			glBindRenderbufferEXT(GL_RENDERBUFFER_EXT, drbId);
-			glRenderbufferStorageEXT(GL_RENDERBUFFER_EXT,
-					GL14.GL_DEPTH_COMPONENT24, width,
-				height);
-			glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, drbId);
-		} else {
-			glTexImage2D(GL_TEXTURE_2D, 0, GL14.GL_DEPTH_COMPONENT32, width,
-					height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, (java.nio.ByteBuffer)
-					null); // Create the texture data
-			glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
-					GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D,
-					texId, 0);
-		}
-		
+	private int neat(int tex, int internal, int format, int thisisnotcppp) {
+		glBindTexture(GL_TEXTURE_2D, tex);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexImage2D(GL_TEXTURE_2D, 0, internal, width,
+				height, 0, format, thisisnotcppp, (java.nio.ByteBuffer)
+				null);
+		
+		return tex;
+	}
+	
+	private void reFB() {
+		
+		fboId = glGenFramebuffersEXT();
+		//drbId = glGenRenderbuffersEXT();
+		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
+		
+		briId = neat(glGenTextures(), GL_RED, GL_RED, GL_UNSIGNED_BYTE); // Brightness
+		depId = neat(glGenTextures(), GL14.GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_FLOAT); // Depth texture
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D,
+				depId, 0);
+		dffId = neat(glGenTextures(), GL_RGB, GL_RGB, GL_UNSIGNED_BYTE); // Diffuse texture
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				GL_COLOR_ATTACHMENT0_EXT, GL_TEXTURE_2D,
+				dffId, 0);
+		nrmId = neat(glGenTextures(), GL_RGB, GL_RGB, GL_FLOAT); // Normal texture
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D,
+				nrmId, 0);
+		texId = neat(glGenTextures(), GL_RGB, GL_RGB, GL_UNSIGNED_BYTE); // Result
 		
 		System.out.println("Retextured");
 	}
@@ -246,6 +218,6 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 
 	@Override
 	public void bind() {
-		glBindTexture(GL_TEXTURE_2D, texId);
+		glBindTexture(GL_TEXTURE_2D, nrmId);
 	}
 }

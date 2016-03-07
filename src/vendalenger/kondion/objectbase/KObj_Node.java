@@ -158,6 +158,7 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	 */
 	@Override
 	public KObj_Node remove(Object key) {
+		System.err.println("Delete!");
 		
 		if (key instanceof String) {
 			int index = childNames.indexOf(key);

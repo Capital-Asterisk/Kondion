@@ -73,13 +73,18 @@ import java.util.HashMap;
 import java.util.List;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.ARBShaderObjects;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTruetype;
 
 import lwjgl.IOUtil;
 import vendalenger.kondion.lwjgl.GLDrawing;
+import vendalenger.kondion.lwjgl.TTT;
 
 public class KondionLoader {
 
@@ -118,12 +123,23 @@ public class KondionLoader {
 		shaders.put("K_Strange", loadShader(
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/strange.frag"),
-				"Thee strange shader with egg uniforms"));
+				"Thee strange shader with egg uniforms", 0));
 		
 		shaders.put("K_FlatCol", loadShader(
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.frag"),
-				"K_FlatCol"));
+				"K_FlatCol", 0));
+		
+		shaders.put("K_Monotexture", loadShader(
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_tex.frag"),
+				"K_Monotexture", 1));
+		
+		shaders.put("K_DeferredRender", loadShader(
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/deferred.frag"),
+				"K_DeferredRender", 3));
+		
 		// Default font informal loading (Ubuntu Mono)
 		//STBTruetype
 		System.out.println("EGGSU");
@@ -166,7 +182,7 @@ public class KondionLoader {
 		}
 	}
 	
-	public static KondionShader loadShader(InputStream vert, InputStream frag, String name) {
+	public static KondionShader loadShader(InputStream vert, InputStream frag, String name, int textureCount) {
 		// create a null object
 		KondionShader shader = null;
 		
@@ -202,12 +218,24 @@ public class KondionLoader {
 					name + " (FRAGMENT)");
 			glAttachShader(program, vertShader);
 			glAttachShader(program, fragShader);
-			int loc = glGetUniformLocation(program, "texture1");
-			glUniform1i(loc, 0);
+			//glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+			//glUniform1i(glGetUniformLocation(program, "texture1"), 1);
+			
+			
+			
 			//glUnifor
 			
 			glLinkProgram(program);
-
+			glUseProgram(program);
+			
+			for (int i = 0; i < textureCount; i++) {
+				//glUniform1i(glGetUniformLocation(program, "texture" + i), i);
+				int fu = glGetUniformLocation(program, "texture" + i);
+				//System.out.println("" +i + " " + fu);
+				glUniform1i(fu, i);
+				//System.out.println("res: " + glGetUniformi(program, fu));
+			}
+			
 			shader = new KondionShader(vertShader, fragShader, program);
 			
 		} catch (IOException e) {
@@ -560,5 +588,123 @@ public class KondionLoader {
 	
 	public static KondionTexture getMissingTexture() {
 		return missingTexture;
+	}
+	
+	/**
+	 * Code from PureArm
+	 */
+	public static KondionModel loadObj(InputStream file) {
+		KondionModel model = new KondionModel();
+		boolean output = false;
+		try {
+			boolean tri = true;
+			//int words = Conmeth.count(ob.getAbsolutePath());
+			int currentline = 0;
+			//double plus = words / 100;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(file));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				//Main.progress = (int)((double)currentline / plus);
+				//if (output) System.out.println("Progress: " + (int)((double)currentline / plus));
+				currentline++;
+				if(line.startsWith("# ")){
+					// Its a comment
+					System.out.println("Message: " + line);
+			
+				}
+			
+				if(line.startsWith("v ")){
+					Vector3f vert = new Vector3f(Float.parseFloat(line.split(" ")[1]), Float.parseFloat(line.split(" ")[2]), Float.parseFloat(line.split(" ")[3]));
+					model.vertices.add(vert);
+					if (output) System.out.println("Vertex: x: " + vert.x + " y: " + vert.y + " z: " + vert.z);
+				
+				}
+			
+				if(line.startsWith("vt ")){
+					Vector2f text = new Vector2f(Float.parseFloat(line.split(" ")[1]), Float.parseFloat(line.split(" ")[2]));
+					model.texture.add(text);
+					if (output) System.out.println("Texture Coordinate: x:" + text.x + " y: " + text.y + " ");
+				
+				}
+			
+				if(line.startsWith("vn ")){
+					Vector3f norm = new Vector3f(Float.parseFloat(line.split(" ")[1]), Float.parseFloat(line.split(" ")[2]), Float.parseFloat(line.split(" ")[3]));
+					model.normals.add(norm);
+					if (output) System.out.println("Normal: x: " + norm.x + " y: " + norm.y + " z: " + norm.z);
+				
+				}
+			
+				if(line.startsWith("f ")){
+					Face f = new Face();
+					f.sides = line.split(" ").length - 1;
+					if (output) System.out.println("Face: # of faces:" + f.sides);
+					if (f.sides != 3) tri = false;
+					for (int i = 0; i < line.split(" ").length - 1; i++) {
+						Corn c = new Corn();
+						if (line.split(" ")[i + 1].contains("//")){
+							if (output) System.out.println("V/N ");
+							f.textured = false;
+							c.vertex = Integer.parseInt(line.split(" ")[i + 1].split("//")[0]);
+							c.normal = Integer.parseInt(line.split(" ")[i + 1].split("//")[1]);
+						}else if (line.split(" ")[i + 1].contains("/")){
+							if (line.split(" ")[i + 1].split("/").length == 3){
+								if (output) System.out.println("V/T/N ");
+								c.vertex = Integer.parseInt(line.split(" ")[i + 1].split("/")[0]);
+								c.texture = Integer.parseInt(line.split(" ")[i + 1].split("/")[1]);
+								c.normal = Integer.parseInt(line.split(" ")[i + 1].split("/")[2]);
+								if (output) System.out.println("VERT: " + model.vertices.get(c.vertex - 1));
+							}else{
+								if (output) System.out.println("V/T ");
+								f.normal = false;
+								c.vertex = Integer.parseInt(line.split(" ")[i + 1].split("/")[0]);
+								c.texture = Integer.parseInt(line.split(" ")[i + 1].split("/")[1]);
+							
+							}
+						
+						}else{
+							if (output) System.out.println("V ");
+							f.normal = false;
+							f.textured = false;
+							c.vertex = Integer.parseInt(line.split(" ")[i + 1]);
+						}
+						f.corns.add(c);
+					
+					}
+					model.faces.add(f);
+					
+				}
+			}
+			reader.close();
+			//Main.progress = 0;
+			Vector3f av = new Vector3f();
+			for (int i = 0; i < model.vertices.size(); i++) {
+				av.x += model.vertices.get(i).x;
+				av.y += model.vertices.get(i).y;
+				av.z += model.vertices.get(i).z;
+				
+			}
+			
+			av.x /= model.vertices.size();
+			av.y /= model.vertices.size();
+			av.z /= model.vertices.size();
+			//Main.componentc_1_load.setText("<Waiting user input>");
+			//String name = (String)JOptionPane.showInputDialog(Main.jf, "Enter name for " + ob.getName(), ob.getName(), JOptionPane.QUESTION_MESSAGE);
+			//model.name = name;
+			//Main.componentc_1_load.setText("Load OBJ");
+			//Main.componentc_1_load.setEnabled(true);
+			System.out.println(model.toString());
+			//if (tri){
+			//	Space.workcomponents.add(model);
+			//	Main.listUpdate();
+			//}else TTT.Error("PureArm only uses Triangles. Please see Help > OBJ format");
+		} catch (FileNotFoundException e) {
+			TTT.Error("FileNotFoundException: \n" + e.getMessage());
+		} catch (NumberFormatException e) {
+			TTT.Error("NumberFormatException: \n" + e.getMessage());
+		} catch (IOException e) {
+			TTT.Error("IOException: \n" + e.getMessage());
+		}
+		
+		return model;
 	}
 }

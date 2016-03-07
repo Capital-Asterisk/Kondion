@@ -27,6 +27,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.InputStreamReader;
@@ -53,6 +54,7 @@ import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.kondion.lwjgl.resource.KondionModel;
 import vendalenger.port.FileShortcuts;
 import vendalenger.port.VD_FlConsole;
 
@@ -75,6 +77,7 @@ public class Kondion {
 
 	public static boolean showPrespective = true;
 	public static boolean showHud = false;
+	public static KondionModel km; // tests only
 	
 	private static void gameLoop() {
 		
@@ -99,6 +102,14 @@ public class Kondion {
 		long prevTime = 0l;
 
 		Window.setWindowVisible(true);
+		
+		km = null;
+		try {
+			km = KondionLoader.loadObj(new FileInputStream(new File("/home/neal/Desktop/kaytrav.obj")));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		}
+		km.createVbo();
 		
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
 			

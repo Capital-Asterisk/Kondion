@@ -17,6 +17,7 @@ import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
 import vendalenger.kondion.lwjgl.resource.KondionShader;
 import vendalenger.kondion.materials.KMat_FlatColor;
+import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.materials.KMat_MultiTexture;
 import vendalenger.kondion.materials.KMat_Strange;
 import vendalenger.kondion.objectbase.CollisionData;
@@ -32,10 +33,14 @@ public class SKO_Cube extends KObj_Solid {
 	private Vector3f temp3 = new Vector3f();
 	
 	public SKO_Cube() {
-		super();
+		this(0);
+	}
+	
+	public SKO_Cube(int eggs) {
+		super(eggs);
 		pointer = false;
 		//eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
-		material = new KMat_FlatColor();
+		material = new KMat_Monotexture();
 		buffer = null;
 	}
 

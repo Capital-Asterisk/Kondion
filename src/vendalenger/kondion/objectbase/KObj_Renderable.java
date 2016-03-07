@@ -25,16 +25,30 @@ import vendalenger.kondion.materials.KMat_erial;
 public abstract class KObj_Renderable extends KObj_Oriented {
 	
 	public float fogIntensity;
-	protected KondionTexture texture;
 	protected KMat_erial material;
+	protected int id;
 	
 	public KObj_Renderable() {
+		this(0);
+	}
+	
+	public KObj_Renderable(int id) {
 		fogIntensity = 0.0f;
+		
+		this.id = id;
 		for (GKO_RenderPass rp : Kondion.getWorld().passes) {
 			if (rp.auto) {
-				rp.addItem(this);
+				rp.consider(this);
 			}
 		}
+	}
+	
+	public void setId(int id) {
+		this.id = id;
+	}
+	
+	public int getId() {
+		return id;
 	}
 	
 	public KMat_erial getMaterial() {

@@ -23,8 +23,8 @@ import vendalenger.kondion.js.JSDrawable;
 
 public class KondionTexture implements JSDrawable {
 
+	public int width, height;
 	private int imageWidth, imageHeight;
-
 	private int minFilter, magFilter;
 	private boolean mipmapped;
 	private int textureId;
@@ -40,6 +40,8 @@ public class KondionTexture implements JSDrawable {
 		wrapS = awrapS;
 		wrapT = awrapT;
 		mipmapped = mipped;
+		this.width = width;
+		this.height = height;
 	}
 
 	public void bind() {

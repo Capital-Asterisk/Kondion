@@ -30,6 +30,15 @@ public class KJS {
 	public final StaticClass i;
 	public final StaticClass c;
 	public final short
+			DEFAULT		= 0,
+			DIFFUSE		= 1,
+			DEPTH		= 2,
+			NORMALS		= 3,
+			BRIGHTNESS	= 4,
+			HDR			= 5,
+			DEFERRED	= 10,
+			GUI			= 20;
+	public final short
 			SINGLE = 0,
 			COMPOSITE = 1,
 			DEBUG = 	2,

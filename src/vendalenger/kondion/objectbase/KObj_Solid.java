@@ -31,7 +31,11 @@ public abstract class KObj_Solid extends KObj_Renderable {
 	public final Vector3f velocity;
 	
 	public KObj_Solid() {
-		super();
+		this(0);
+	}
+	
+	public KObj_Solid(int id) {
+		super(id);
 		prevTransform = new Matrix4f();
 		rotVelocity = new Quaternionf();
 		velocity = new Vector3f();
