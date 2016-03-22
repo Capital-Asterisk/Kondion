@@ -138,7 +138,12 @@ public class KondionLoader {
 		shaders.put("K_DeferredRender", loadShader(
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
 				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/deferred.frag"),
-				"K_DeferredRender", 3));
+				"K_DeferredRender", 4));
+		
+		shaders.put("K_AmbientLight", loadShader(
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/light_ambient.frag"),
+				"K_AmbientLight", 4));
 		
 		// Default font informal loading (Ubuntu Mono)
 		//STBTruetype

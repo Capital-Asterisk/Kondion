@@ -35,13 +35,17 @@ void main(){
     } else if (type == 1) {
     	final = texture2D(texture0, texCoord.st);
     } else if (type == 3) {
-    	final = vec4(((gl_ModelViewProjectionMatrix * vec4(normal, 0.0)).xyz + 0.5) / 2, 1.0);
+    	final = vec4(((gl_ModelViewProjectionMatrix * vec4(normal, 1.0)).xyz + 0.5) / 2, 1.0);
     }
     
     if (type != 30) {
     	gl_FragData[0] = final;
     } else {
-    	gl_FragData[0] = texture2D(texture0, texCoord.st);
-    	gl_FragData[1] = vec4(((gl_ModelViewProjectionMatrix * vec4(normal, 0.0)).xyz + 0.5) / 2, 1.0);
+    	//vec2 coord = texCoord.xy;
+		//coord.s = mod(coord.s + 0.2, 1.0);
+    	gl_FragData[0] = texture2D(texture0, texCoord.xy);
+    	gl_FragData[1] = vec4(((mat3(gl_ModelViewProjectionMatrix) * normal) + 1.0) / 2, 1.0);
+    	gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
+    	gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
     }
 }

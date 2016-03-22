@@ -39,6 +39,7 @@ var RKO_Board = Java.type("vendalenger.kondion.kobj.RKO_Board");
 var SKO_Cube = Java.type("vendalenger.kondion.kobj.SKO_Cube");
 var SKO_InfinitePlane = Java.type("vendalenger.kondion.kobj.SKO_InfinitePlane");
 
+var OKO_AmbientLight = Java.type("vendalenger.kondion.kobj.RKO_Light");
 //^kdion.rungamedir (electricfence/kondion.json)
 //var KJS = Java.type("vendalenger.kondion.KJS")
 

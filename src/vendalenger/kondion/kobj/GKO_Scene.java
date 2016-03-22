@@ -16,6 +16,9 @@
 
 package vendalenger.kondion.kobj;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.objectbase.KObj_Node;
 import vendalenger.kondion.objectbase.KObj_Oriented;
@@ -24,6 +27,7 @@ import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class GKO_Scene extends KObj_Node {
 	
+	private List<KObj_Node> allObjects;
 	private KObj_Solid currentA;
 	private KObj_Solid currentB;
 	
@@ -31,7 +35,7 @@ public class GKO_Scene extends KObj_Node {
 	public boolean disable = false;
 	
 	public GKO_Scene() {
-		
+		allObjects = new ArrayList<KObj_Node>();
 	}
 	
 	protected static void immaEatYourChildren(KObj_Node child) {
@@ -56,6 +60,22 @@ public class GKO_Scene extends KObj_Node {
 				immaGulaYourChildren(or);
 		}
 	}
+	
+	protected void immaListYourChildren(KObj_Node child) {
+		allObjects.add(child);
+		for (KObj_Node or : child.values()) {
+			if (or instanceof KObj_Oriented)
+				immaListYourChildren(or);
+		}
+	}
+	
+	public void rescan() {
+		allObjects.clear();
+		for (KObj_Node kids : children) {
+			immaListYourChildren(kids);
+		}
+		
+	}
 
 	@Override
 	public void update() {
@@ -68,19 +88,26 @@ public class GKO_Scene extends KObj_Node {
 			// doing this
 			
 			// UpdateA first, with movement and js
-			for (KObj_Node kobj : children) {
-				immaWulaYourChildren(kobj);
-				// else not an oriented
+			//for (KObj_Node kobj : children) {
+			//	immaWulaYourChildren(kobj);
+			//	// else not an oriented
+			//}
+			for (KObj_Node kobj : allObjects) {
+				kobj.update();
 			}
 			
 			// Then apply apply transformations
-			for (KObj_Node kobj : children) {
-				// Is it solid?
-				if (kobj instanceof KObj_Oriented) {
-					immaEatYourChildren(kobj);
-					//System.out.println("neat " + kobj);
-				}
+			//for (KObj_Node kobj : children) {
+			//	// Is it solid?
+			//	if (kobj instanceof KObj_Oriented) {
+			//		immaEatYourChildren(kobj);
+			//		//System.out.println("neat " + kobj);
+			//	}
 				// else not an oriented
+			//}
+			for (KObj_Node kobj : allObjects) {
+				if (kobj instanceof KObj_Oriented)
+					((KObj_Oriented) kobj).applyTransform();
 			}
 			
 			// Then Collisions
@@ -89,12 +116,17 @@ public class GKO_Scene extends KObj_Node {
 			}
 			
 			// UpdateB all the objects, with detectors
-			for (KObj_Node kobj : children) {
-				// Is it solid?
-				if (kobj instanceof KObj_Oriented) {
-					immaGulaYourChildren(kobj);
-				}
-				// else not an oriented
+			//for (KObj_Node kobj : children) {
+			//	// Is it solid?
+			//	if (kobj instanceof KObj_Oriented) {
+			//		immaGulaYourChildren(kobj);
+			//	}
+			//	// else not an oriented
+			//}
+			
+			for (KObj_Node kobj : allObjects) {
+				if (kobj instanceof KObj_Oriented)
+					((KObj_Oriented) kobj).updateB();
 			}
 			
 			// Render at the same time

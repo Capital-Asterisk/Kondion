@@ -28,6 +28,11 @@ import static org.lwjgl.opengl.EXTFramebufferObject.glGenFramebuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glGenRenderbuffersEXT;
 import static org.lwjgl.opengl.EXTFramebufferObject.glRenderbufferStorageEXT;
 import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE1;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE2;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE3;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
 
 import java.nio.ByteBuffer;
@@ -43,15 +48,17 @@ import org.lwjgl.opengl.GL12;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
+import static org.lwjgl.opengl.GL20.*;
 import org.lwjgl.opengl.GL21;
 import org.lwjgl.opengl.GL30;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.js.JSDrawable;
+import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.kondion.lwjgl.resource.KondionShader;
 import vendalenger.kondion.lwjgl.resource.KondionTexture;
 import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.objectbase.KObj_Node;
@@ -64,12 +71,14 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	//protected int texId = 0;
 	// texId is result
 	// drbId is unused
-	protected int briId = 0; // Brightness
-	protected int depId = 0; // Depth texture
-	protected int dffId = 0; // Diffuse texture
-	protected int nrmId = 0; // Normal texture
+	private int briId = 0; // Brightness
+	private int depId = 0; // Depth texture
+	private int dffId = 0; // Diffuse texture
+	private int nrmId = 0; // Normal texture
+	private int skyUni = 0;
 	protected IntBuffer ducks;
 	protected List<RKO_Light> lights;
+	private KondionShader program;
 	
 	public GKO_DeferredPass() {
 		this(0, true);
@@ -81,13 +90,19 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	
 	public GKO_DeferredPass(int id, boolean a) {
 		items = new ArrayList<KObj_Renderable>();
+		lights = new ArrayList<RKO_Light>();
 		type = 30;
 		this.id = id;
 		this.auto = a;
-		ducks = BufferUtils.createIntBuffer(2);
-		//ducks.put
+		
+		ducks = BufferUtils.createIntBuffer(4);
 		ducks.put(GL_COLOR_ATTACHMENT0_EXT);
 		ducks.put(GL_COLOR_ATTACHMENT1_EXT);
+		ducks.put(GL_COLOR_ATTACHMENT2_EXT);
+		ducks.put(GL_COLOR_ATTACHMENT3_EXT);
+		
+		program = KondionLoader.shaders.get("K_DeferredRender");
+		skyUni = program.uniformLocation("skyColor");
 		
 		if (a)
 			scan();
@@ -105,12 +120,15 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 		return type;
 	}
 	
+	@Override
 	public void consider(KObj_Renderable f) {
-		if ((id | f.getId()) == id)
-			if (f instanceof RKO_Light)
-				lights.add((RKO_Light) f);
-			else
-				items.add(f);
+		System.out.print("a: " + f);
+		if (f instanceof RKO_Light) {
+			lights.add((RKO_Light) f);
+			System.out.print(f);
+		} else if ((f instanceof KObj_Renderable)
+				&& (id & ((KObj_Renderable) f).getId()) == id)
+			items.add((KObj_Renderable) f);
 	}
 	
 	public void forceAddLight(RKO_Light f) {
@@ -133,7 +151,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 		}
 		if (!ready) {
 			if (!framebuffered) {
-				reFB();
+				generate();
 				framebuffered = true;
 			}
 			//glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT,
@@ -149,7 +167,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				
 				glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
 				ducks.position(0);
-				GL20.glDrawBuffers(ducks);
+				glDrawBuffers(ducks);
 				
 				//System.out.println(glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT));
 				//System.out.println(GL_FRAMEBUFFER_COMPLETE_EXT);
@@ -172,14 +190,61 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				for (KObj_Renderable kobj : items) {
 					kobj.render(30, this);
 				}
+				
+				glMatrixMode(GL_PROJECTION);
+				glLoadIdentity();
+				glOrtho(0, Window.getWidth(), Window.getHeight(),
+						0, 6.0f, -6.0f);
+				glMatrixMode(GL_MODELVIEW);
+				glLoadIdentity();
+				
+				glDepthMask(false);
+				glDisable(GL_DEPTH_TEST);
+				
+				glActiveTexture(GL_TEXTURE0); // Diffuse
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, dffId);
+				glActiveTexture(GL_TEXTURE1); // Depth
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, depId);
+				glActiveTexture(GL_TEXTURE2); // Normals
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, nrmId);
+				glActiveTexture(GL_TEXTURE3); // Brightness
+				glEnable(GL_TEXTURE_2D);
+				glBindTexture(GL_TEXTURE_2D, briId);
+				GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+				glTranslatef(width / 2, height / 2, 0);
+				for (RKO_Light light : lights) {
+					light.apply(width, height);
+				}
+				program.useProgram();
+				glUniform4f(skyUni, Kondion.getWorld().skyColor.x, Kondion.getWorld().skyColor.y,
+						Kondion.getWorld().skyColor.z, Kondion.getWorld().skyColor.w);
+				GLDrawing.renderQuad(width, height);
+				glTranslatef(-width / 2, -height / 2, 0);
+				KondionShader.unbind();
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glActiveTexture(GL_TEXTURE2);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glActiveTexture(GL_TEXTURE3);
+				glBindTexture(GL_TEXTURE_2D, 0);
+				glActiveTexture(GL_TEXTURE0);
+				
+				glDepthMask(true);
 			}
 		}
 	}
 
 	private int neat(int tex, int internal, int format, int thisisnotcppp) {
 		glBindTexture(GL_TEXTURE_2D, tex);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, internal, width,
 				height, 0, format, thisisnotcppp, (java.nio.ByteBuffer)
 				null);
@@ -187,13 +252,16 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 		return tex;
 	}
 	
-	private void reFB() {
+	private void generate() {
 		
 		fboId = glGenFramebuffersEXT();
 		//drbId = glGenRenderbuffersEXT();
 		glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
 		
-		briId = neat(glGenTextures(), GL_RED, GL_RED, GL_UNSIGNED_BYTE); // Brightness
+		briId = neat(glGenTextures(), GL_RGB, GL_RGB, GL_UNSIGNED_BYTE); // Brightness
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				GL_COLOR_ATTACHMENT3_EXT, GL_TEXTURE_2D,
+				briId, 0);
 		depId = neat(glGenTextures(), GL14.GL_DEPTH_COMPONENT32, GL_DEPTH_COMPONENT, GL_FLOAT); // Depth texture
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
 				GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D,
@@ -207,6 +275,9 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D,
 				nrmId, 0);
 		texId = neat(glGenTextures(), GL_RGB, GL_RGB, GL_UNSIGNED_BYTE); // Result
+		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+				GL_COLOR_ATTACHMENT2_EXT, GL_TEXTURE_2D,
+				texId, 0);
 		
 		System.out.println("Retextured");
 	}
@@ -215,9 +286,10 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	public void update() {
 		defaultUpdate();
 	}
-
+	
 	@Override
 	public void bind() {
-		glBindTexture(GL_TEXTURE_2D, nrmId);
+		// TODO Auto-generated method stub
+		glBindTexture(GL_TEXTURE_2D, texId);
 	}
 }

@@ -121,7 +121,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	}
 	
 	public void consider(KObj_Renderable f) {
-		if ((id | f.getId()) == id)
+		if ((id & f.getId()) == id)
 			items.add(f);
 	}
 	

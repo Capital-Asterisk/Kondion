@@ -309,6 +309,7 @@ public class TTT {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
+		
 		glOrtho(0, Window.getWidth(), Window.getHeight(),
 				0, 6.0f, -6.0f);
 		glMatrixMode(GL_MODELVIEW);

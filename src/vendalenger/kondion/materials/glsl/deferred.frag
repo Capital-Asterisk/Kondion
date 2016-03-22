@@ -2,11 +2,12 @@
 
 uniform int type;
 uniform float fog;
-uniform vec4 color;
+uniform vec4 skyColor;
 
-uniform sampler2D texture0;
-uniform sampler2D texture1;
-uniform sampler2D texture2;
+uniform sampler2D texture0; // Diffuse
+uniform sampler2D texture1; // Depth
+uniform sampler2D texture2; // Normals
+uniform sampler2D texture3; // Brightness
 
 varying vec3 normal;
 varying vec4 texCoord;
@@ -16,13 +17,28 @@ varying mat4 cuteMatrix;
 
 void main(){
 	vec4 final = vec4(0.0, 0.0, 0.0, 0.0);
-	final = mix(texture2D(texture0, texCoord.st), vec4(0.0, 0.0, 0.0, 1.0), clamp(vec4(pow(texture2D(texture1, texCoord.st).r, 900)), 0.0, 1.0));
-	if (texture2D(texture1, texCoord.st).r == 1.0) {
-		final = vec4(0.6, 0.6, 1.0, 1.0);
+	vec2 coord = texCoord.xy;
+	coord.x = mod((coord.x - 0.5) / 2 + 0.5 - sin(((1 - coord.x) - 0.5) * 3) / 4, 1.0);
+	coord.y = mod((coord.y - 0.5) / 2 + 0.5 - sin(((1 - coord.y) - 0.5) * 3) / 4, 1.0);
+	//coord.x += 0.01;
+	//coord.x = mod(coord.x, 1.0);
+	//coord.x += 0.5;
+	//final = mix(texture2D(texture0, texCoord.st), vec4(0.0, 0.0, 0.0, 1.0), clamp(vec4(pow(texture2D(texture1, texCoord.st).r, 900)), 0.0, 1.0));
+	if (texture2D(texture1, coord).r == 1.0) {
+		final = skyColor;
+	} else {
+		
+		final = texture2D(texture0, coord) * texture2D(texture3, coord);
+		//final = vec4(0, coord.x, 0.0, 1.0);
 	}
-	//final.x -= mod(gl_FragCoord.y / 20, 2);
-    //gl_FragColor = texture2D(texture0, texCoord.st) * texture2D(texture2, texCoord.st) * texture2D(texture1, texCoord.st);
-    //gl_FragColor -= vec4(floor(mod(gl_FragColor.x / 2, 2)), 0.0, 0.0, 0.0);
-    //final = clamp(1 - vec4(pow(texture2D(texture1, texCoord.st).r, 80)), 0.0, 1.0);
-    gl_FragColor = final;
+	float v = 0;//(float(mod(coord.y * 80, 2) < 0.9)) * 0.2 + mod(coord.y * 80, 2) / 24;
+	v = pow(length(coord - vec2(0.5, 0.5)) * sqrt(2), 4) * 0.7;
+	//v *= 60;
+	//v *= abs(coord.x - 0.5) / 4;
+	//v *= abs(coord.y - 0.5);
+	final -= vec4(v, v, v, 0.0);
+    gl_FragData[0] = texture2D(texture0, texCoord.st);
+    gl_FragData[1] = texture2D(texture2, texCoord.st);
+    gl_FragData[2] = final;
+    gl_FragData[3] = texture2D(texture3, texCoord.st);
 }

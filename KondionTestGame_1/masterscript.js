@@ -23,6 +23,7 @@ var start = function() {
 	//World.passes[1].setType(2);
 
 	//SCN.rounGd = new SKO_InfinitePlane();
+	SCN.Light = new OKO_AmbientLight();
 	SCN.Ground = new SKO_InfinitePlane();
 	SCN.Wallz = new SKO_InfinitePlane();
 	//SCN.WallE = new SKO_InfinitePlane();
@@ -31,6 +32,7 @@ var start = function() {
 	SCN.Ground.transform.rotateX(-Math.PI / 2);
 	SCN.Ground.textureSize = 10;
 	SCN.Ground.transform.translate(0, 0, 0);
+	SCN.Light.color.set(1.0, 0.0, 0.0, 1.0);
 
 	//SCN.rounGd.transform.rotateX(Math.PI / 2);
 	//SCN.rounGd.textureSize = 2;
@@ -52,7 +54,7 @@ var start = function() {
 	plane.drag = new SKO_Cube();
 	plane.drag.transform.translate(0.1, 0.8, 0);
 	plane.drag.transform.scale(0.6, 0.05, 0.05);
-	delete plane.remove("drag");
+	//plane.remove("drag");
 	//plane.drag.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
 	//plane.drag.transform.rotateX(Math.random() * Math.PI * 2);
 	//plane.drag.transform.rotateY(Math.random() * Math.PI * 2);
@@ -73,6 +75,9 @@ var start = function() {
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 		},
 		onupdate: function() {
+			
+			//World.skyColor.set(Math.random(), Math.random(), Math.random(), 1);
+			
 			SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
 		
 			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
@@ -88,8 +93,9 @@ var start = function() {
 			KJS.d.pos = "(" + this.obj.actTransform.m30 + ", " + this.obj.actTransform.m31 + ", " + this.obj.actTransform.m32 + ")";
 			KJS.d.speed = this.speed;
 			//print(Math.floor(this.speed * 3.6) + "km/h");
-			
+
 			if (!this.falling) {
+				this.infl = Math.min(Math.abs(this.speed / 5), 2) * !this.falling;
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
 					if (this.obj.velocity.y < 0) {
 						this.obj.velocity.y = 5;
@@ -112,9 +118,14 @@ var start = function() {
 				} else  {
 					this.speed *= 0.8
 				}
-			}
+			} else
+				this.infl *= 0.95;
 			
-			this.infl = Math.min(Math.abs(this.speed / 5), 2) * !this.falling;
+			this.infl = 0;
+
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+				this.obj.velocity.y = 5;
+			}
 			
 			camera.transform.identity();
 			camera.transform.translate(0, 1 + Math.abs(Math.cos(this.bob / 2) / 24) * this.infl, Math.sin(-this.bob / 2) / 24 * this.infl);
@@ -139,12 +150,12 @@ var start = function() {
 	World.camera = camera;
 	//SCN.Camera.look(0, 0, 5, 0, 0, 0);
 
-	for (var i = 0; i < 80; i++) {
+	for (var i = 0; i < 50; i++) {
 		var cube = new SKO_Cube();
-		cube.morecube = new SKO_Cube(1);
+		cube.morecube = new SKO_Cube(0);
 		//cube.rotVelocity.rotateX(0.01);
 		//cube.rotVelocity.rotateY(0.01);
-		cube.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
+		cube.transform.translate((i - 50) * 7, Math.random() * 20, Math.random() * 100);
 		//cube.transform.rotateX(Math.random() * Math.PI * 2);
 		//cube.transform.rotateY(Math.random() * Math.PI * 2);
 		//cube.transform.rotateZ(Math.random() * Math.PI * 2);
@@ -153,6 +164,7 @@ var start = function() {
 				this.obj.velocity.z -= Math.random() / 7
 				//this.obj.transform.translate(0.01, 0, 0);
 				this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
+				//this.obj.morecube.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 40) / 20, 0);
 				//this.obj.transform.translate(0.04, 0, 0);
 				//this.obj.rotVelocity.rotateX((Math.random() - 0.5) / 60);
 				this.obj.rotVelocity.rotateY((Math.random() - 0.5) / 60);
@@ -160,6 +172,8 @@ var start = function() {
 			}
 		}
 		cube.morecube.transform.translate(0, 1, 0);
+		//cube.morecube.morecube = new SKO_Cube(0);
+		//cube.morecube.morecube.transform.translate(0, 1, 0);
 		SCN["CUBE_" + i] = cube;
 	}
 
@@ -189,5 +203,7 @@ var start = function() {
 		//	passes[0].width, passes[0].height);
 		ctx.fillText("Frame r8: " + Math.floor(this.s.fpav), 10, 30);
 	}
+
+	SCN.rescan();
 
 };

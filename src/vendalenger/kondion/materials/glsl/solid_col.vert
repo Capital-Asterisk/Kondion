@@ -18,6 +18,7 @@ float rand(vec2 co){
 
 void main(){
 	texCoord = gl_MultiTexCoord0;
+	//texCoord.x += 0.9;
 	normal = gl_Normal;
 	viewPos = gl_ModelViewProjectionMatrix * gl_Vertex;
 	worldPos = viewPos - (gl_ModelViewProjectionMatrix * vec4(0.0, 0.0, 0.0, 0.0));
