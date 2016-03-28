@@ -33,6 +33,7 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	protected final List<KObj_Node> children;
 	protected final List<String> childNames;
 	protected KObj_Node parent;
+	public boolean killMe = false;
 	public String name;
 	public ScriptObjectMirror s;
 	
@@ -133,6 +134,18 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	
 	public KObj_Node get(int key) {
 		return children.get(key);
+	}
+	
+	public KObj_Node getParent() {
+		return parent;
+	}
+	
+	public String nextName(String first) {
+		int i = 0;
+		while (childNames.contains(first + "_" + i))
+			i ++;
+		//for (i = 0; childNames.contains(first + "_" + i); i++) {}
+		return first + "_" + i;
 	}
 
 	@Override

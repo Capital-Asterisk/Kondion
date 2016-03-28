@@ -21,6 +21,7 @@ import javax.script.ScriptException;
 import jdk.internal.dynalink.beans.StaticClass;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.lwjgl.Window;
 import vendalenger.port.Command;
 
 public class KJS {
@@ -66,6 +67,14 @@ public class KJS {
 		Kondion.getNashorn().eval("var thisisabitlong = {}");
 		o = (ScriptObjectMirror) Kondion.getNashorn().eval("thisisabitlong");
 
+	}
+	
+	public void duck() {
+		Window.poopy();
+	}
+	
+	public long currentTime() {
+		return Kondion.msTime() - Kondion.startTime();
 	}
 	
 	public long currentTick() {

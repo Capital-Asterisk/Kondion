@@ -43,11 +43,22 @@ import static org.lwjgl.opengl.GL11.GL_TRUE;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.util.Date;
 
+import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.ALC;
+import org.lwjgl.openal.ALC10;
+import org.lwjgl.openal.ALC11;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALCapabilities;
+import org.lwjgl.openal.ALContext;
+import org.lwjgl.openal.ALDevice;
 
 import vendalenger.kondion.Kondion;
 
@@ -143,11 +154,46 @@ public class Window {
 		
 		System.out.println("GLFW Version: " + glfwGetVersionString());
 		
-		//System.out.println("OpenGL Version: " + GL11.glGetString(GL11.GL_VERSION));
-
+		System.out.println("Initialize OpenAL...");
+		
+		//ALC.create();
+		//if (devnotsdaorsdb == NULL) {
+		//	System.err.println("Unable to open sound device");
+		//}
+		ALContext vc = ALContext.create();
+		System.out.println(vc.getCapabilities().OpenAL10);
+		System.out.println(vc.getCapabilities().OpenAL11);
+		System.out.println(vc.isCurrent());
+		
+		//long devnotsdaorsdb = ALC10.alcOpenDevice((ByteBuffer) null);
+		//ALC10.alcOpenDevice(deviceSpecifier)
+		System.out.println(AL10.AL_NO_ERROR);
+		int buff = AL10.alGenBuffers();
+		ByteBuffer buffy = BufferUtils.createByteBuffer(8000);
+		for (int i = 0; i < 8000; i++) {
+			buffy.put((byte)(((i / 6) % 2) * Byte.MAX_VALUE - 127));
+		
+		}
+		buffy.flip();
+		AL10.alBufferData(buff, AL10.AL_FORMAT_MONO8, buffy, 8000);
+		System.out.println(AL10.alGetError());
+		src = AL10.alGenSources();
+		AL10.alSourcei(src, AL10.AL_BUFFER, buff);
+		AL10.alSourcef(src, AL10.AL_PITCH, 1.0f);
+		AL10.alSourcef(src, AL10.AL_GAIN, 1.0f);
+		AL10.alSource3f(src, AL10.AL_POSITION, 0.0f, 0.0f, 0.0f);
+		AL10.alSource3f(src, AL10.AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+		AL10.alSourcePlay(src);
+		System.out.println(AL10.alGetError());
 		// TTT.Two();
 	}
-
+	public static int src;
+	public static void poopy() {
+		AL10.alSourcePlay(src);
+		System.out.println(AL10.alGetError());
+	}
+	
+	
 	/**
 	 * Sets LWJGL native library path.
 	 */

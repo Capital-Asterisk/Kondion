@@ -92,8 +92,8 @@ public class SKO_Cube extends KObj_Solid {
                         velocity.x *= Math.abs(temp1.x);
                         velocity.y *= Math.abs(temp1.y);
                         velocity.z *= Math.abs(temp1.z);
-                        
-                        if (s.containsKey("collide")) {
+  
+                        if (s != null && s.containsKey("collide")) {
             				s.callMember("collide", kobj, temp2);
             			}
                     }

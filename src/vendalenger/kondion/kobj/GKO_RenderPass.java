@@ -184,8 +184,13 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				Kondion.km.draw();
 				glPopMatrix();
 				
-				for (KObj_Renderable kobj : items) {
-					kobj.render(type, this);
+				for (int i = 0; i < items.size(); i++) {
+					if (!items.get(i).killMe)
+						items.get(i).render(type, this);
+					else {
+						items.remove(i);
+						i --;
+					}
 				}
 			}
 			//glDisable(GL_DEPTH_TEST);

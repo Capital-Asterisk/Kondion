@@ -77,6 +77,8 @@ public class Kondion {
 	private static float delta;
 	private static float fps;
 	private static long ticks;
+	private static long startTime;
+	private static long currentTime;
 
 	public static boolean showPrespective = true;
 	public static boolean showHud = false;
@@ -114,6 +116,8 @@ public class Kondion {
 		}
 		km.createVbo();
 		
+		startTime = System.currentTimeMillis();
+		
 		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
 			
 			prevTime = System.nanoTime();
@@ -128,11 +132,12 @@ public class Kondion {
 
 			TTT.three();
 
-			
 			//currentCamera.gluLookAt();
 			
 			//glTranslatef(0, 0, 1);
 			//FlatDrawing.renderBillboard(1, 1, KondionLoader.textures.get("noah"));
+			
+			currentTime = System.currentTimeMillis();
 			
 			world.Scene.update();
 			
@@ -162,6 +167,14 @@ public class Kondion {
 
 	public static float getFramerate() {
 		return fps;
+	}
+	
+	public static long msTime() {
+		return currentTime;
+	}
+	
+	public static long startTime() {
+		return startTime;
 	}
 
 	public static float getDelta() {

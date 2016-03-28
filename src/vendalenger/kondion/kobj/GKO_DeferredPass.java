@@ -187,8 +187,13 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				Kondion.km.draw();
 				glPopMatrix();
 				
-				for (KObj_Renderable kobj : items) {
-					kobj.render(30, this);
+				for (int i = 0; i < items.size(); i++) {
+					if (!items.get(i).killMe)
+						items.get(i).render(30, this);
+					else {
+						items.remove(i);
+						i --;
+					}
 				}
 				
 				glMatrixMode(GL_PROJECTION);

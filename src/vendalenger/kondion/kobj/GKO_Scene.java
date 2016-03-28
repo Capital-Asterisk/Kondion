@@ -35,6 +35,7 @@ public class GKO_Scene extends KObj_Node {
 	public boolean disable = false;
 	
 	public GKO_Scene() {
+		pointer = false;
 		allObjects = new ArrayList<KObj_Node>();
 	}
 	
@@ -92,8 +93,15 @@ public class GKO_Scene extends KObj_Node {
 			//	immaWulaYourChildren(kobj);
 			//	// else not an oriented
 			//}
-			for (KObj_Node kobj : allObjects) {
-				kobj.update();
+			for (int i = 0; i < allObjects.size(); i++) {
+				allObjects.get(i).update();
+				if (allObjects.get(i).killMe) {
+					//System.out.println(allObjects.get(i).getParent());
+					allObjects.get(i).getParent().remove(allObjects.get(i));
+					
+					allObjects.remove(i);
+					i --;
+				}
 			}
 			
 			// Then apply apply transformations
