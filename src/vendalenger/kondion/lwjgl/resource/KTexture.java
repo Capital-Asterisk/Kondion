@@ -21,16 +21,33 @@ import static org.lwjgl.opengl.GL11.glBindTexture;
 
 import vendalenger.kondion.js.JSDrawable;
 
-public class KondionTexture implements JSDrawable {
+public class KTexture implements JSDrawable {
 
 	public int width, height;
+	private boolean internal;
+	private boolean isLoaded;
+	private boolean mipmapped;
 	private int imageWidth, imageHeight;
 	private int minFilter, magFilter;
-	private boolean mipmapped;
 	private int textureId;
 	private int wrapS, wrapT;
 
-	public KondionTexture(int id, int width, int height, int miFilter,
+	public KTexture(String path, int miFilter,
+			int maFilter, int awrapS, int awrapT) {
+		//textureId = id;
+		imageWidth = width;
+		imageHeight = height;
+		minFilter = miFilter;
+		magFilter = maFilter;
+		wrapS = awrapS;
+		wrapT = awrapT;
+		internal = false;
+		//mipmapped = mipped;
+		this.width = width;
+		this.height = height;
+	}
+	
+	public KTexture(int id, int miFilter, int width, int height,
 			int maFilter, int awrapS, int awrapT, boolean mipped) {
 		textureId = id;
 		imageWidth = width;
@@ -40,8 +57,21 @@ public class KondionTexture implements JSDrawable {
 		wrapS = awrapS;
 		wrapT = awrapT;
 		mipmapped = mipped;
+		internal = true;
 		this.width = width;
 		this.height = height;
+	}
+	
+	public void load() {
+		if (!internal) {
+			
+		}
+	}
+	
+	public void unLoad() {
+		if (!internal) {
+			
+		}
 	}
 
 	public void bind() {

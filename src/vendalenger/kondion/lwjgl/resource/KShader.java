@@ -20,14 +20,14 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 import org.lwjgl.opengl.ARBShaderObjects;
 
-public class KondionShader {
+public class KShader {
 
 	private int frag;
 	private int vert;
 	
 	private int prog;
 
-	public KondionShader(int v, int f, int p) {
+	public KShader(int v, int f, int p) {
 		vert = v;
 		frag = f;
 		prog = p;

@@ -23,6 +23,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.MalformedInputException;
@@ -97,6 +99,23 @@ public class FileShortcuts {
 	public static String readTextFile(File textFile) throws IOException {
 		String file = "";
 		FileReader reader = new FileReader(textFile);
+		BufferedReader buffer = new BufferedReader(reader);
+		String line = "";
+		while ((line = buffer.readLine()) != null) {
+			file += line + sep;
+		}
+		reader.close();
+		return file;
+	}
+	
+	/**
+	 * Read through a text file and return it as a string.
+	 *
+	 * @throws IOException
+	 */
+	public static String readInputStream(InputStream is) throws IOException {
+		String file = "";
+		InputStreamReader reader = new InputStreamReader(is);
 		BufferedReader buffer = new BufferedReader(reader);
 		String line = "";
 		while ((line = buffer.readLine()) != null) {

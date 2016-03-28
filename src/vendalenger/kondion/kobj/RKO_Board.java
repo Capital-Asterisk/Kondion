@@ -11,17 +11,17 @@ import java.nio.FloatBuffer;
 import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.lwjgl.GLDrawing;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class RKO_Board extends KObj_Renderable {
 	
 	private FloatBuffer buffer;
-	KondionShader eggs;
+	KShader eggs;
 	
 	public RKO_Board() {
-		eggs = KondionLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
+		//eggs = KLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 	}
 	
 	@Override
@@ -39,7 +39,7 @@ public class RKO_Board extends KObj_Renderable {
 		if (material != null)
 			material.bind(type);
 		GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
-		GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
+		GLDrawing.renderQuad(1, 1, KLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();
 		if (material != null)
 			material.unbind();

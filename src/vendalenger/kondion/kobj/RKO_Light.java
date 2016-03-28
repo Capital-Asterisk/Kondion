@@ -10,19 +10,19 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.lwjgl.GLDrawing;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
 import vendalenger.kondion.objectbase.KObj_Oriented;
 import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class RKO_Light extends KObj_Renderable {
 	
-	private static KondionShader ambient;
+	private static KShader ambient;
 	private static int colorUni = -1;
 	public final Vector4f color;
 	
 	public RKO_Light() {
-		ambient = KondionLoader.shaders.get("K_AmbientLight");
+		ambient = KLoader.shaders.get("K_AmbientLight");
 		color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 		if (colorUni == -1) {
 			colorUni = ambient.uniformLocation("color");

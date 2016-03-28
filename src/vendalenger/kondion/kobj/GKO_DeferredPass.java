@@ -57,9 +57,9 @@ import vendalenger.kondion.js.JSDrawable;
 import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.objectbase.KObj_Node;
 import vendalenger.kondion.objectbase.KObj_Oriented;
@@ -78,7 +78,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	private int skyUni = 0;
 	protected IntBuffer ducks;
 	protected List<RKO_Light> lights;
-	private KondionShader program;
+	private KShader program;
 	
 	public GKO_DeferredPass() {
 		this(0, true);
@@ -101,7 +101,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 		ducks.put(GL_COLOR_ATTACHMENT2_EXT);
 		ducks.put(GL_COLOR_ATTACHMENT3_EXT);
 		
-		program = KondionLoader.shaders.get("K_DeferredRender");
+		program = KLoader.shaders.get("K_DeferredRender");
 		skyUni = program.uniformLocation("skyColor");
 		
 		if (a)
@@ -182,7 +182,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				
 				glPushMatrix();
 				new KMat_Monotexture().bind(30);
-				KondionLoader.textures.get("neat").bind();
+				KLoader.textures.get("neat").bind();
 				glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
 				Kondion.km.draw();
 				glPopMatrix();
@@ -223,7 +223,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 						Kondion.getWorld().skyColor.z, Kondion.getWorld().skyColor.w);
 				GLDrawing.renderQuad(width, height);
 				glTranslatef(-width / 2, -height / 2, 0);
-				KondionShader.unbind();
+				KShader.unbind();
 				glActiveTexture(GL_TEXTURE0);
 				glBindTexture(GL_TEXTURE_2D, 0);
 				glActiveTexture(GL_TEXTURE1);

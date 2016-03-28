@@ -5,8 +5,8 @@ import static org.lwjgl.opengl.GL20.*;
 import static org.lwjgl.opengl.EXTFramebufferObject.*;
 
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
 
 /**
  * 
@@ -14,13 +14,13 @@ import vendalenger.kondion.lwjgl.resource.KondionShader;
  */
 public class KMat_FlatColor implements KMat_erial {
 	
-	private KondionShader shader;
+	private KShader shader;
 	private float r, g, b, a;
 	private int uni_type, uni_fog, uni_color;
 	private boolean alpha;
 	
 	public KMat_FlatColor() {
-		shader = KondionLoader.shaders.get("K_FlatCol");
+		shader = KLoader.shaders.get("K_FlatCol");
 		uni_type = shader.uniformLocation("type");
 		uni_color = shader.uniformLocation("color");
 		uni_fog = shader.uniformLocation("fog");

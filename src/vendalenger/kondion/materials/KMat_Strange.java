@@ -4,8 +4,8 @@ import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL20.*;
 
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
 
 /**
  * 
@@ -13,12 +13,12 @@ import vendalenger.kondion.lwjgl.resource.KondionShader;
  */
 public class KMat_Strange implements KMat_erial {
 	
-	private KondionShader shader;
+	private KShader shader;
 	private int eggs = 0;
 	private int fuk = 0;
 	
 	public KMat_Strange() {
-		shader = KondionLoader.shaders.get("K_Strange");
+		shader = KLoader.shaders.get("K_Strange");
 		eggs = shader.uniformLocation("eggs");
 		fuk = shader.uniformLocation("fuk");
 	}

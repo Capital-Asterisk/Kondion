@@ -15,8 +15,8 @@ import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.GLDrawing;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
 import vendalenger.kondion.materials.KMat_FlatColor;
 import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.materials.KMat_Strange;
@@ -30,7 +30,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	public float textureSize;
 	private Matrix4f temp0;
 	
-	KondionShader eggs;
+	KShader eggs;
 	
 	public SKO_InfinitePlane() {
 		super();
@@ -79,7 +79,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 				addx, addy,
 				size / textureSize + addx, addy});
 		//if (material == null)
-			GLDrawing.renderQuad(size, -size, KondionLoader.getMissingTexture());
+			GLDrawing.renderQuad(size, -size, KLoader.getMissingTexture());
 		//else
 			//GLDrawing.renderQuad(size, -size);
 		//System.out.println(textureSize);

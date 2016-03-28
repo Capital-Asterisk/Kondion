@@ -22,6 +22,8 @@ import java.io.IOException;
 import argo.jdom.JdomParser;
 import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KResource;
 import vendalenger.port.FileShortcuts;
 
 public class KHacker {
@@ -36,18 +38,11 @@ public class KHacker {
 	 *            Path to your game folder
 	 */
 	public static void runGame(String path) {
-		try {
-			KondionGame game = new KondionGame() {};
-			String text = FileShortcuts.readTextFile(new File(path));
-			JsonRootNode rootNode = new JdomParser().parse(text);
-			game.setGameInfo(rootNode);
-			game.setGameDir(new File(path).getParentFile());
-			hacking = true;
-			Kondion.run(game);
-		} catch (InvalidSyntaxException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		//KondionGame game = new KondionGame() {};
+		KLoader.init();
+		KResource res = KLoader.addFolderResource(new File(path));
+		//String text = FileShortcuts.readInputStream(res.get("kondion"))
+		hacking = true;
+		Kondion.run(res.getName());
 	}
 }

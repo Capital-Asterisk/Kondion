@@ -55,7 +55,7 @@ import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.stb.STBTTPackedchar;
 import org.lwjgl.stb.STBTruetype;
 
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 import vendalenger.kondion.materials.KMat_Strange;
 import vendalenger.port.FileShortcuts;
 
@@ -72,7 +72,7 @@ public class GLDrawing {
 	// private static ArrayList<int[]> canvasTextures = new ArrayList<int[]>();
 	private static FloatBuffer texCoords;
 
-	public static void renderCube(float size, KondionTexture t) {
+	public static void renderCube(float size, KTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
 		glScalef(size, size, size);
@@ -127,7 +127,7 @@ public class GLDrawing {
 		glPopMatrix();
 	}
 
-	public static void renderQuad(float width, float height, KondionTexture t) {
+	public static void renderQuad(float width, float height, KTexture t) {
 		glPushMatrix();
 		glEnable(GL_TEXTURE_2D);
 		glScalef(width, -height, 1);

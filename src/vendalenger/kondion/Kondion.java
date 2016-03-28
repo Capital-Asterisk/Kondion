@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
 
@@ -45,16 +46,19 @@ import javax.swing.JLabel;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.opengl.GL11;
 
+import argo.jdom.JdomParser;
 import argo.jdom.JsonNode;
 import argo.jdom.JsonRootNode;
+import argo.saj.InvalidSyntaxException;
+import jdk.nashorn.internal.parser.JSONParser;
 import vendalenger.kondion.js.KJS;
 import vendalenger.kondion.kobj.GKO_Scene;
 import vendalenger.kondion.kobj.OKO_Camera_;
 import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionModel;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KModel;
 import vendalenger.port.FileShortcuts;
 import vendalenger.port.VD_FlConsole;
 
@@ -64,7 +68,6 @@ public class Kondion {
 
 	private static OKO_Camera_ dummyCamera;
 	private static JFrame loadingScreen;
-	private static KondionGame game;
 	private static ScriptEngine jsEngine;
 	private static Thread gameThread;
 	private static KondionWorld world;
@@ -77,7 +80,7 @@ public class Kondion {
 
 	public static boolean showPrespective = true;
 	public static boolean showHud = false;
-	public static KondionModel km; // tests only
+	public static KModel km; // tests only
 	
 	private static void gameLoop() {
 		
@@ -105,7 +108,7 @@ public class Kondion {
 		
 		km = null;
 		try {
-			km = KondionLoader.loadObj(new FileInputStream(new File("/home/neal/Desktop/kaytrav.obj")));
+			km = KLoader.loadObj(new FileInputStream(new File("/home/neal/Desktop/kaytrav.obj")));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
@@ -157,10 +160,6 @@ public class Kondion {
 		return world.Scene;
 	}
 
-	public static KondionGame getGame() {
-		return game;
-	}
-	
 	public static float getFramerate() {
 		return fps;
 	}
@@ -194,7 +193,7 @@ public class Kondion {
 		height = h;
 	}
 
-	public static void run(KondionGame g) {
+	public static void run(String identifier) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -235,8 +234,7 @@ public class Kondion {
 						height = 600;
 					}
 					
-					Window.initGL(width, height, false, false, g.getGameInfo()
-							.getStringValue("GameName"));
+					Window.initGL(width, height, false, false, KLoader.getKResource(identifier).getNeatName());
 					GL.createCapabilities();
 					GLDrawing.setup();
 					///FlatDrawing.
@@ -251,10 +249,13 @@ public class Kondion {
 									.getResourceAsStream("kondiondefault.js"))));
 
 					System.out.print("Parsing game information...");
-					JsonRootNode rootNode = g.getGameInfo();
+					JsonRootNode rootNode = KLoader.getKResource(identifier).getConfig();
+					
 					// reusable variable
 					List<JsonNode> array;
+					
 					// Buttons
+					
 					JsonNode node = rootNode.getNode("Buttons");
 					for (int i = 0; i < node.getFieldList().size(); i++) {
 						array = node.getFieldList().get(i).getValue()
@@ -268,7 +269,7 @@ public class Kondion {
 					}
 
 					// Graphics
-					KondionLoader.init();
+					
 					node = rootNode.getNode("Graphics");
 
 					try {
@@ -280,12 +281,7 @@ public class Kondion {
 
 							}
 
-							KondionLoader.queueTexture(
-									FileShortcuts.getChild(g.getGameDir(),
-											"graphics"
-													+ File.separator
-													+ array.get(0)
-															.getStringValue()),
+							KLoader.registerTexture(identifier + ":" + array.get(0).getStringValue(),
 									node.getFieldList().get(i).getName()
 											.getStringValue(),
 									GL11.class.getField(
@@ -299,7 +295,7 @@ public class Kondion {
 											.getInt(0),
 									GL11.class.getField(
 											array.get(4).getStringValue())
-											.getInt(0));
+											.getInt(0), true);
 						}
 					} catch (IllegalArgumentException e) {
 						e.printStackTrace();
@@ -312,12 +308,12 @@ public class Kondion {
 					}
 
 					System.out.println("Doing other stuff...");
+					
 					GLDrawing.setup();
 
 					System.out.print("Loading game scripts...");
 
-					jsEngine.eval(new FileReader(FileShortcuts.getChild(
-							g.getGameDir(), "masterscript.js")));
+					jsEngine.eval(new InputStreamReader(KLoader.get(identifier + ":masterjs")));
 					
 					dummyCamera = new OKO_Camera_();
 					dummyCamera.look(0, 0, 5, 0, 0, 0);
@@ -327,7 +323,7 @@ public class Kondion {
 					jsEngine.put("KJS", kjs);
 					((Invocable) jsEngine).invokeFunction("init");
 					Window.update();
-					KondionLoader.load();
+					KLoader.load();
 
 					loadingScreen.setVisible(false);
 					loadingScreen.dispose();
@@ -336,9 +332,6 @@ public class Kondion {
 				} catch (ScriptException e) {
 					e.printStackTrace();
 				} catch (NoSuchMethodException e) {
-					e.printStackTrace();
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}

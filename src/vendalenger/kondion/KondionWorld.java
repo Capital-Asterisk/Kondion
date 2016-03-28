@@ -23,7 +23,7 @@ import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.OpenGL2DContext;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
 
 public class KondionWorld {
 	

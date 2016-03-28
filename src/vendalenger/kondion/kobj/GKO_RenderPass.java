@@ -47,8 +47,8 @@ import vendalenger.kondion.Kondion;
 import vendalenger.kondion.js.JSDrawable;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.objectbase.KObj_Node;
 import vendalenger.kondion.objectbase.KObj_Oriented;
@@ -179,7 +179,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				
 				glPushMatrix();
 				new KMat_Monotexture().bind(type);
-				KondionLoader.textures.get("neat").bind();
+				KLoader.textures.get("neat").bind();
 				glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
 				Kondion.km.draw();
 				glPopMatrix();

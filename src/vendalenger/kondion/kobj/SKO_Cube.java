@@ -14,8 +14,8 @@ import org.lwjgl.BufferUtils;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.GLDrawing;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
 import vendalenger.kondion.materials.KMat_FlatColor;
 import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.materials.KMat_MultiTexture;
@@ -122,7 +122,7 @@ public class SKO_Cube extends KObj_Solid {
 			material.bind(type);
 		if (fogIntensity > 0.0f)
 			material.fogOverride(fogIntensity);
-		GLDrawing.renderCube(1, KondionLoader.textures.get("K_Cube"));
+		GLDrawing.renderCube(1, KLoader.textures.get("K_Cube"));
 		//GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();
 		if (material != null)

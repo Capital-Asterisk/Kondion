@@ -7,9 +7,9 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.js.JSContext2D;
 import vendalenger.kondion.js.JSDrawable;
 import vendalenger.kondion.kobj.GKO_RenderPass;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
-import vendalenger.kondion.lwjgl.resource.KondionShader;
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KShader;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 
 public class OpenGL2DContext implements JSContext2D {
 
@@ -205,8 +205,8 @@ public class OpenGL2DContext implements JSContext2D {
 
 	@Override
 	public void drawImage(JSDrawable img, float x, float y) {
-		if (img instanceof KondionTexture) {
-			drawImage(img, x, y, ((KondionTexture) img).getImageWidth(), ((KondionTexture) img).getImageHeight());
+		if (img instanceof KTexture) {
+			drawImage(img, x, y, ((KTexture) img).getImageWidth(), ((KTexture) img).getImageHeight());
 		} else if (img instanceof GKO_RenderPass) {
 			drawImage(img, x, y, ((GKO_RenderPass) img).width, ((GKO_RenderPass) img).height);
 		}
@@ -263,7 +263,7 @@ public class OpenGL2DContext implements JSContext2D {
 	public void deferredRender(JSDrawable diffuse, JSDrawable depth, JSDrawable normals,
 			float sx, float sy, float swidth, float sheight, float x, float y,
 			float width, float height) {
-		KondionLoader.shaders.get("K_DeferredRender").useProgram();
+		KLoader.shaders.get("K_DeferredRender").useProgram();
 		glActiveTexture(GL_TEXTURE0);
 		glEnable(GL_TEXTURE_2D);
 		diffuse.bind();
@@ -277,7 +277,7 @@ public class OpenGL2DContext implements JSContext2D {
 		glTranslatef(x + width / 2, y + height / 2, 0);
 		GLDrawing.renderQuad(width, height);
 		glTranslatef(-(x + width / 2), -(y + height / 2), 0);
-		KondionShader.unbind();
+		KShader.unbind();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE1);

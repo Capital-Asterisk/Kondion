@@ -18,7 +18,7 @@ package vendalenger.kondion.objectbase;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.kobj.GKO_RenderPass;
-import vendalenger.kondion.lwjgl.resource.KondionTexture;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 import vendalenger.kondion.materials.KMat_erial;
 
 

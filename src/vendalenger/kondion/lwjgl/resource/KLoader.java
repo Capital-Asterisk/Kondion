@@ -85,23 +85,59 @@ import org.lwjgl.stb.STBTruetype;
 import lwjgl.IOUtil;
 import vendalenger.kondion.lwjgl.GLDrawing;
 import vendalenger.kondion.lwjgl.TTT;
+import vendalenger.port.FileShortcuts;
 
-public class KondionLoader {
+public class KLoader {
 
 	public static List<Object[]> queue;
-	public static HashMap<String, KondionTexture> textures;
-	public static HashMap<String, KondionShader> shaders;
+	public static List<KResource> resources;
+	public static HashMap<String, KTexture> textures;
+	public static HashMap<String, KShader> shaders;
+	public static HashMap<String, KModel> obj;
 
-	private static KondionTexture missingTexture;
+	private static KTexture missingTexture;
 	
 	/**
 	 * Initialize textures and queue
 	 */
 	public static void init() {
-		textures = new HashMap<String, KondionTexture>();
-		shaders = new HashMap<String, KondionShader>();
+		textures = new HashMap<String, KTexture>();
+		shaders = new HashMap<String, KShader>();
+		obj = new HashMap<String, KModel>();
+		resources = new ArrayList<KResource>();
 		queue = new ArrayList<Object[]>();
 		missingTexture = null;
+		
+		resources.add(new DefaultResource());
+	}
+	
+	public static KResource addFolderResource(File folder) {
+		if (folder.exists() && folder.isDirectory()) {
+			FolderResource fr = new FolderResource(folder);
+			fr.init();
+			resources.add(fr);
+			return fr;
+		} else {
+			//System.err.println();
+			TTT.error("Directory \"" + folder.getPath() + "\" is not a valid directory");
+		}
+		return null;
+	}
+	
+	public static KResource getKResource(String name) {
+		for (KResource kres : resources) {
+			//System.out.println(name + " == " + kres.getName() + " horse");
+			if (kres.getName().equals(name)) {
+				return kres;
+			}
+		}
+		return null;
+	}
+	
+	public static InputStream get(String path) {
+		String[] split = path.split(":");
+		System.out.println(path + " eggs " + split[0] + " eggus " + split[1]);
+		return getKResource(split[0]).get(split[1]);
 	}
 
 	/**
@@ -110,39 +146,39 @@ public class KondionLoader {
 	 * 
 	 */
 	public static void load() {
-		// TODO Revise loading system, only specified resources are loaded
+		
 		if (missingTexture == null) {
-			missingTexture = registerTexture(KondionLoader.class.getResourceAsStream("missingno.png"),
+			missingTexture = internalTexture(KLoader.class.getResourceAsStream("missingno.png"),
 					"K_Missing", GL_LINEAR, GL_NEAREST,
 					GL_REPEAT, GL_REPEAT, true);
+			internalTexture(KLoader.class.getResourceAsStream("uvcube.png"),
+					"K_Cube", GL_LINEAR, GL_NEAREST,
+					GL_REPEAT, GL_REPEAT, true);
 		}
-		registerTexture(KondionLoader.class.getResourceAsStream("uvcube.png"),
-				"K_Cube", GL_LINEAR, GL_NEAREST,
-				GL_REPEAT, GL_REPEAT, true);
 		
 		shaders.put("K_Strange", loadShader(
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/strange.frag"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/strange.frag"),
 				"Thee strange shader with egg uniforms", 0));
 		
 		shaders.put("K_FlatCol", loadShader(
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.frag"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.frag"),
 				"K_FlatCol", 0));
 		
 		shaders.put("K_Monotexture", loadShader(
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_tex.frag"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_tex.frag"),
 				"K_Monotexture", 1));
 		
 		shaders.put("K_DeferredRender", loadShader(
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/deferred.frag"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/deferred.frag"),
 				"K_DeferredRender", 4));
 		
 		shaders.put("K_AmbientLight", loadShader(
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
-				KondionLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/light_ambient.frag"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/light_ambient.frag"),
 				"K_AmbientLight", 4));
 		
 		// Default font informal loading (Ubuntu Mono)
@@ -179,17 +215,17 @@ public class KondionLoader {
 				// its a shader
 			} else {
 				// its a texture
-				registerTexture((File) queue.get(i)[1],
-						(String) queue.get(i)[2], (int) queue.get(i)[3],
-						(int) queue.get(i)[4], (int) queue.get(i)[5],
-						(int) queue.get(i)[6], true);
+				//registerTexture((File) queue.get(i)[1],
+				//		(String) queue.get(i)[2], (int) queue.get(i)[3],
+				//		(int) queue.get(i)[4], (int) queue.get(i)[5],
+				//		(int) queue.get(i)[6], true);
 			}
 		}
 	}
 	
-	public static KondionShader loadShader(InputStream vert, InputStream frag, String name, int textureCount) {
+	public static KShader loadShader(InputStream vert, InputStream frag, String name, int textureCount) {
 		// create a null object
-		KondionShader shader = null;
+		KShader shader = null;
 		
 		try {
 			// Create readers to read vert and frag files (or whatever)
@@ -241,7 +277,7 @@ public class KondionLoader {
 				//System.out.println("res: " + glGetUniformi(program, fu));
 			}
 			
-			shader = new KondionShader(vertShader, fragShader, program);
+			shader = new KShader(vertShader, fragShader, program);
 			
 		} catch (IOException e) {
 			System.err.println("Error loading shader: " + name);
@@ -252,111 +288,6 @@ public class KondionLoader {
 		}
 		
 		return shader;
-	}
-
-	/**
-	 * Load a nash. (sh on nash already means shader)
-	 * 
-	 * @param nash
-	 *            The .nash shader file being loaded.
-	 */
-	@Deprecated
-	public static KondionShader loadNashShader(File nash) {
-		boolean mode_vert = false;
-		boolean mode_frag = false;
-		BufferedReader reader;
-		KondionShader nash_shader = null;
-		String line;
-		StringBuilder vertSB = new StringBuilder();
-		StringBuilder fragSB = new StringBuilder();
-		try {
-			reader = new BufferedReader(new FileReader(nash));
-			while ((line = reader.readLine()) != null) {
-				if (!line.startsWith("#mode")) {
-					if (mode_vert)
-						vertSB.append(line + "\n");
-					if (mode_frag)
-						fragSB.append(line + "\n");
-				} else {
-					mode_vert = false;
-					mode_frag = false;
-					String[] mode = line.split(" ");
-					for (int i = 0; i < mode.length; i++) {
-						if (i != 0) {
-							// System.out.println(mode[i]);
-							if (mode[i].startsWith("//"))
-								break;
-							if (mode[i].startsWith("vert")) {
-								mode_vert = true;
-							}
-							if (mode[i].startsWith("frag")) {
-								mode_frag = true;
-							}
-						}
-					}
-				}
-			}
-			reader.close();
-			int program = glCreateProgram();
-			int vertShader = newShader(GL_VERTEX_SHADER, vertSB.toString(),
-					nash.getPath() + " (VERTEX)");
-			int fragShader = newShader(GL_FRAGMENT_SHADER, fragSB.toString(),
-					nash.getPath() + " (FRAGMENT)");
-			glAttachShader(program, vertShader);
-			glAttachShader(program, fragShader);
-			int loc = glGetUniformLocation(program, "texture1");
-			glUniform1i(loc, 0);
-			glLinkProgram(program);
-
-			nash_shader = new KondionShader(vertShader, fragShader, program);
-			/*
-			 * int vert_shader = ARBShaderObjects
-			 * .glCreateShaderObjectARB(ARBVertexShader.GL_VERTEX_SHADER_ARB);
-			 * ARBShaderObjects.glShaderSourceARB(vert_shader,
-			 * vertSB.toString());
-			 * ARBShaderObjects.glCompileShaderARB(vert_shader); if
-			 * (ARBShaderObjects.glGetObjectParameteriARB(vert_shader,
-			 * ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL_FALSE) {
-			 * System.out.println("Failed to load Vertex shader: " +
-			 * nash.getPath()); }
-			 * 
-			 * int frag_shader = ARBShaderObjects
-			 * .glCreateShaderObjectARB(ARBFragmentShader
-			 * .GL_FRAGMENT_SHADER_ARB);
-			 * ARBShaderObjects.glShaderSourceARB(frag_shader,
-			 * fragSB.toString());
-			 * ARBShaderObjects.glCompileShaderARB(frag_shader); if
-			 * (ARBShaderObjects.glGetObjectParameteriARB(frag_shader,
-			 * ARBShaderObjects.GL_OBJECT_COMPILE_STATUS_ARB) == GL_FALSE) {
-			 * System.out.println("Failed to load Fragment shader: " +
-			 * nash.getPath()); System.out
-			 * .println(ARBShaderObjects.glGetInfoLogARB( vert_shader,
-			 * ARBShaderObjects .glGetObjectParameteriARB( vert_shader,
-			 * ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB))); }
-			 * 
-			 * int program = ARBShaderObjects.glCreateProgramObjectARB();
-			 * ARBShaderObjects.glAttachObjectARB(program, vert_shader);
-			 * ARBShaderObjects.glAttachObjectARB(program, frag_shader);
-			 * ARBShaderObjects.glLinkProgramARB(program); if
-			 * (ARBShaderObjects.glGetObjectParameteriARB(program,
-			 * ARBShaderObjects.GL_OBJECT_LINK_STATUS_ARB) == GL_FALSE) {
-			 * System.out.println("Failed to create Shader Program: " +
-			 * nash.getPath()); System.out
-			 * .println(ARBShaderObjects.glGetInfoLogARB( frag_shader,
-			 * ARBShaderObjects .glGetObjectParameteriARB( frag_shader,
-			 * ARBShaderObjects.GL_OBJECT_INFO_LOG_LENGTH_ARB))); }
-			 * ARBShaderObjects.glValidateProgramARB(program);
-			 * 
-			 * nash_shader = new KondionShader(vert_shader, frag_shader,
-			 * program);
-			 */
-
-		} catch (FileNotFoundException e1) {
-			System.err.println(e1.getMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return nash_shader;
 	}
 
 	public static int newShader(int t, String code, String errName) {
@@ -385,6 +316,46 @@ public class KondionLoader {
 				wrapT});
 	}
 	
+	
+	/**
+	 * 
+	 * @param image
+	 *            The path to the image file in game:dir/file format
+	 * @param id
+	 *            The string Id to create / replace
+	 * @param minFilter
+	 *            Min Filter use GL11.NEAREST of linear or anything
+	 * @param magFilter
+	 *            Mag Filter use GL11.NEAREST of linear or anything
+	 * @param wrapS
+	 * @param wrapT
+	 * @return
+	 */
+	public static KTexture registerTexture(String path, String id,
+			int minFilter, int magFilter, int wrapS, int wrapT, boolean add) {
+		// Pack it up
+		KTexture kt = new KTexture(path, minFilter, magFilter, wrapS, wrapT);
+
+		if (add) {
+			if (textures.containsKey(id)) {
+				System.out.println("Replacing texture: " + id);
+				System.out.println("    with <UNKNOWN PATH>");
+				textures.replace(id, kt);
+			} else {
+				System.out.println("Adding texture: " + id);
+				System.out.println("    from <UNKNOWN PATH>");
+				textures.put(id, kt);
+			}
+		} else {
+			System.out.println("Loaded texture: " + id);
+			System.out.println("    path <UNKNOWN PATH>");
+		}
+
+		// return stuff
+		return kt;
+	
+	}
+	
 
 	/**
 	 * 
@@ -400,12 +371,12 @@ public class KondionLoader {
 	 * @param wrapT
 	 * @return
 	 */
-	public static KondionTexture registerTexture(InputStream image, String id,
+	public static KTexture internalTexture(InputStream image, String id,
 			int minFilter, int magFilter, int wrapS, int wrapT, boolean add) {
 		try {
 			// loading the image
 			BufferedImage i = ImageIO.read(image);
-
+			
 			// flip the image
 			AffineTransform transform = AffineTransform.getScaleInstance(1f,
 					-1f);
@@ -454,7 +425,7 @@ public class KondionLoader {
 					i.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
 			// Pack it up
-			KondionTexture kt = new KondionTexture(tex, i.getWidth(),
+			KTexture kt = new KTexture(tex, i.getWidth(),
 					i.getHeight(), minFilter, magFilter, wrapS, wrapT, mipmap);
 
 			if (add) {
@@ -502,7 +473,7 @@ public class KondionLoader {
 	 * @param wrapT
 	 * @return
 	 */
-	public static KondionTexture registerTexture(File image, String id,
+	/*public static KTexture registerTexture(File image, String id,
 			int minFilter, int magFilter, int wrapS, int wrapT, boolean add) {
 		try {
 			// loading the image
@@ -557,7 +528,7 @@ public class KondionLoader {
 					i.getHeight(), 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
 
 			// Pack it up
-			KondionTexture kt = new KondionTexture(tex, i.getWidth(),
+			KTexture kt = new KTexture(tex, i.getWidth(),
 					i.getHeight(), minFilter, magFilter, wrapS, wrapT, mipmap);
 
 			if (add) {
@@ -589,17 +560,17 @@ public class KondionLoader {
 			e.printStackTrace();
 			return null;
 		}
-	}
+	}*/
 	
-	public static KondionTexture getMissingTexture() {
+	public static KTexture getMissingTexture() {
 		return missingTexture;
 	}
 	
 	/**
 	 * Code from PureArm
 	 */
-	public static KondionModel loadObj(InputStream file) {
-		KondionModel model = new KondionModel();
+	public static KModel loadObj(InputStream file) {
+		KModel model = new KModel();
 		boolean output = false;
 		try {
 			boolean tri = true;
@@ -703,11 +674,11 @@ public class KondionLoader {
 			//	Main.listUpdate();
 			//}else TTT.Error("PureArm only uses Triangles. Please see Help > OBJ format");
 		} catch (FileNotFoundException e) {
-			TTT.Error("FileNotFoundException: \n" + e.getMessage());
+			TTT.error("FileNotFoundException: \n" + e.getMessage());
 		} catch (NumberFormatException e) {
-			TTT.Error("NumberFormatException: \n" + e.getMessage());
+			TTT.error("NumberFormatException: \n" + e.getMessage());
 		} catch (IOException e) {
-			TTT.Error("IOException: \n" + e.getMessage());
+			TTT.error("IOException: \n" + e.getMessage());
 		}
 		
 		return model;

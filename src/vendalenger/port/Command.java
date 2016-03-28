@@ -28,7 +28,7 @@ import org.lwjgl.opengl.GL11;
 
 import vendalenger.kondion.KHacker;
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.lwjgl.resource.KondionLoader;
+import vendalenger.kondion.lwjgl.resource.KLoader;
 
 public class Command {
 
@@ -123,12 +123,12 @@ public class Command {
 						"Register a texture",
 						"^ef.regtex [id] [file]"
 								+ "\nid: Id - The Id the texture will be identified by. "
-								+ "\nfile: path - Path to image in electricfence folder. eg, /img/living/human.png"
+								+ "\nfile: path - Path to image data. gamename:dir/file"
 								+ "\n\nThis command will replace a texture if the same id exists") {
 					@Override
 					public String action(String[] args) {
 
-						KondionLoader.registerTexture(new File(args[1]),
+						KLoader.registerTexture(args[1],
 								args[0], GL11.GL_NEAREST, GL11.GL_NEAREST,
 								GL11.GL_CLAMP, GL11.GL_CLAMP, true);
 						return null;

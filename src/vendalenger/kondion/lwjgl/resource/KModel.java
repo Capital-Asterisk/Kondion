@@ -9,7 +9,9 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
-public class KondionModel {
+public class KModel {
+	
+	
 	int vert_handle;
 	int norm_handle;
 	int cord_handle;
