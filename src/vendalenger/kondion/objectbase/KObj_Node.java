@@ -213,4 +213,8 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	public Set<java.util.Map.Entry<String, KObj_Node>> entrySet() {
 		return null;
 	}
+	
+	public boolean isLight() {
+		return false;
+	};
 }

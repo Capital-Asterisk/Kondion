@@ -122,7 +122,7 @@ public class SKO_Cube extends KObj_Solid {
 			material.bind(type);
 		if (fogIntensity > 0.0f)
 			material.fogOverride(fogIntensity);
-		GLDrawing.renderCube(1, KLoader.textures.get("K_Cube"));
+		GLDrawing.renderCube(1);
 		//GLDrawing.renderQuad(1, 1, KondionLoader.textures.get("K_Cube"));
 		//KondionShader.unbind();
 		if (material != null)

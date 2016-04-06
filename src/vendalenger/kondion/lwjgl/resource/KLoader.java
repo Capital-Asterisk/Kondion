@@ -181,6 +181,11 @@ public class KLoader {
 				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/light_ambient.frag"),
 				"K_AmbientLight", 4));
 		
+		shaders.put("K_DirectionLight", loadShader(
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/solid_col.vert"),
+				KLoader.class.getResourceAsStream("/vendalenger/kondion/materials/glsl/light_direction.frag"),
+				"K_DirectionLight", 4));
+		
 		// Default font informal loading (Ubuntu Mono)
 		//STBTruetype
 		System.out.println("EGGSU");
@@ -339,16 +344,16 @@ public class KLoader {
 		if (add) {
 			if (textures.containsKey(id)) {
 				System.out.println("Replacing texture: " + id);
-				System.out.println("    with <UNKNOWN PATH>");
+				System.out.println("    with " + path);
 				textures.replace(id, kt);
 			} else {
 				System.out.println("Adding texture: " + id);
-				System.out.println("    from <UNKNOWN PATH>");
+				System.out.println("    from " + path);
 				textures.put(id, kt);
 			}
 		} else {
 			System.out.println("Loaded texture: " + id);
-			System.out.println("    path <UNKNOWN PATH>");
+			System.out.println("    path " + path);
 		}
 
 		// return stuff
@@ -356,6 +361,29 @@ public class KLoader {
 	
 	}
 	
+	public static KModel registerObj(String path, String id, String dtext, boolean add) {
+		
+		KModel km = new KModel(path, dtext);
+		
+		if (add) {
+			if (textures.containsKey(id)) {
+				System.out.println("Replacing OBJ: " + id);
+				System.out.println("    with " + path);
+				obj.replace(id, km);
+			} else {
+				System.out.println("Adding OBJ: " + id);
+				System.out.println("    from " + path);
+				obj.put(id, km);
+			}
+		} else {
+			System.out.println("Internally Loaded OBJ: " + id);
+			System.out.println("    path " + path);
+		}
+
+		// return stuff
+		return km;
+	
+	}
 
 	/**
 	 * 
@@ -569,7 +597,7 @@ public class KLoader {
 	/**
 	 * Code from PureArm
 	 */
-	public static KModel loadObj(InputStream file) {
+	/*public static KModel loadObj(InputStream file) {
 		KModel model = new KModel();
 		boolean output = false;
 		try {
@@ -682,5 +710,5 @@ public class KLoader {
 		}
 		
 		return model;
-	}
+	}*/
 }

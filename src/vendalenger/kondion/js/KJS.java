@@ -22,6 +22,9 @@ import jdk.internal.dynalink.beans.StaticClass;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.Window;
+import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.lwjgl.resource.KModel;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 import vendalenger.port.Command;
 
 public class KJS {
@@ -71,6 +74,18 @@ public class KJS {
 	
 	public void duck() {
 		Window.poopy();
+	}
+	
+	public KTexture texture(String name) {
+		KTexture t = KLoader.textures.get(name);
+		if (t == null)
+			t = KLoader.getMissingTexture();
+		return t;
+	}
+	
+	public KModel obj(String name) {
+		KModel t = KLoader.obj.get(name);
+		return t;
 	}
 	
 	public long currentTime() {

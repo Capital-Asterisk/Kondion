@@ -29,6 +29,11 @@ public class KMat_Monotexture implements KMat_erial  {
 		setColorf(0.4f, 1.0f, 0.0f);
 	}
 	
+	public KMat_Monotexture(String nom) {
+		this();
+		texture = Kondion.kjs.texture(nom);
+	}
+	
 	/**
 	 * Set the colo(u)r, from 0.0f - 1.0f
 	 * @param r
@@ -84,7 +89,10 @@ public class KMat_Monotexture implements KMat_erial  {
 
 	@Override
 	public int bind(int type) {
-		
+		if (texture != null)
+			texture.bind();
+		else
+			KLoader.getMissingTexture();
 		shader.useProgram();
 		//KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
 		glUniform4f(uni_color, r, g, b, a);

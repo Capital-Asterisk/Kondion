@@ -17,20 +17,20 @@ import vendalenger.kondion.objectbase.KObj_Renderable;
 
 public class RKO_Light extends KObj_Renderable {
 	
-	private static KShader ambient;
-	private static int colorUni = -1;
+	protected KShader shader; // could have been static
+	protected int colorUni = -1;
 	public final Vector4f color;
 	
 	public RKO_Light() {
-		ambient = KLoader.shaders.get("K_AmbientLight");
+		shader = KLoader.shaders.get("K_AmbientLight");
 		color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
 		if (colorUni == -1) {
-			colorUni = ambient.uniformLocation("color");
+			colorUni = shader.uniformLocation("color");
 		}
 	}
 	
 	public void apply(int width, int height) {
-		ambient.useProgram();
+		shader.useProgram();
 		glUniform4f(colorUni, color.x, color.y, color.z, color.z);
 		GLDrawing.renderQuad(width, height);
 	}
@@ -54,5 +54,10 @@ public class RKO_Light extends KObj_Renderable {
 	public void render(int type, GKO_RenderPass pass) {
 		// TODO Auto-generated method stub
 		
+	}
+	
+	@Override
+	public boolean isLight() {
+		return true;
 	}
 }

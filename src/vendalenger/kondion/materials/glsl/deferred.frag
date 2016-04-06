@@ -36,7 +36,7 @@ void main(){
 	//v *= 60;
 	//v *= abs(coord.x - 0.5) / 4;
 	//v *= abs(coord.y - 0.5);
-	final -= vec4(v, v, v, 0.0);
+	//final -= vec4(v, v, v, 0.0);
     gl_FragData[0] = texture2D(texture0, texCoord.st);
     gl_FragData[1] = texture2D(texture2, texCoord.st);
     gl_FragData[2] = final;

@@ -1,5 +1,9 @@
 package vendalenger.kondion.lwjgl.resource;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
 
@@ -9,31 +13,44 @@ import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL15;
 
+import vendalenger.kondion.lwjgl.TTT;
+
 public class KModel {
 	
+	private String source;
+	private String dtext;
+	private int vert_handle;
+	private int norm_handle;
+	private int cord_handle;
+	private FloatBuffer vert_data;
+	private FloatBuffer norm_data;
+	private FloatBuffer cord_data;
+	private boolean loaded = false;
+	private boolean selected = false;
+	private boolean clicked = false;
+	private ArrayList<Vector3f> vertices;
+	private ArrayList<Vector3f> normals;
+	private ArrayList<Vector2f> texture;
+	private ArrayList<Face> faces; // Come and take a look at my beautiful list of faces :D
 	
-	int vert_handle;
-	int norm_handle;
-	int cord_handle;
-	FloatBuffer vert_data;
-	FloatBuffer norm_data;
-	FloatBuffer cord_data;
-	float radius = 24;
-	boolean vbo = false;
-	boolean selected = false;
-	boolean clicked = false;
-	String name = "Unnammed";
-	ArrayList<Vector3f> vertices = new ArrayList<Vector3f>();
-	ArrayList<Vector3f> normals = new ArrayList<Vector3f>();
-	ArrayList<Vector2f> texture = new ArrayList<Vector2f>();
-	ArrayList<Face> faces = new ArrayList<Face>(); //Come and take a look at my beautiful list of faces :D
-	
-	public void createVbo(){
-		vbo = true;
+	public KModel(String path, String text) {
+		source = path;
+		dtext = text;
+		vertices = new ArrayList<Vector3f>();
+		normals = new ArrayList<Vector3f>();
+		texture = new ArrayList<Vector2f>();
+		faces = new ArrayList<Face>();
+	}
+
+	private void createVbo() {
 		
 		vert_data = BufferUtils.createFloatBuffer(faces.size() * 3 * 3);
 		norm_data = BufferUtils.createFloatBuffer(faces.size() * 3 * 3);
-		cord_data = BufferUtils.createFloatBuffer(texture.size() * 2 * 3);
+		cord_data = BufferUtils.createFloatBuffer(faces.size() * 2 * 3);
+		
+		System.out.println("face: " + faces.size());
+		//System.out.println("norm: " + faces.size());
+		System.out.println("text: " + texture.size());
 		
 		for (int i = 0; i < faces.size(); i++) {
 			vert_data.put(new float[] {vertices.get(faces.get(i).corns.get(2).vertex - 1).x, vertices.get(faces.get(i).corns.get(2).vertex - 1).y, vertices.get(faces.get(i).corns.get(2).vertex - 1).z});
@@ -70,6 +87,16 @@ public class KModel {
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, cord_handle);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, cord_data, GL15.GL_STATIC_DRAW);
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
+        
+        System.out.println("verthandle: " + vert_handle);
+        
+        loaded = true;
+        
+        //vertices.clear();
+    	//normals.clear();
+    	//texture.clear();
+    	//faces.clear();
+ 
 	}
 	
 	public void draw() {
@@ -95,19 +122,126 @@ public class KModel {
         GL11.glDisableClientState(GL11.GL_NORMAL_ARRAY);
         GL11.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
 	}
-}
-
-class Corn{
-	int vertex = 0;
-	int texture = 0;
-	int normal = 0;
+	
+	public void load() {
+		boolean output = false;
+		try {
+			//double plus = words / 100;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(KLoader.get(source)));
+			String line;
+			while ((line = reader.readLine()) != null) {
+				if (line.startsWith("# ")) {
+					// Its a comment
+					System.out.println("Message: " + line);
+			
+				}
+			
+				if (line.startsWith("v ")) {
+					Vector3f vert = new Vector3f(Float.parseFloat(line.split(" ")[1]), Float.parseFloat(line.split(" ")[2]), Float.parseFloat(line.split(" ")[3]));
+					vertices.add(vert);
+					if (output) System.out.println("Vertex: x: " + vert.x + " y: " + vert.y + " z: " + vert.z);
+				
+				}
+			
+				if (line.startsWith("vt ")) {
+					Vector2f text = new Vector2f(Float.parseFloat(line.split(" ")[1]), Float.parseFloat(line.split(" ")[2]));
+					texture.add(text);
+					if (output) System.out.println("Texture Coordinate: x:" + text.x + " y: " + text.y + " ");
+				
+				}
+			
+				if (line.startsWith("vn ")) {
+					Vector3f norm = new Vector3f(Float.parseFloat(line.split(" ")[1]), Float.parseFloat(line.split(" ")[2]), Float.parseFloat(line.split(" ")[3]));
+					this.normals.add(norm);
+					if (output) System.out.println("Normal: x: " + norm.x + " y: " + norm.y + " z: " + norm.z);
+				
+				}
+			
+				if (line.startsWith("f ")) {
+					Face f = new Face();
+					f.sides = line.split(" ").length - 1;
+					if (output) System.out.println("Face: # of faces:" + f.sides);
+					if (f.sides != 3) {}
+					for (int i = 0; i < line.split(" ").length - 1; i++) {
+						Corn c = new Corn();
+						if (line.split(" ")[i + 1].contains("//")){
+							if (output) System.out.println("V/N ");
+							f.textured = false;
+							c.vertex = Integer.parseInt(line.split(" ")[i + 1].split("//")[0]);
+							c.normal = Integer.parseInt(line.split(" ")[i + 1].split("//")[1]);
+						} else if (line.split(" ")[i + 1].contains("/")){
+							if (line.split(" ")[i + 1].split("/").length == 3){
+								if (output) System.out.println("V/T/N ");
+								c.vertex = Integer.parseInt(line.split(" ")[i + 1].split("/")[0]);
+								c.texture = Integer.parseInt(line.split(" ")[i + 1].split("/")[1]);
+								c.normal = Integer.parseInt(line.split(" ")[i + 1].split("/")[2]);
+								if (output) System.out.println("VERT: " + this.vertices.get(c.vertex - 1));
+							} else {
+								if (output) System.out.println("V/T ");
+								f.normal = false;
+								c.vertex = Integer.parseInt(line.split(" ")[i + 1].split("/")[0]);
+								c.texture = Integer.parseInt(line.split(" ")[i + 1].split("/")[1]);
+							
+							}
+						
+						} else {
+							if (output) System.out.println("V ");
+							f.normal = false;
+							f.textured = false;
+							c.vertex = Integer.parseInt(line.split(" ")[i + 1]);
+						}
+						f.corns.add(c);
+					
+					}
+					faces.add(f);
+					
+				}
+			}
+			reader.close();
+			
+			Vector3f av = new Vector3f();
+			for (int i = 0; i < vertices.size(); i++) {
+				av.x += vertices.get(i).x;
+				av.y += vertices.get(i).y;
+				av.z += vertices.get(i).z;
+			}
+			
+			av.x /= vertices.size();
+			av.y /= vertices.size();
+			av.z /= vertices.size();
+			
+			System.out.println(toString());
+			
+		} catch (FileNotFoundException e) {
+			TTT.error("FileNotFoundException: \n" + e.getMessage());
+		} catch (NumberFormatException e) {
+			TTT.error("NumberFormatException: \n" + e.getMessage());
+		} catch (IOException e) {
+			TTT.error("IOException: \n" + e.getMessage());
+		}
+		
+		createVbo();
+	}
+	
+	public void unload() {
+		
+	}
+	
+	public String getDefaultTexture() {
+		return dtext;
+	}
 	
 }
 
-class Face{
-	ArrayList<Corn> corns = new ArrayList<Corn>();
-	boolean normal = true;
-	boolean textured = true;
-	int sides = 3;
-	
+class Corn { // just use a struct
+	public int vertex = 0;
+	public int texture = 0;
+	public int normal = 0;
+}
+
+class Face {
+	public ArrayList<Corn> corns = new ArrayList<Corn>();
+	public boolean normal = true;
+	public boolean textured = true;
+	public int sides = 3;
 }

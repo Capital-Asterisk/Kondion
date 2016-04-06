@@ -46,6 +46,7 @@ import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Date;
 
+import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.glfw.GLFWErrorCallback;
 import org.lwjgl.glfw.GLFWKeyCallback;
@@ -61,6 +62,7 @@ import org.lwjgl.openal.ALContext;
 import org.lwjgl.openal.ALDevice;
 
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class Window {
 
@@ -145,7 +147,7 @@ public class Window {
 		glfwSetKeyCallback(window, keyCallback);
 
 		GLFWVidMode mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-
+		
 		glfwSetWindowPos(window, (mode.width() - width) / 2,
 				(mode.height() - height) / 2);
 
@@ -169,10 +171,10 @@ public class Window {
 		//ALC10.alcOpenDevice(deviceSpecifier)
 		System.out.println(AL10.AL_NO_ERROR);
 		int buff = AL10.alGenBuffers();
-		ByteBuffer buffy = BufferUtils.createByteBuffer(8000);
-		for (int i = 0; i < 8000; i++) {
-			buffy.put((byte)(((i / 6) % 2) * Byte.MAX_VALUE - 127));
-		
+		ByteBuffer buffy = BufferUtils.createByteBuffer(80000);
+		for (int t = 0; t < 80000; t++) {
+			//buffy.put((byte)(((i / 6) % 2) * Byte.MAX_VALUE - 127));
+			buffy.put((byte) ((t / 2 * (((t >> 4 | t) >> 8) % 11) & 255) / 4 + (t * (((t >> 5 | t) >> 8) % 11) & 100) / 2));
 		}
 		buffy.flip();
 		AL10.alBufferData(buff, AL10.AL_FORMAT_MONO8, buffy, 8000);
@@ -184,12 +186,15 @@ public class Window {
 		AL10.alSource3f(src, AL10.AL_POSITION, 0.0f, 0.0f, 0.0f);
 		AL10.alSource3f(src, AL10.AL_VELOCITY, 0.0f, 0.0f, 0.0f);
 		AL10.alSourcePlay(src);
+		System.out.println("Sources: " + ALC11.ALC_MONO_SOURCES);
 		System.out.println(AL10.alGetError());
 		// TTT.Two();
 	}
 	public static int src;
 	public static void poopy() {
 		AL10.alSourcePlay(src);
+		//Matrix4f f = ((KObj_Solid) Kondion.getCurrentScene().get("car")).actTransform;
+		//AL10.alListener3f(AL10.AL_POSITION, f.m30, f.m31, f.m32);
 		System.out.println(AL10.alGetError());
 	}
 	

@@ -177,12 +177,12 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				else
 					TTT.three();
 				
-				glPushMatrix();
-				new KMat_Monotexture().bind(type);
-				KLoader.textures.get("neat").bind();
-				glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
-				Kondion.km.draw();
-				glPopMatrix();
+				//glPushMatrix();
+				//new KMat_Monotexture().bind(type);
+				//KLoader.textures.get("neat").bind();
+				//glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
+				//Kondion.km.draw();
+				//glPopMatrix();
 				
 				for (int i = 0; i < items.size(); i++) {
 					if (!items.get(i).killMe)

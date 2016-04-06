@@ -35,11 +35,16 @@ var GKO_Scene = Java.type("vendalenger.kondion.kobj.GKO_Scene");
 var OKO_Camera_ = Java.type("vendalenger.kondion.kobj.OKO_Camera_");
 
 var RKO_Board = Java.type("vendalenger.kondion.kobj.RKO_Board");
+var RKO_Obj = Java.type("vendalenger.kondion.kobj.RKO_Obj");
  
 var SKO_Cube = Java.type("vendalenger.kondion.kobj.SKO_Cube");
 var SKO_InfinitePlane = Java.type("vendalenger.kondion.kobj.SKO_InfinitePlane");
 
-var OKO_AmbientLight = Java.type("vendalenger.kondion.kobj.RKO_Light");
+var Mat_FlatColor = Java.type("vendalenger.kondion.materials.KMat_FlatColor");
+var Mat_Monotexture = Java.type("vendalenger.kondion.materials.KMat_Monotexture");
+
+var RKO_AmbientLight = Java.type("vendalenger.kondion.kobj.RKO_Light");
+var RKO_DirectionalLight = Java.type("vendalenger.kondion.kobj.RKO_DirLight");
 //^kdion.rungamedir (electricfence/kondion.json)
 //var KJS = Java.type("vendalenger.kondion.KJS")
 
@@ -52,5 +57,6 @@ var patchObject = function(obj, patch) {
 };
 
 var kondionInit = function() {
+	SCN.s = {};
 	delete kondionInit;
 }

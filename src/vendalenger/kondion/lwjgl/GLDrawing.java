@@ -100,6 +100,34 @@ public class GLDrawing {
 		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 		glPopMatrix();
 	}
+	
+	public static void renderCube(float size) {
+		glPushMatrix();
+		glEnable(GL_TEXTURE_2D);
+		glScalef(size, size, size);
+
+		// setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
+
+		// floats are equal to 4 bytes
+		// "Interleaved Data"
+		glBindBuffer(GL_ARRAY_BUFFER, vbo_cube);
+		glVertexPointer(3, GL_FLOAT, 32, 0l); // First object
+		glNormalPointer(GL_FLOAT, 32, 12l); // Second
+		glTexCoordPointer(2, GL_FLOAT, 32, 24l); // Third
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+		glEnableClientState(GL_VERTEX_ARRAY);
+		glEnableClientState(GL_NORMAL_ARRAY);
+		glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+		
+		// System.out.print("EGGUS");
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+
+		glDisableClientState(GL_VERTEX_ARRAY);
+		glDisableClientState(GL_NORMAL_ARRAY);
+		glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+		glPopMatrix();
+	}
 
 	public static void renderQuad(float width, float height) {
 		glPushMatrix();

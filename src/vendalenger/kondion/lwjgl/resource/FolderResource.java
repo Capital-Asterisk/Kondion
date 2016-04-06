@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.regex.Pattern;
 
 import argo.jdom.JdomParser;
 import argo.jdom.JsonRootNode;
@@ -48,6 +49,29 @@ public class FolderResource implements KResource {
 				return new FileInputStream(FileShortcuts.getChild(directory, "masterscript.js"));
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		} else {
+			// String parsing
+			//System.out.println("NAV: " + path);
+			File dir = directory;
+			String[] split = path.split(Pattern.quote(System.getProperty("file.separator")));
+			for (int i = 0; i < split.length; i++) {
+				File[] f = dir.listFiles();
+				//System.out.println("FILE: " + dir.getName() + " NEED: " + split[i]);
+				for (int j = 0; j < f.length; j++) {
+					if (f[j].getName().startsWith(split[i]) && (f[j].isDirectory() || split.length - 1 == i)) {
+						//System.out.println("ENTER: " + f[j].getName());
+						dir = f[j];
+						j = f.length + 4;
+					}
+				}
+			}
+			try {
+				System.out.println("Using file " + dir.getName());
+				System.out.println("    for " + name + ":" + path);
+				return new FileInputStream(dir);
+			} catch (FileNotFoundException e) {
 				e.printStackTrace();
 			}
 		}

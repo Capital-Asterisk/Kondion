@@ -82,7 +82,7 @@ public class Kondion {
 
 	public static boolean showPrespective = true;
 	public static boolean showHud = false;
-	public static KModel km; // tests only
+	//public static KModel km; // tests only
 	
 	private static void gameLoop() {
 		
@@ -108,13 +108,13 @@ public class Kondion {
 
 		Window.setWindowVisible(true);
 		
-		km = null;
-		try {
-			km = KLoader.loadObj(new FileInputStream(new File("/home/neal/Desktop/kaytrav.obj")));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		km.createVbo();
+		//km = null;
+		//try {
+		//	km = KLoader.loadObj(new FileInputStream(new File("/home/neal/Desktop/kaytrav.obj")));
+		//} catch (FileNotFoundException e) {
+		//	e.printStackTrace();
+		//}
+		//km.createVbo();
 		
 		startTime = System.currentTimeMillis();
 		
@@ -269,6 +269,8 @@ public class Kondion {
 					
 					// Buttons
 					
+					System.out.println("Loading buttons...");
+					
 					JsonNode node = rootNode.getNode("Buttons");
 					for (int i = 0; i < node.getFieldList().size(); i++) {
 						array = node.getFieldList().get(i).getValue()
@@ -285,14 +287,15 @@ public class Kondion {
 					
 					node = rootNode.getNode("Graphics");
 
+					System.out.println("Loading textures (" + node.getFieldList().size() + ")");
+					
 					try {
 						for (int i = 0; i < node.getFieldList().size(); i++) {
 							array = node.getFieldList().get(i).getValue()
 									.getArrayNode();
-							for (int j = 0; j < array.size() - 1; j++) {
-								System.out.println(array.get(j + 1));
-
-							}
+							
+							System.out.println("TEXTURE: " + node.getFieldList().get(i).getName()
+									.getStringValue());
 
 							KLoader.registerTexture(identifier + ":" + array.get(0).getStringValue(),
 									node.getFieldList().get(i).getName()
@@ -319,6 +322,26 @@ public class Kondion {
 					} catch (SecurityException e) {
 						e.printStackTrace();
 					}
+					
+					// OBJ
+					
+					node = rootNode.getNode("OBJ");
+					
+					System.out.println("Loading OBJ models (" + node.getFieldList().size() + ")");
+
+					try {
+						for (int i = 0; i < node.getFieldList().size(); i++) {
+							array = node.getFieldList().get(i).getValue()
+									.getArrayNode();
+
+							KLoader.registerObj(identifier + ":" + array.get(0).getStringValue(),
+									node.getFieldList().get(i).getName().getStringValue(),
+									array.get(1).getStringValue(), true);
+						}
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					}
+
 
 					System.out.println("Doing other stuff...");
 					

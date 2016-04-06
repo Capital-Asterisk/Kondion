@@ -24,6 +24,7 @@ import vendalenger.kondion.lwjgl.OpenGL2DContext;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KLoader;
+import vendalenger.kondion.objectbase.KObj_Oriented;
 
 public class KondionWorld {
 	
@@ -36,6 +37,7 @@ public class KondionWorld {
 	public ScriptObjectMirror compositor;
 	public ScriptObjectMirror s;
 	public OKO_Camera_ camera;
+	public KObj_Oriented mic;
 	public GKO_Scene Scene;
 	
 	public short compMode = 0;
@@ -50,6 +52,7 @@ public class KondionWorld {
 		skyColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);
 		passes = new ArrayList<GKO_RenderPass>();
 		Scene = new GKO_Scene();
+		mic = null;
 	}
 	
 	float rot = 0;

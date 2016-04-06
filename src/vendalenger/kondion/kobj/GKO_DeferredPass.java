@@ -77,7 +77,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	private int nrmId = 0; // Normal texture
 	private int skyUni = 0;
 	protected IntBuffer ducks;
-	protected List<RKO_Light> lights;
+	protected List<KObj_Renderable> lights;
 	private KShader program;
 	
 	public GKO_DeferredPass() {
@@ -90,7 +90,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	
 	public GKO_DeferredPass(int id, boolean a) {
 		items = new ArrayList<KObj_Renderable>();
-		lights = new ArrayList<RKO_Light>();
+		lights = new ArrayList<KObj_Renderable>();
 		type = 30;
 		this.id = id;
 		this.auto = a;
@@ -123,8 +123,8 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	@Override
 	public void consider(KObj_Renderable f) {
 		System.out.print("a: " + f);
-		if (f instanceof RKO_Light) {
-			lights.add((RKO_Light) f);
+		if (f.isLight()) {
+			lights.add(f);
 			System.out.print(f);
 		} else if ((f instanceof KObj_Renderable)
 				&& (id & ((KObj_Renderable) f).getId()) == id)
@@ -180,12 +180,12 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				else
 					TTT.three();
 				
-				glPushMatrix();
-				new KMat_Monotexture().bind(30);
-				KLoader.textures.get("neat").bind();
-				glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
-				Kondion.km.draw();
-				glPopMatrix();
+				//glPushMatrix();
+				//new KMat_Monotexture().bind(30);
+				//KLoader.textures.get("neat").bind();
+				//glTranslatef(-getCamera().actTransform.m30, -getCamera().actTransform.m31 + 10, -getCamera().actTransform.m32);
+				//KLoader.obj.get("kaytrav").draw();
+				//glPopMatrix();
 				
 				for (int i = 0; i < items.size(); i++) {
 					if (!items.get(i).killMe)
@@ -220,8 +220,8 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				glBindTexture(GL_TEXTURE_2D, briId);
 				GLDrawing.setCoords(new float[] {1, 1, 0, 1, 0, 0, 1, 0});
 				glTranslatef(width / 2, height / 2, 0);
-				for (RKO_Light light : lights) {
-					light.apply(width, height);
+				for (KObj_Renderable light : lights) {
+					((RKO_Light) light).apply(width, height);
 				}
 				program.useProgram();
 				glUniform4f(skyUni, Kondion.getWorld().skyColor.x, Kondion.getWorld().skyColor.y,

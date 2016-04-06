@@ -16,8 +16,13 @@
 
 package vendalenger.kondion.kobj;
 
+import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.joml.Vector3f;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.openal.AL10;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.objectbase.KObj_Node;
@@ -27,6 +32,8 @@ import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class GKO_Scene extends KObj_Node {
 	
+	private final Vector3f temp0;
+	private final FloatBuffer facebook;
 	private List<KObj_Node> allObjects;
 	private KObj_Solid currentA;
 	private KObj_Solid currentB;
@@ -35,6 +42,8 @@ public class GKO_Scene extends KObj_Node {
 	public boolean disable = false;
 	
 	public GKO_Scene() {
+		facebook = BufferUtils.createFloatBuffer(6);
+		temp0 = new Vector3f();
 		pointer = false;
 		allObjects = new ArrayList<KObj_Node>();
 	}
@@ -137,6 +146,11 @@ public class GKO_Scene extends KObj_Node {
 					((KObj_Oriented) kobj).updateB();
 			}
 			
+			if (Kondion.getWorld().mic == null)
+				setListener(Kondion.getWorld().camera);
+			else
+				setListener(Kondion.getWorld().mic);
+			
 			// Render at the same time
 			/*for (GKO_RenderPass rp : Kondion.getWorld().passes) {
 				rp.render();
@@ -145,6 +159,24 @@ public class GKO_Scene extends KObj_Node {
 			Kondion.getWorld().composite();
 		}
 		
+	}
+	
+	private void setListener(KObj_Oriented ear) {
+		AL10.alListener3f(AL10.AL_POSITION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);
+		temp0.set(0.0f, 0.0f, -1.0f);
+		temp0.mulDirection(ear.actTransform);
+		facebook.position(0);
+		facebook.put(temp0.x);
+		facebook.put(temp0.y);
+		facebook.put(temp0.z);
+		temp0.set(0.0f, 1.0f, 0.0f);
+		temp0.mulDirection(ear.actTransform);
+		facebook.put(temp0.x);
+		facebook.put(temp0.y);
+		facebook.put(temp0.z);
+		facebook.position(0);
+		//AL10.alListener3f(AL10.AL_ORIENTATION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);
+		AL10.alListenerfv(AL10.AL_ORIENTATION, facebook);
 	}
 	
 	private void doCollisions() {

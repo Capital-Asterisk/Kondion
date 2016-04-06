@@ -11,124 +11,70 @@ var init = function() {
 
 };
 
-var start = function() {
-
-	KJS.i.setMouseLock(true);
-
-	// Create a new render layer (GKO: Game Kondion Object)
-	World.passes.add(new GKO_DeferredPass(0));
-	//World.passes.add(new GKO_RenderPass(2, KJS.NORMALS, true));
-	//World.passes.add(new GKO_RenderPass(2, KJS.DEPTH, true));
-	//World.passes[0].type = 2;
-	//World.passes[1].setType(2);
-
-	//SCN.rounGd = new SKO_InfinitePlane();
-	SCN.Light = new OKO_AmbientLight();
-	SCN.Ground = new SKO_InfinitePlane();
-	SCN.Wallz = new SKO_InfinitePlane();
-	//SCN.WallE = new SKO_InfinitePlane();
-
-	//SCN.Apple.transform.translate(0, 2, 0);
-	SCN.Ground.transform.rotateX(-Math.PI / 2);
-	SCN.Ground.textureSize = 10;
-	SCN.Ground.transform.translate(0, 0, 0);
-	SCN.Light.color.set(1.0, 1.0, 0.0, 1.0);
-
-	//SCN.rounGd.transform.rotateX(Math.PI / 2);
-	//SCN.rounGd.textureSize = 2;
-	//SCN.rounGd.transform.translate(0, 0, -200);
-
-	SCN.Wallz.transform.translate(0, 0, -40);
-	SCN.Wallz.textureSize = 10;
-	SCN.Wallz.transform.rotateX(-Math.PI / 2);
-
-	//SCN.WallE.transform.rotateX(Math.PI);
-	//SCN.WallE.transform.rotateZ(0.3);
-	//SCN.WallE.transform.translate(0, 0, -40);
-	//SCN.WallE.textureSize = 1;
-
-	//World.Layers[0].Apple = SCN.Apple;
-
+var fpsGuy = function() {
 	var plane = new SKO_Cube();
-	//plane.transform.m30 = 6000000;
-	plane.drag = new SKO_Cube();
-	plane.drag.transform.translate(0.1, 0.8, 0);
-	plane.drag.transform.scale(0.6, 0.05, 0.05);
-	//plane.remove("drag");
-	//plane.drag.transform.translate((Math.random() - 0.5) * 100, Math.random() * 20, (Math.random() - 0.5) * 100);
-	//plane.drag.transform.rotateX(Math.random() * Math.PI * 2);
-	//plane.drag.transform.rotateY(Math.random() * Math.PI * 2);
-	//plane.drag.transform.rotateZ(Math.random() * Math.PI * 2);
-	camera = new OKO_Camera_();
+
+	var camera = new OKO_Camera_();
 	camera.transform.translate(0, 1, 0);
 	camera.transform.rotateY(-3.14159 / 2);
 	camera.mode = 0;
+	plane.drag = new SKO_Cube();
+	//plane.drag.transform.translate(0.0, 0.2, 0);
+	//plane.drag.transform.scale(0.6, 0.05, 0.05);
+	
+	plane.camera = camera;
+
 	plane.s = {
 		speed: 0.0,
 		bob: 0,
 		y: 0,
 		p: 0,
+		on: false,
 		mss: 0,
 		falling: false,
+		neaat: new Mat_Monotexture(),
 		collide: function(kobj, normal) {
 			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 		},
 		onupdate: function() {
 			
-			//World.skyColor.set(Math.random(), Math.random(), Math.random(), 1);
-			
-			SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
-		
 			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
 				camera.moveSpeed = 20;
 			} else {
 				camera.moveSpeed = 8;
 			}
 
-			if (KJS.i.mouseDown(1)) {
-				KJS.i.setMouseLock(false);
-			}
-
-			if (KJS.i.mouseDown(0)) {
+			if (KJS.i.mouseDown(0) && this.on) {
 				var eggs = new SKO_Cube();
-				eggs.velocity.y = 10;
+				eggs.setMaterial(this.neaat);
+				eggs.velocity.y = 40;
 				eggs.transform.translate(Math.random() * 30, Math.random() * 10, Math.random() * 30);
-				eggs.s = {
-					startTime: KJS.currentTime(),
-					onupdate: function() {
-						if (this.startTime < KJS.currentTime() - 1000 * 3) {
-							this.obj.killMe = true;
-						}
-					}
-				}
 				SCN[SCN.nextName("boolet")] = eggs;
 				SCN.rescan();
-				KJS.poopy();
+				KJS.duck();
 			}
 
 			KJS.d.pos = "(" + this.obj.actTransform.m30 + ", " + this.obj.actTransform.m31 + ", " + this.obj.actTransform.m32 + ")";
 			KJS.d.speed = this.speed;
-			//print(Math.floor(this.speed * 3.6) + "km/h");
 
 			if (!this.falling) {
 				this.infl = Math.min(Math.abs(this.speed / 5), 2) * !this.falling;
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
 					if (this.obj.velocity.y < 0) {
 						this.obj.velocity.y = 5;
 						this.speed *= 1.2;
 					}
 				}
 	
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p'))) {
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p')) && this.on) {
 					camera.transform.translate(0, 0.02, 0.08)
 				}
-	
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('s'))) {
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('s')) && this.on) {
 					//this.obj.rotVelocity.rotateZ(0.006);
 					this.speed = Math.max(this.speed - delta * 9, -5);
 					this.bob -= this.speed / 24;
-				} else if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w'))) {
+				} else if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w')) && this.on) {
 					//this.obj.rotVelocity.rotateZ(-0.006);
 					this.speed = Math.min(this.speed + delta * 9, 6 + KJS.i.keyboardDown(KJS.i.toGLFWCode('q')) * 10);
 					this.bob += this.speed / 24;
@@ -140,13 +86,17 @@ var start = function() {
 			
 			//this.infl = 0;
 
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
 				this.obj.velocity.y = 5;
 			}
 			
 			camera.transform.identity();
 			camera.transform.translate(0, 1 + Math.abs(Math.cos(this.bob / 2) / 24) * this.infl, Math.sin(-this.bob / 2) / 24 * this.infl);
-			
+			plane.drag.transform.identity();
+			plane.drag.transform.translate(0.0, 0.6, 0);
+			//plane.drag.transform.identity();
+			this.obj.drag.transform.setRotationYXZ(-Math.PI / 2, this.p, 0); // formalitites
+			plane.drag.transform.scale(0.1, 0.1, 2.0);
 			
 			this.y = (this.y + (-KJS.i.getMouseDX() / 100)) % (Math.PI * 2);
 			this.p = Math.max(Math.min(Math.PI / 2, this.p + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2);
@@ -159,41 +109,94 @@ var start = function() {
 		},
 		onupdateb: function() {
 			this.falling = this.mss > -0.6;
-			//print(this.falling);
 		}
 	}
-	SCN.car = plane;
+	
+	plane.s.neaat.texture = KJS.texture("human");
+
+	return plane;
+}
+
+var flyingThing = function() {
+	var plane = new SKO_Cube();
+	plane.drag = new SKO_Cube();
+	plane.drag.transform.translate(0.1, 0.8, 0);
+	plane.drag.transform.scale(0.6, 0.05, 0.05);
+
+	camera = new OKO_Camera_();
+	camera.transform.translate(0, 1, 0);
+	camera.transform.rotateY(-3.14159 / 2);
+	camera.mode = 0;
 	plane.camera = camera;
-	World.camera = camera;
-	//SCN.Camera.look(0, 0, 5, 0, 0, 0);
+
+	plane.s = {
+		on: false,
+		collide: function(kobj, normal) {
+			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
+			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
+		},
+		onupdate: function() {
+		
+		},
+		onupdateb: function() {
+		}
+	}
+	
+	return plane;
+}
+
+var start = function() {
+
+	KJS.i.setMouseLock(true);
+
+	// Create a new render layer (GKO: Game Kondion Object)
+	World.passes.add(new GKO_DeferredPass(0));
+	
+	// Add light
+	SCN.LightB = new RKO_DirectionalLight();
+	// Add ground, and that moving thing
+	SCN.Ground = new SKO_InfinitePlane();
+	SCN.Wallz = new SKO_InfinitePlane();
+
+	// Do stuff
+	SCN.Ground.transform.rotateX(-Math.PI / 2);
+	SCN.Ground.textureSize = 10;
+	SCN.Ground.transform.translate(0, 0, 0);
+	SCN.LightB.color.set(1.0, 1.0, 1.0, 1.0);
+	SCN.Wallz.transform.translate(0, 0, -40);
+	SCN.Wallz.textureSize = 10;
+	SCN.Wallz.transform.rotateX(-Math.PI / 2);
+	
+	SCN.eggs = new RKO_Obj(KJS.obj("coolthing"));
+	SCN.eggs.transform.translate(0.0, 5.0, 0);
+	SCN.eggs.setMaterial(new Mat_Monotexture("bird"));
+	
+	SCN.guy = fpsGuy();
+	SCN.plane = flyingThing();
+	SCN.s.players = [SCN.guy, SCN.plane];
+	SCN.guy.s.on = true;
+	SCN.s.currentPlayer = 0;
 
 	for (var i = 0; i < 2; i++) {
 		var cube = new SKO_Cube();
 		cube.morecube = new SKO_Cube(0);
-		//cube.rotVelocity.rotateX(0.01);
-		//cube.rotVelocity.rotateY(0.01);
 		cube.transform.translate((i - 50) * 7, Math.random() * 20, Math.random() * 100);
-		//cube.transform.rotateX(Math.random() * Math.PI * 2);
-		//cube.transform.rotateY(Math.random() * Math.PI * 2);
-		//cube.transform.rotateZ(Math.random() * Math.PI * 2);
 		cube.s = {
 			onupdate: function() {
-				this.obj.velocity.z -= Math.random() / 7
-				//this.obj.transform.translate(0.01, 0, 0);
+				this.obj.velocity.z -= Math.random() / 7;
 				this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
-				//this.obj.morecube.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 40) / 20, 0);
-				//this.obj.transform.translate(0.04, 0, 0);
-				//this.obj.rotVelocity.rotateX((Math.random() - 0.5) / 60);
 				this.obj.rotVelocity.rotateY((Math.random() - 0.5) / 60);
-				//this.obj.rotVelocity.rotateZ((Math.random() - 0.5) / 60);
 			}
 		}
 		cube.morecube.transform.translate(0, 1, 0);
-		//cube.morecube.morecube = new SKO_Cube(0);
-		//cube.morecube.morecube.transform.translate(0, 1, 0);
 		SCN["CUBE_" + i] = cube;
 	}
 
+	KJS.obj("coolthing").load();
+	KJS.texture("noah").load();
+	KJS.texture("human").load();
+	KJS.texture("bird").load();
+	
 
 	World.fogIntensity = 0.0001;
 	World.clearColor.set(0, 0, 0, 1);
@@ -219,6 +222,20 @@ var start = function() {
 		//	0, 0, 0, 0, 0, 0,
 		//	passes[0].width, passes[0].height);
 		ctx.fillText("Frame r8: " + Math.floor(this.s.fpav), 10, 30);
+	}
+
+	SCN.s.onupdate = function() {
+		SCN.eggs.transform.rotateZ(0.01);
+		SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
+		World.camera = this.players[this.currentPlayer].camera;
+		if (KJS.i.mouseDown(1)) {
+			KJS.i.setMouseLock(false);
+		}
+		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('z'))) {
+			this.players[this.currentPlayer].s.on = false;
+			this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
+			this.players[this.currentPlayer].s.on = true;
+		}
 	}
 
 	SCN.rescan();

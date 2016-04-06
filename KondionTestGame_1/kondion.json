@@ -25,10 +25,15 @@
 		"open": ["Open a door", "key", "e"]
 	},
 	"Graphics": {
-		"human": ["living/human.png", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-		"eggs": ["maps/noah.png", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-		"neat": ["kaytrav.png", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-		"noah": ["maps/ktt.png", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
+		"human": ["living/human", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"eggs": ["maps/noah", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"neat": ["kaytrav", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"noah": ["maps/ktt", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"bird": ["maps/moreeggs", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
+	},
+	"OBJ": {
+		"kaytrav": ["models/kaytrav", "neat"],
+		"coolthing": ["models/coolthin", "neat"]
 	},
 	"Audio": {
 		"monkey0": ["weapons/monkey0.wav", "asis"],

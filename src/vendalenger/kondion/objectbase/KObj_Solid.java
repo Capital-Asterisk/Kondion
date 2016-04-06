@@ -42,5 +42,4 @@ public abstract class KObj_Solid extends KObj_Renderable {
 	}
 
 	public abstract CollisionData collisionCheck(KObj_Solid kobj);
-	
 }
