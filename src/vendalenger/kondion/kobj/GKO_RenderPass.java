@@ -44,7 +44,9 @@ import org.lwjgl.opengl.GL21;
 import org.lwjgl.opengl.GL30;
 
 import vendalenger.kondion.Kondion;
+import vendalenger.kondion.gui.KComponent;
 import vendalenger.kondion.js.JSDrawable;
+import vendalenger.kondion.lwjgl.OpenGL2DContext;
 import vendalenger.kondion.lwjgl.TTT;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KLoader;
@@ -67,6 +69,8 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 		DEFERRED	= 10,
 		GUI			= 20;
 	
+	public final List<KComponent> gui;
+	public KComponent selected;
 	protected List<KObj_Renderable> items;
 	protected boolean framebuffered = false;
 	protected boolean ready = false;
@@ -100,6 +104,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	}
 	
 	public GKO_RenderPass(int id, int t, boolean a, GKO_RenderPass depth) {
+		gui = new ArrayList<KComponent>();
 		items = new ArrayList<KObj_Renderable>();
 		type = t;
 		this.id = id;
@@ -202,6 +207,23 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				}
 			}*/
 		}
+	}
+	
+	public void renderGUI(OpenGL2DContext ctx) {
+		int state = 0;
+		
+		for (int i = 0; i < gui.size(); i++) {
+			if (gui.get(i) == selected)
+				state = KComponent.SELECT;
+			//KComponent b = gui.get(i);
+			//while (b.parent != null) {
+			//	b = b.parent;
+			//}
+			
+			gui.get(i).applyTransforms(ctx);
+			gui.get(i).draw(ctx, 0);
+		}
+		
 	}
 
 	private void reFB() {

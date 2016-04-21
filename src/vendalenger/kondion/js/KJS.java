@@ -22,6 +22,7 @@ import jdk.internal.dynalink.beans.StaticClass;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.Window;
+import vendalenger.kondion.lwjgl.resource.KAudio;
 import vendalenger.kondion.lwjgl.resource.KLoader;
 import vendalenger.kondion.lwjgl.resource.KModel;
 import vendalenger.kondion.lwjgl.resource.KTexture;
@@ -31,8 +32,9 @@ public class KJS {
 	
 	public final ScriptObjectMirror o;
 	public final ScriptObjectMirror d;
-	public final StaticClass i;
 	public final StaticClass c;
+	public final StaticClass s;
+	public final StaticClass i;
 	public final short
 			DEFAULT		= 0,
 			DIFFUSE		= 1,
@@ -60,6 +62,7 @@ public class KJS {
 	
 	public KJS() throws ScriptException {
 		System.out.println("KJS initialization");
+		s = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.SceneLoader\")");
 		c = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.js.KJS\")");
 		i = (StaticClass) Kondion.getNashorn().eval("Java.type(\"vendalenger.kondion.KInput\")");
 		Kondion.getNashorn().eval("var thisislong = {"
@@ -72,9 +75,9 @@ public class KJS {
 
 	}
 	
-	public void duck() {
-		Window.poopy();
-	}
+	//public void duck() {
+	//	Window.poopy();
+	//}
 	
 	public KTexture texture(String name) {
 		KTexture t = KLoader.textures.get(name);
@@ -85,6 +88,11 @@ public class KJS {
 	
 	public KModel obj(String name) {
 		KModel t = KLoader.obj.get(name);
+		return t;
+	}
+	
+	public KAudio aud(String name) {
+		KAudio t = KLoader.aud.get(name);
 		return t;
 	}
 	

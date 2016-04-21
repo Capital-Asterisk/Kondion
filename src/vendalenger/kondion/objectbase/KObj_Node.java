@@ -175,10 +175,12 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 		
 		if (key instanceof String) {
 			int index = childNames.indexOf(key);
+			children.get(index).delete();
 			children.remove(index);
 			childNames.remove(index);
 		} else if (key instanceof KObj_Node) {
 			int index = children.indexOf(key);
+			children.get(index).delete();
 			children.remove(index);
 			childNames.remove(index);
 		} else {
@@ -217,4 +219,8 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	public boolean isLight() {
 		return false;
 	};
+	
+	public void delete() {
+		
+	}
 }

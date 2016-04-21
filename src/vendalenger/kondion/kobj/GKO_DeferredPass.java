@@ -76,6 +76,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	private int dffId = 0; // Diffuse texture
 	private int nrmId = 0; // Normal texture
 	private int skyUni = 0;
+	private int fogUni = 0;
 	protected IntBuffer ducks;
 	protected List<KObj_Renderable> lights;
 	private KShader program;
@@ -103,6 +104,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 		
 		program = KLoader.shaders.get("K_DeferredRender");
 		skyUni = program.uniformLocation("skyColor");
+		fogUni = program.uniformLocation("fog");
 		
 		if (a)
 			scan();
@@ -159,6 +161,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 			ready = EXTFramebufferObject.glCheckFramebufferStatusEXT(GL_FRAMEBUFFER_EXT) == EXTFramebufferObject.GL_FRAMEBUFFER_COMPLETE_EXT;
 			
 		} else {
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 			if (Kondion.showPrespective) {
 				//System.out.println("b4: " + ducks.remaining());
 				
@@ -189,7 +192,8 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				
 				for (int i = 0; i < items.size(); i++) {
 					if (!items.get(i).killMe)
-						items.get(i).render(30, this);
+						if (!items.get(i).hidden)
+							items.get(i).render(30, this);
 					else {
 						items.remove(i);
 						i --;
@@ -226,6 +230,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				program.useProgram();
 				glUniform4f(skyUni, Kondion.getWorld().skyColor.x, Kondion.getWorld().skyColor.y,
 						Kondion.getWorld().skyColor.z, Kondion.getWorld().skyColor.w);
+				glUniform1f(fogUni, 1f);
 				GLDrawing.renderQuad(width, height);
 				glTranslatef(-width / 2, -height / 2, 0);
 				KShader.unbind();

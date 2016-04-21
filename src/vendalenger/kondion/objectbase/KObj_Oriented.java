@@ -17,10 +17,12 @@
 package vendalenger.kondion.objectbase;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 public abstract class KObj_Oriented extends KObj_Node {
 	
 	//public static final int 
+	private final Vector3f temp0 = new Vector3f();
 	public final Matrix4f transform = new Matrix4f();
 	public final Matrix4f actTransform = new Matrix4f();
 	
@@ -43,6 +45,13 @@ public abstract class KObj_Oriented extends KObj_Node {
 				this.s.callMember("onupdateb");
 			}
 		}
+	}
+	
+	public void dir(Vector3f in, float x, float y, float z, float amt, boolean local) {
+		temp0.set(x, y, z);
+		(local ? transform : actTransform).transformDirection(temp0);
+		temp0.mul(amt);
+		in.add(temp0);
 	}
 	
 	public void multiplyByAct(Matrix4f h) {

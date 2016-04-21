@@ -18,6 +18,8 @@ package vendalenger.kondion.kobj;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.joml.Vector3f;
@@ -74,8 +76,7 @@ public class GKO_Scene extends KObj_Node {
 	protected void immaListYourChildren(KObj_Node child) {
 		allObjects.add(child);
 		for (KObj_Node or : child.values()) {
-			if (or instanceof KObj_Oriented)
-				immaListYourChildren(or);
+			immaListYourChildren(or);
 		}
 	}
 	
@@ -85,6 +86,13 @@ public class GKO_Scene extends KObj_Node {
 			immaListYourChildren(kids);
 		}
 		
+	}
+	
+	@Override
+	public void clear() {
+		children.clear();
+		childNames.clear();
+		allObjects.clear();
 	}
 
 	@Override
@@ -104,10 +112,10 @@ public class GKO_Scene extends KObj_Node {
 			//}
 			for (int i = 0; i < allObjects.size(); i++) {
 				allObjects.get(i).update();
-				if (allObjects.get(i).killMe) {
+				if (allObjects.get(i).killMe || allObjects.get(i).getParent().killMe) {
 					//System.out.println(allObjects.get(i).getParent());
 					allObjects.get(i).getParent().remove(allObjects.get(i));
-					
+					allObjects.get(i).killMe = true;
 					allObjects.remove(i);
 					i --;
 				}
@@ -162,21 +170,23 @@ public class GKO_Scene extends KObj_Node {
 	}
 	
 	private void setListener(KObj_Oriented ear) {
-		AL10.alListener3f(AL10.AL_POSITION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);
-		temp0.set(0.0f, 0.0f, -1.0f);
-		temp0.mulDirection(ear.actTransform);
-		facebook.position(0);
-		facebook.put(temp0.x);
-		facebook.put(temp0.y);
-		facebook.put(temp0.z);
-		temp0.set(0.0f, 1.0f, 0.0f);
-		temp0.mulDirection(ear.actTransform);
-		facebook.put(temp0.x);
-		facebook.put(temp0.y);
-		facebook.put(temp0.z);
-		facebook.position(0);
-		//AL10.alListener3f(AL10.AL_ORIENTATION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);
-		AL10.alListenerfv(AL10.AL_ORIENTATION, facebook);
+		if (ear != null) {
+			AL10.alListener3f(AL10.AL_POSITION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);
+			temp0.set(0.0f, 0.0f, -1.0f);
+			ear.actTransform.transformDirection(temp0);
+			facebook.position(0);
+			facebook.put(temp0.x);
+			facebook.put(temp0.y);
+			facebook.put(temp0.z);
+			temp0.set(0.0f, 1.0f, 0.0f);
+			ear.actTransform.transformDirection(temp0);
+			facebook.put(temp0.x);
+			facebook.put(temp0.y);
+			facebook.put(temp0.z);
+			facebook.position(0);
+			//AL10.alListener3f(AL10.AL_ORIENTATION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);
+			AL10.alListenerfv(AL10.AL_ORIENTATION, facebook);
+		}
 	}
 	
 	private void doCollisions() {
@@ -203,5 +213,10 @@ public class GKO_Scene extends KObj_Node {
 			}
 		}
 	}
+
+	public Collection<KObj_Node> everything() {
+		return Collections.unmodifiableList(allObjects);
+	}
+
 	
 }

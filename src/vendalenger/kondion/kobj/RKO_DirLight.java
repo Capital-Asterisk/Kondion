@@ -22,8 +22,9 @@ public class RKO_DirLight extends RKO_Light {
 	public RKO_DirLight() {
 		shader = KLoader.shaders.get("K_DirectionLight");
 		//color = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
-		//if (colorUni == -1) {
+		//if (colorUni ==	 -1) {
 		//	colorUni = ambient.uniformLocation("color");
-		//}
+		//}	
+		
 	}
 }

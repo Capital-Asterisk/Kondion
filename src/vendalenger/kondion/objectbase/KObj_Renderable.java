@@ -19,13 +19,16 @@ package vendalenger.kondion.objectbase;
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.kobj.GKO_RenderPass;
 import vendalenger.kondion.lwjgl.resource.KTexture;
+import vendalenger.kondion.materials.KMat_FlatColor;
+import vendalenger.kondion.materials.KMat_Monotexture;
 import vendalenger.kondion.materials.KMat_erial;
 
 
 public abstract class KObj_Renderable extends KObj_Oriented {
 	
+	public boolean hidden = false;
 	public float fogIntensity;
-	protected KMat_erial material;
+	protected KMat_erial material = new KMat_Monotexture();
 	protected int id;
 	
 	public KObj_Renderable() {

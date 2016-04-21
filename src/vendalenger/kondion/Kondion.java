@@ -92,7 +92,7 @@ public class Kondion {
 		
 		try {
 			jsEngine.put("World", world);
-			jsEngine.put("SCN", world.Scene);
+			jsEngine.put("SCN", world.scene);
 			((Invocable) jsEngine).invokeFunction("kondionInit");
 			((Invocable) jsEngine).invokeFunction("start");
 		} catch (NoSuchMethodException e) {
@@ -139,7 +139,7 @@ public class Kondion {
 			
 			currentTime = System.currentTimeMillis();
 			
-			world.Scene.update();
+			world.scene.update();
 			
 			ticks++;
 			Window.update();
@@ -162,7 +162,7 @@ public class Kondion {
 	}
 	
 	public static GKO_Scene getCurrentScene() {
-		return world.Scene;
+		return world.scene;
 	}
 
 	public static float getFramerate() {
@@ -342,6 +342,26 @@ public class Kondion {
 						e.printStackTrace();
 					}
 
+					// Audio
+					
+					node = rootNode.getNode("Audio");
+					
+					System.out.println("Loading Audio (" + node.getFieldList().size() + ")");
+
+					try {
+						for (int i = 0; i < node.getFieldList().size(); i++) {
+							array = node.getFieldList().get(i).getValue()
+									.getArrayNode();
+
+							KLoader.registerAudio("ol:" + array.get(0).getStringValue(), node.getFieldList().get(i).getName().getStringValue(), true);
+							
+							//KLoader.registerObj(identifier + ":" + array.get(0).getStringValue(),
+							//		node.getFieldList().get(i).getName().getStringValue(),
+							//		array.get(1).getStringValue(), true);
+						}
+					} catch (IllegalArgumentException e) {
+						e.printStackTrace();
+					}
 
 					System.out.println("Doing other stuff...");
 					

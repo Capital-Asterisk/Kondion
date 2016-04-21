@@ -3,6 +3,8 @@ package vendalenger.kondion.lwjgl;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.opengl.GL13.*;
 
+import org.joml.Vector4f;
+
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.js.JSContext2D;
 import vendalenger.kondion.js.JSDrawable;
@@ -11,8 +13,16 @@ import vendalenger.kondion.lwjgl.resource.KLoader;
 import vendalenger.kondion.lwjgl.resource.KShader;
 import vendalenger.kondion.lwjgl.resource.KTexture;
 
-public class OpenGL2DContext implements JSContext2D {
+public class OpenGL2DContext extends JSContext2D {
 
+	private final Vector4f fillColor;
+	private final Vector4f strokeColor;
+	
+	public OpenGL2DContext() {
+		fillColor = new Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+		strokeColor = new Vector4f(1.0f, 1.0f, 1.0f, 1.0f);
+	}
+	
 	@Override
 	public int createLinearGradient(float x0, float y0, float x1, float y1) {
 		// TODO Auto-generated method stub
@@ -51,7 +61,11 @@ public class OpenGL2DContext implements JSContext2D {
 
 	@Override
 	public void fillRect(float x, float y, float width, float height) {
-		
+		KTexture.unBind();
+		applyFillColor();
+		glTranslatef(x + width / 2, y + height / 2, 0);
+		GLDrawing.renderQuad(width, height);
+		glTranslatef(-(x + width / 2), -(y + height / 2), 0);
 	}
 
 	@Override
@@ -146,14 +160,12 @@ public class OpenGL2DContext implements JSContext2D {
 
 	@Override
 	public void scale(float x, float y) {
-		// TODO Auto-generated method stub
-		
+		glScalef(x, y, 1.0f);
 	}
 
 	@Override
 	public void rotate(float angle) {
-		// TODO Auto-generated method stub
-		
+		glRotatef(angle, 0, 0, 1);
 	}
 
 	@Override
@@ -168,21 +180,27 @@ public class OpenGL2DContext implements JSContext2D {
 
 	@Override
 	public void setTransform(float a, float b, float c, float d, float e, float f) {
-		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
 	public void identity() {
-		// TODO Auto-generated method stub
-		
+		glLoadIdentity();
 	}
 
 	@Override
 	public void fillText(String text, float x, float y) {
+		applyFillColor();
+		glPushMatrix();
 		glTranslatef(x, y, 0.0f);
+		if (textAlign != null)
+			if (textAlign.equals("center")) {
+				glTranslatef(-measureText(text) / 2, y, 0.0f);
+			} else if (textAlign.equals("right") || textAlign.equals("end")) {
+				glTranslatef(-measureText(text) / 2, y, 0.0f);
+			}
 		GLDrawing.drawText(text);
-		glTranslatef(-x, -y, 0.0f);
+		glPopMatrix();
 	}
 
 	@Override
@@ -198,9 +216,8 @@ public class OpenGL2DContext implements JSContext2D {
 	}
 
 	@Override
-	public void measureText(String text) {
-		// TODO Auto-generated method stub
-		
+	public float measureText(String text) {
+		return GLDrawing.measureText(text);
 	}
 
 	@Override
@@ -215,6 +232,7 @@ public class OpenGL2DContext implements JSContext2D {
 	@Override
 	public void drawImage(JSDrawable img, float x, float y, float width, float height) {
 		img.bind();
+		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glTranslatef(x + width / 2, y + height / 2, 0);
 		GLDrawing.renderQuad(width, height);
 		glTranslatef(-(x + width / 2), -(y + height / 2), 0);
@@ -260,7 +278,19 @@ public class OpenGL2DContext implements JSContext2D {
 		TTT.two();
 	}
 	
-	public void deferredRender(JSDrawable diffuse, JSDrawable depth, JSDrawable normals,
+	public Vector4f fillRgba(float r, float g, float b, float a) {
+		return fillColor.set(r, g, b, a);
+	}
+	
+	public Vector4f fillRgb(float r, float g, float b) {
+		return fillColor.set(r, g, b, 1.0f);
+	}
+	
+	private void applyFillColor() {
+		glColor4f(fillColor.x, fillColor.y, fillColor.z, fillColor.w);
+	}
+	
+	/*public void deferredRender(JSDrawable diffuse, JSDrawable depth, JSDrawable normals,
 			float sx, float sy, float swidth, float sheight, float x, float y,
 			float width, float height) {
 		KLoader.shaders.get("K_DeferredRender").useProgram();
@@ -285,5 +315,5 @@ public class OpenGL2DContext implements JSContext2D {
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glActiveTexture(GL_TEXTURE0);
-	}
+	}*/
 }

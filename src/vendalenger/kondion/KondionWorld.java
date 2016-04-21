@@ -38,7 +38,7 @@ public class KondionWorld {
 	public ScriptObjectMirror s;
 	public OKO_Camera_ camera;
 	public KObj_Oriented mic;
-	public GKO_Scene Scene;
+	public GKO_Scene scene;
 	
 	public short compMode = 0;
 	
@@ -51,7 +51,7 @@ public class KondionWorld {
 		clearColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);
 		skyColor = new Vector4f(0.02f, 0.02f, 0.02f, 0.0f);
 		passes = new ArrayList<GKO_RenderPass>();
-		Scene = new GKO_Scene();
+		scene = new GKO_Scene();
 		mic = null;
 	}
 	

@@ -32,6 +32,8 @@ var GKO_RenderPass = Java.type("vendalenger.kondion.kobj.GKO_RenderPass");
 var GKO_DeferredPass = Java.type("vendalenger.kondion.kobj.GKO_DeferredPass");
 var GKO_Scene = Java.type("vendalenger.kondion.kobj.GKO_Scene");
 
+var NKO_Audio = Java.type("vendalenger.kondion.kobj.NKO_Audio");
+
 var OKO_Camera_ = Java.type("vendalenger.kondion.kobj.OKO_Camera_");
 
 var RKO_Board = Java.type("vendalenger.kondion.kobj.RKO_Board");
@@ -45,6 +47,8 @@ var Mat_Monotexture = Java.type("vendalenger.kondion.materials.KMat_Monotexture"
 
 var RKO_AmbientLight = Java.type("vendalenger.kondion.kobj.RKO_Light");
 var RKO_DirectionalLight = Java.type("vendalenger.kondion.kobj.RKO_DirLight");
+
+var GUI_Button = Java.type("vendalenger.kondion.gui.KButton");
 //^kdion.rungamedir (electricfence/kondion.json)
 //var KJS = Java.type("vendalenger.kondion.KJS")
 

@@ -91,6 +91,7 @@ public class KLoader {
 
 	public static List<Object[]> queue;
 	public static List<KResource> resources;
+	public static HashMap<String, KAudio> aud;
 	public static HashMap<String, KTexture> textures;
 	public static HashMap<String, KShader> shaders;
 	public static HashMap<String, KModel> obj;
@@ -104,6 +105,7 @@ public class KLoader {
 		textures = new HashMap<String, KTexture>();
 		shaders = new HashMap<String, KShader>();
 		obj = new HashMap<String, KModel>();
+		aud = new HashMap<String, KAudio>();
 		resources = new ArrayList<KResource>();
 		queue = new ArrayList<Object[]>();
 		missingTexture = null;
@@ -382,6 +384,32 @@ public class KLoader {
 
 		// return stuff
 		return km;
+	
+	}
+	
+	public static KAudio registerAudio(String path, String id, boolean add) {
+		
+		//KModel km = new KModel(path, dtext);
+		
+		KAudio ka = new KAudio(path);
+		
+		if (add) {
+			if (textures.containsKey(id)) {
+				System.out.println("Replacing Sound: " + id);
+				System.out.println("    with " + path);
+				aud.replace(id, ka);
+			} else {
+				System.out.println("Adding Sound: " + id);
+				System.out.println("    from " + path);
+				aud.put(id, ka);
+			}
+		} else {
+			System.out.println("Internally Loaded Sound: " + id);
+			System.out.println("    path " + path);
+		}
+
+		// return stuff
+		return ka;
 	
 	}
 

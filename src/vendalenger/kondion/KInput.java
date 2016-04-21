@@ -62,7 +62,7 @@ public class KInput {
 			GLFW_KEY_M, GLFW_KEY_N, GLFW_KEY_O, GLFW_KEY_P, GLFW_KEY_Q,
 			GLFW_KEY_R, GLFW_KEY_S, GLFW_KEY_T, GLFW_KEY_U, GLFW_KEY_V,
 			GLFW_KEY_W, GLFW_KEY_X, GLFW_KEY_Y, GLFW_KEY_Z};
-
+	
 	private static List<KButton> buttonList = new ArrayList<KButton>();
 	private static double mouseDX = 0, mouseDY = 0, mousePX = 0, mousePY = 0;
 	private static boolean mouseLocked = false;
@@ -78,6 +78,23 @@ public class KInput {
 			// mouse test
 			return (GLFW.glfwGetMouseButton(Window.getWindow(),
 					buttonList.get(buttonIndex).key) == GL_TRUE);
+		}
+		return false;
+	}
+	
+	public static byte buttonTap(int buttonIndex) {
+		return buttonList.get(buttonIndex).tap;
+	}
+	
+	private static boolean buttonIsDown(KButton k) {
+		if (k.device == 0) {
+			// keyboard test
+			return (GLFW.glfwGetKey(Window.getWindow(),
+					k.key) == GL_TRUE);
+		} else if (k.device == 1) {
+			// mouse test
+			return (GLFW.glfwGetMouseButton(Window.getWindow(),
+					k.key) == GL_TRUE);
 		}
 		return false;
 	}
@@ -187,6 +204,17 @@ public class KInput {
 			mousePX = mouseX.get(0);
 			mousePY = mouseY.get(0);
 		}
+		
+		boolean c;
+		for (KButton butt : buttonList) {
+			c = buttonIsDown(butt);
+			if (butt.down != c)
+				butt.tap = (byte) (c ? 1 : -1);
+			else
+				butt.tap = 0;
+				
+			butt.down = c;
+		}
 		// System.out.println(mouseDX + " " + mouseDY);
 	}
 }
@@ -195,13 +223,16 @@ class KButton {
 
 	// Mouse, keyboard
 	public int device;
-
-	public String id;
 	public int key;
+	public boolean down;
+	public byte tap;
+	public String id;
 	public String name;
 
 	public KButton(String i, String n, int d, int k) {
 		System.out.println(i);
+		tap = 0;
+		down = false;
 		id = i;
 		name = n;
 		device = d;

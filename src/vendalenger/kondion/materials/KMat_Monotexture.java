@@ -92,7 +92,7 @@ public class KMat_Monotexture implements KMat_erial  {
 		if (texture != null)
 			texture.bind();
 		else
-			KLoader.getMissingTexture();
+			KLoader.getMissingTexture().bind();
 		shader.useProgram();
 		//KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
 		glUniform4f(uni_color, r, g, b, a);

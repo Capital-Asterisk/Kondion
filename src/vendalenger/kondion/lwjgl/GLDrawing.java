@@ -243,6 +243,17 @@ public class GLDrawing {
 		glEnd();
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
+	
+	public static float measureText(String text) {
+		x.put(0, 0.0f);
+		y.put(0, 0.0f);
+		for (int i = 0; i < text.length(); i++) {
+			c = text.charAt(i);
+			//STBTruetype.stbtt_GetBakedQuad(dfont_buffer, 512, 512, c - 32, x, y, chr, 1);
+			STBTruetype.stbtt_GetBakedQuad(dfont_buffer, 512, 512, c - 32, x, y, chr, 1);
+		}
+		return x.get(0);
+	}
 
 	public static void rotate2D(float ang) {
 		glRotatef(ang, 0, 0, 1);

@@ -45,6 +45,7 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 import java.io.File;
 import java.nio.ByteBuffer;
 import java.util.Date;
+import java.util.Random;
 
 import org.joml.Matrix4f;
 import org.lwjgl.BufferUtils;
@@ -65,14 +66,15 @@ import vendalenger.kondion.Kondion;
 import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class Window {
-
+	
+	private static int windowWidth, windowHeight;
+	private static long window;
+	private static ALContext ac;
 	private static GLFWKeyCallback keyCallback;
 
-	private static long window;
-
-	private static int windowWidth, windowHeight;
-
 	public static void end() {
+		//ac.destroy();
+		AL.destroy(ac);
 		glfwDestroyWindow(Window.getWindow());
 	}
 
@@ -111,6 +113,9 @@ public class Window {
 	 */
 	public static void initGL(int width, int height, boolean resizable,
 			boolean fullscreen, String title) {
+		
+		double f = 6000007.600;
+		System.out.println("Double Presishon: " + String.format("%.12f", f));
 		System.out.println("Initialize...");
 		System.out.println("Create window:");
 		windowWidth = width;
@@ -162,22 +167,33 @@ public class Window {
 		//if (devnotsdaorsdb == NULL) {
 		//	System.err.println("Unable to open sound device");
 		//}
-		ALContext vc = ALContext.create();
-		System.out.println(vc.getCapabilities().OpenAL10);
-		System.out.println(vc.getCapabilities().OpenAL11);
-		System.out.println(vc.isCurrent());
+		ac = ALContext.create();
+		System.out.println(ac.getCapabilities().OpenAL10);
+		System.out.println(ac.getCapabilities().OpenAL11);
+		System.out.println(ac.isCurrent());
 		
 		//long devnotsdaorsdb = ALC10.alcOpenDevice((ByteBuffer) null);
 		//ALC10.alcOpenDevice(deviceSpecifier)
 		System.out.println(AL10.AL_NO_ERROR);
-		int buff = AL10.alGenBuffers();
-		ByteBuffer buffy = BufferUtils.createByteBuffer(80000);
-		for (int t = 0; t < 80000; t++) {
+		/*int buff = AL10.alGenBuffers();
+		//ByteBuffer buffy = BufferUtils.createByteBuffer(80000);
+		int size = 3000;
+		ByteBuffer buffy = BufferUtils.createByteBuffer(size);
+		for (int t = 0; t < size; t++) {
+			buffy.put((byte) ((Math.random() * 255 * ((double) (t - size) / size)) - 127));
+			
 			//buffy.put((byte)(((i / 6) % 2) * Byte.MAX_VALUE - 127));
-			buffy.put((byte) ((t / 2 * (((t >> 4 | t) >> 8) % 11) & 255) / 4 + (t * (((t >> 5 | t) >> 8) % 11) & 100) / 2));
+			//buffy.put((byte) ((t / 2 * (((t >> 4 | t) >> 8) % 11) & 255) / 4 + (t * (((t >> 5 | t) >> 8) % 11) & 100) / 2));
+			//new Random().
 		}
+		//byte[] f = new byte[1000];
+		//for (int i = 0; i < f.length; i++) {
+		//	f[i] *= i / 1000;
+		//}
+		//new Random().nextBytes(f);
+		//buffy.put(f);
 		buffy.flip();
-		AL10.alBufferData(buff, AL10.AL_FORMAT_MONO8, buffy, 8000);
+		AL10.alBufferData(buff, AL10.AL_FORMAT_MONO8, buffy, 16000);
 		System.out.println(AL10.alGetError());
 		src = AL10.alGenSources();
 		AL10.alSourcei(src, AL10.AL_BUFFER, buff);
@@ -188,15 +204,15 @@ public class Window {
 		AL10.alSourcePlay(src);
 		System.out.println("Sources: " + ALC11.ALC_MONO_SOURCES);
 		System.out.println(AL10.alGetError());
-		// TTT.Two();
+		// TTT.Two();*/
 	}
-	public static int src;
+	/*public static int src;
 	public static void poopy() {
 		AL10.alSourcePlay(src);
 		//Matrix4f f = ((KObj_Solid) Kondion.getCurrentScene().get("car")).actTransform;
 		//AL10.alListener3f(AL10.AL_POSITION, f.m30, f.m31, f.m32);
 		System.out.println(AL10.alGetError());
-	}
+	}*/
 	
 	
 	/**

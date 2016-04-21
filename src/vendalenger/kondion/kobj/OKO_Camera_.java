@@ -20,6 +20,7 @@ import static org.lwjgl.opengl.GL11.glMultMatrixf;
 
 import java.nio.FloatBuffer;
 
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -105,7 +106,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	 */
 	private void calculateAngles() {
 		tempVector0.set(0, 0, -1);
-		tempVector0.mulPoint(transform);
+		transform.transformPosition(tempVector0);
 		System.out.println(tempVector0.z - transform.m32);
 		yaw = (float) Math.atan2(tempVector0.z - transform.m32, tempVector0.x - transform.m30);
 		pitch = (float) Math.asin(tempVector0.y - transform.m31);
@@ -113,13 +114,14 @@ public class OKO_Camera_ extends KObj_Oriented {
 	
 	private void calculateCenter() {
 		center.set(0, 0, -1);
-		center.mulPoint(actTransform);
+		actTransform.transformPosition(center);
 	}
 	
 	private void calculateUp() {
 		// Very upsetting eh??
 		up.set(0, 1, 0);
-		up.mulDirection(actTransform);
+		actTransform.transformDirection(up);
+		//up.mulDirection(actTransform);
 		//up.mulPoint(actTransform);
 		//up.x -= actTransform.m30;
 		//up.y -= actTransform.m31;
@@ -187,7 +189,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	/**
 	 * Look at a vector from another vector. Center, eye, and up are modified.
 	 */
-	public void look(float posx, float posy, float posz, float desx,
+	public void look(long posx, long posy, long posz, float desx,
 			float desy, float desz) {
 		actTransform.m30 = posx;
 		actTransform.m31 = posy;
@@ -227,7 +229,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	}
 
 	public void unbind() {
-		//bind = null;
+		//bind = null;r
 	}
 
 	public void update() {

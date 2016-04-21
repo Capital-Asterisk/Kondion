@@ -53,6 +53,7 @@ public class SKO_Cube extends KObj_Solid {
 			//rotVelocity.x *= 0.992;
 			//rotVelocity.y *= 0.992;
 			//rotVelocity.z *= 0.992;
+			
 			velocity.y -= Kondion.getDelta() * 9.806;
 			rotVelocity.normalize();
 			transform.m30 += velocity.x * Kondion.getDelta();
@@ -116,7 +117,6 @@ public class SKO_Cube extends KObj_Solid {
 		buffer.clear();
 		actTransform.get(buffer);
 		glMultMatrixf(buffer);
-		
 		//eggs.useProgram();
 		if (material != null)
 			material.bind(type);
