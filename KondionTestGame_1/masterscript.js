@@ -13,13 +13,12 @@ var init = function() {
 
 var fpsGuy = function() {
 	var plane = new SKO_Cube();
-
 	var camera = new OKO_Camera_();
 	camera.transform.translate(0, 1, 0);
 	camera.transform.rotateY(-3.14159 / 2);
 	camera.mode = 0;
 	plane.drag = new SKO_Cube();
-	plane.sound = new NKO_Audio(KJS.aud("bang"));
+	plane.sound = new NKO_Audio(KJS.aud("viznut"));
 	plane.sound.volume = 0.3;
 	//plane.drag.transform.translate(0.0, 0.2, 0);
 	//plane.drag.transform.scale(0.6, 0.05, 0.05);
@@ -33,9 +32,14 @@ var fpsGuy = function() {
 		p: 0,
 		deb: 0,
 		on: false,
+		camera: camera,
 		mss: 0,
 		falling: false,
 		neaat: new Mat_Monotexture(),
+		onselect: function() {
+			KJS.i.setMouseLock(true);
+			
+		},
 		collide: function(kobj, normal) {
 			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
@@ -95,7 +99,10 @@ var fpsGuy = function() {
 						this.speed *= 1.2;
 					}
 				}
-	
+				
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
+					this.obj.velocity.y = 2;
+				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p')) && this.on) {
 					camera.transform.translate(0, 0.02, 0.08)
 				}
@@ -115,9 +122,6 @@ var fpsGuy = function() {
 			
 			//this.infl = 0;
 
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
-				this.obj.velocity.y = 5;
-			}
 			
 			camera.transform.identity();
 			camera.transform.translate(0, 1 + Math.abs(Math.cos(this.bob / 2) / 24) * this.infl, Math.sin(-this.bob / 2) / 24 * this.infl);
@@ -165,6 +169,7 @@ var flyingThing = function() {
 
 	plane.drag.drag = new SKO_Cube();
 	plane.drag.drag.transform.translate(0, 2, 0);
+	plane.drag.drag.setMaterial(new Mat_Monotexture("K_Cube"));
 	
 	plane.s = {
 		on: false,
@@ -178,9 +183,14 @@ var flyingThing = function() {
 		up: new Vector3f(),
 		heading: new Vector3f(),
 		worldup: new Vector3f(0, 1, 0),
+		camera: camera,
 		vp: 0,
 		vy: 0,
 		vr: 0,
+		onselect: function() {
+			KJS.i.setMouseLock(true);
+			
+		},
 		collide: function(kobj, normal) {
 			//this.obj.dir(this.up, 0, 1, 0, 1, false);
 			var doot = normal.dot(this.up);
@@ -336,143 +346,133 @@ var flyingThing = function() {
 	return plane;
 }
 
-var start = function() {
+var sign = function(a) {
+	if (a == 0)
+		return 0;
+	else
+		return (a < 0) ? -1 : 1;
+	
+}
 
-	KJS.i.setMouseLock(true);
-
-	// Create a new render layer (GKO: Game Kondion Object)
-	World.passes.add(new GKO_DeferredPass(0));
-	World.passes[0].gui.add(new GUI_Button({
-		x: 500,
-		y: 500,
-		width: 300,
-		height: 300,
-		text: "neat birds m8"//,
-		//draw: function(ctx) {
+var fanbot = function() {
+	var verybase = new SKO_Cube();
+	var material = new Mat_Monotexture("fanbot");
+	var camera = new OKO_Camera_(); // third person camera
+	verybase.transform.rotateY(Math.PI / 2);
+	verybase.hidden = true;
+	verybase.base = new RKO_Obj(KJS.obj("fanbot_base"));
+	verybase.base.setMaterial(material);
+	verybase.base.transform.translate(0, -0.5, 0);
+	verybase.base.head = new RKO_Obj(KJS.obj("fanbot_head"));
+	verybase.base.head.setMaterial(material);
+	verybase.base.head.transform.translate(0, 1.1, 0.25);
+	verybase.base.head.fan = new RKO_Obj(KJS.obj("fanbot_fan"));
+	verybase.base.head.fan.setMaterial(material);
+	verybase.base.head.fan.transform.translate(0, 1.85961 - 1.1, 0.31 - 0.25);
+	verybase.s = {
+		speed: 0.0,
+		camera: camera,
+		cameraY: 1,
+		cameraP: 0,
+		headRot: 0,
+		on: false,
+		angle: 0,
+		prefAngle: 0,
+		fanspeed: 5,
+		moving: false,
+		turning: false,
+		onselect: function() {
+			KJS.i.setMouseLock(true);
 			
-		//}
-	
-	}));
-	
-	// Add light
-	SCN.LightB = new RKO_DirectionalLight();
-	// Add ground, and that moving thing
-	SCN.Ground = new SKO_InfinitePlane();
-	SCN.Wallz = new SKO_InfinitePlane();
-
-	// Do stuff
-	SCN.Ground.transform.rotateX(-Math.PI / 2);
-	SCN.Ground.textureSize = 100;
-	SCN.Ground.transform.translate(0, 0, 0);
-	SCN.LightB.color.set(1.0, 1.0, 1.0, 1.0);
-	SCN.Wallz.transform.translate(0, 0, -40);
-	SCN.Wallz.textureSize = 50;
-	SCN.Wallz.transform.rotateX(-Math.PI / 2);
-	
-	KJS.d["------ Controls ------"] = 0;
-	KJS.d["Z: Hold to switch camera / character"] = 0;
-	KJS.d["C: Hold it"] = 0;
-	KJS.d["WASD: Movement"] = 0;
-	KJS.d["X: Look Behind"] = 0;
-	KJS.d["QE: YAW"] = 0;
-	KJS.d["V: Do not press"] = 0;
-	KJS.d["----------------------"] = 0;
-	
-	SCN.guy = fpsGuy();
-	SCN.planeA = flyingThing();
-	SCN.planeB = flyingThing();
-	SCN.planeB.transform.m30 = 6211000;
-	SCN.s.players = [SCN.guy, SCN.planeA, SCN.planeB];
-	SCN.guy.s.on = true;
-	SCN.s.currentPlayer = 0;
-
-	for (var i = 0; i < 2; i++) {
-		var cube = new SKO_Cube();
-		cube.morecube = new SKO_Cube(0);
-		cube.transform.translate((i - 50) * 7, Math.random() * 20, Math.random() * 100);
-		cube.s = {
-			onupdate: function() {
-				this.obj.velocity.z -= Math.random() / 7;
-				this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
-				this.obj.rotVelocity.rotateY((Math.random() - 0.5) / 60);
+		},
+		collide: function(kobj, normal) {
+			//this.obj.dir(this.up, 0, 1, 0, 1, false);
+			//var doot = normal.dot(this.up);
+			//KJS.d.wheels = "(" + Math.floor(this.up.x * 100) + ", " + Math.floor(this.up.y * 100) + ", " + Math.floor(this.up.z * 100) + ")";
+			//KJS.d.wheels = doot;
+			//if (doot > -0.97)
+			//	this.speed *= Math.pow(0.004, delta) / 1.0;
+			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
+		},
+		onupdate: function() {
+			verybase.base.head.fan.transform.rotateZ(delta * this.fanspeed);
+			this.cameraY += (((this.cameraY + (-KJS.i.getMouseDX() / 100))) - this.cameraY) / 8;
+			this.cameraP += ((Math.max(Math.min(Math.PI / 2, this.cameraP + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2)) - this.cameraP) / 8;
+			//this.headRot += (sign(this.headRot + sign(this.cameraP - this.headRot) * delta) == sign(this.headRot)) ? sign(this.cameraP - this.headRot) * delta : this.headRot - this.cameraP;
+			this.obj.base.head.transform.setRotationYXZ(0, this.cameraP, 0);
+			//this.camera.transform.translate(0, 0, 4);
+			//public void dir(Matrix4f in, float x, float y, float z, float amt, boolean local) {
+			//this.camera.transform.rotateY(0.01);
+			this.obj.transform.setRotationYXZ(this.angle, 0, 0);
+			if (this.on) {
+				//this.speed = 0;
+				this.moving = false;
+				
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w'))) {
+					this.prefAngle = this.cameraY;
+					//this.speed = 20;
+					this.fanspeed = Math.min(30, this.fanspeed + delta * 4);
+					this.moving = true;
+				}
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('s'))) {
+					this.prefAngle = this.cameraY - Math.PI;
+					//this.speed = 20;
+					this.fanspeed = Math.min(30, this.fanspeed + delta * 4);
+					this.moving = true;
+				}
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('d'))) {
+					this.prefAngle = this.cameraY - Math.PI / 2;
+					//this.speed = 20;
+					this.fanspeed = Math.min(30, this.fanspeed + delta * 4);
+					this.moving = true;
+				}
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('a'))) {
+					this.prefAngle = this.cameraY + Math.PI / 2;
+					//this.speed = Math.max(0, this.speed - delta * 10);
+					this.fanspeed = Math.min(30, this.fanspeed + delta * 4);
+					this.moving = true;
+				}
+				
+				var diff = Math.atan2(Math.sin(this.prefAngle - this.angle), Math.cos(this.prefAngle - this.angle));
+				
+				KJS.d.sinthing = Math.floor(diff * 1000) / 1000;
+				KJS.d.thing = Math.floor(this.angle * 1000) / 1000 + " " + Math.floor((this.angle + sign(diff) * delta) * 1000) / 1000
+				if (Math.abs(diff) > 0.01) {
+					if (sign(this.angle - this.prefAngle + sign(diff) * delta) == sign(this.angle - this.prefAngle)) {
+						this.angle += sign(diff) * delta;
+						//this.speed = Math.max(0, this.speed - delta * 40);
+						if (Math.abs(diff) > 1.58)
+						this.turning = true;
+					} else {
+						this.angle = this.prefAngle;
+						this.turning = false;
+					}
+				} else
+					this.turning = false;
+				
+				if (this.turning || !this.moving) {
+					this.speed = Math.max(0, this.speed - delta * 40);
+				} else if (this.moving) {
+					this.speed = Math.min(10, this.speed + delta * 20);
+				}
+				
+				this.obj.transform.translate(0, 0, -this.speed * delta);
+				this.camera.moveTo(this.obj.transform);
+				this.camera.transform.translate(0, 1, 0);
+				this.camera.transform.setRotationYXZ(this.cameraY, this.cameraP, 0);
+				this.camera.transform.translate(1, 0, 4);
 			}
+			
+			this.fanspeed += sign(this.speed - this.fanspeed) * delta;//Math.max(2, this.fanspeed - delta * 3);
+			
 		}
-		cube.morecube.transform.translate(0, 1, 0);
-		SCN["CUBE_" + i] = cube;
-	}
+	};
+	SCN.BotCam = camera;
+	return verybase;
+}
 
-	KJS.obj("coolthing").load();
-	KJS.texture("noah").load();
-	KJS.texture("human").load();
-	KJS.texture("bird").load();
-	KJS.aud("sss").load();
-	KJS.aud("viznut").load();
-	KJS.aud("noice").load();
-	KJS.aud("bang").load();
-
-	World.fogIntensity = 0.0001;
-	World.clearColor.set(0, 0, 0, 1);
-	World.skyColor.set(1, 1, 1, 1);
-	World.compMode = KJS.DEBUG;
-	World.s = {fpav: 0};
-	
-	World.compositor = function(ctx, passes) {
-		//print(ctx);
-		//print(passes);
-		ctx.fillRgb(1.0, 1.0, 1.0);
-		passes[0].render();
-		//passes[1].render();
-		//passes[2].render();
-		ctx.next();
-		
-		ctx.fillRgba(1.0, 1.0, 1.0, 1.0);
-		var eggs = Math.max(Math.min(KJS.fps(), 1000), 0);
-		//print("neat: " + eggs);
-		//print("fuck: " + (this.s.fpav - eggs))
-		this.s.fpav -= (this.s.fpav - eggs) / 20;//Math.floor(this.s.fpav - KJS.fps());
-		//print("eggs: " + (this.s.fpav - Math.round(Math.floor(KJS.fps()) / 60)));
-		ctx.drawImage(passes[0], 0, 0, passes[0].width, passes[0].height);
-		//ctx.drawImage(passes[1], passes[0].width / 2, 0, passes[1].width / 6, passes[1].height / 6);
-		//ctx.deferredRender(passes[0], passes[2], passes[1],
-		//	0, 0, 0, 0, 0, 0,
-		//	passes[0].width, passes[0].height);
-		ctx.scale(0.5, 0.5);
-		ctx.fillRgba(0.0, 0.0, 0.0, 0.5);
-		ctx.fillRect(0, 0, 500, 68);
-		ctx.textAlign = "left";
-		ctx.fillRgba(1.0, 1.0, 1.0, 1.0);
-		ctx.fillText("Frame r8: " + Math.floor(this.s.fpav) + " + Tap: " + (KJS.i.buttonTap(0)), 10, 30);
-		ctx.fillText("Speed: " + (Math.floor(SCN.s.players[SCN.s.currentPlayer].s.speed * 3.6 * 100) / 100) + " km/h", 10, 60);
-
-		passes[0].renderGUI(ctx);
-
-		ctx.fillRgba(0.0, 1.0, 0.0, 1.0);
-		ctx.identity()
-		ctx.fillRect(KJS.i.getMouseX(), KJS.i.getMouseY(), 10, 10);
-		
-	}
-
-	SCN.s.onupdate = function() {
-		//SCN.eggs.transform.rotateZ(0.01);
-		SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
-		World.camera = this.players[this.currentPlayer].camera;
-		if (KJS.i.mouseDown(1)) {
-			KJS.i.setMouseLock(false);
-		}
-		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('z')) && KJS.currentTick() % 60 == 3) {
-			this.players[this.currentPlayer].s.on = false;
-			this.currentPlayer = (this.currentPlayer + 1) % this.players.length;
-			this.players[this.currentPlayer].s.on = true;
-		}
-		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('c')) && KJS.currentTick() % 60 == 3) {
-			World.compMode ++;
-			World.compMode %= 3;
-		}
-		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('f'))) {
-			KJS.s.clear();
-		}
-	}
-
-	SCN.rescan();
-
+var start = function() {
+	KJS.i.setMouseLock(true);
+	KJS.s.clear();
+	KJS.s.load("ktg1:scenes/gameA");
 };

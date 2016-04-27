@@ -15,10 +15,21 @@ public class KButton extends KComponent {
 		if (obj instanceof ScriptObjectMirror && ((ScriptObjectMirror) obj).isFunction()) {
 			((ScriptObjectMirror) obj).call(this, ctx, state);
 		} else {
-			ctx.fillRgb(1.0f, 0.0f, 0.0f);
+			
+			switch (state) {
+				case NORMAL:
+					ctx.fillRgb(1.0f, 0.0f, 0.0f);
+					break;
+				case SELECT:
+					ctx.fillRgb(0.0f, 1.0f, 0.0f);
+					break;
+				default:
+				break;
+			}
 			ctx.fillRect(-width / 2, -height / 2, width, height);
 			obj = s.get("text");
 			if (obj != null) {
+				
 				ctx.fillRgb(1.0f, 1.0f, 1.0f);
 				ctx.textAlign = "center";
 				ctx.fillText(obj.toString(), 0, 0);

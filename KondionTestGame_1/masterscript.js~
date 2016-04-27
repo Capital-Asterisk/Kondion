@@ -95,7 +95,10 @@ var fpsGuy = function() {
 						this.speed *= 1.2;
 					}
 				}
-	
+				
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
+					this.obj.velocity.y = 8;
+				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p')) && this.on) {
 					camera.transform.translate(0, 0.02, 0.08)
 				}
@@ -115,9 +118,6 @@ var fpsGuy = function() {
 			
 			//this.infl = 0;
 
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
-				this.obj.velocity.y = 5;
-			}
 			
 			camera.transform.identity();
 			camera.transform.translate(0, 1 + Math.abs(Math.cos(this.bob / 2) / 24) * this.infl, Math.sin(-this.bob / 2) / 24 * this.infl);
@@ -467,6 +467,10 @@ var start = function() {
 		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('c')) && KJS.currentTick() % 60 == 3) {
 			World.compMode ++;
 			World.compMode %= 3;
+		}
+		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('f'))) {
+			KJS.s.clear();
+			KJS.s.load("ktg1:scenes/menu");
 		}
 	}
 

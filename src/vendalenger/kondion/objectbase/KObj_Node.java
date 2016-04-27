@@ -129,7 +129,11 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 		if (key instanceof Integer) {
 			return get((int) key);
 		}
-		return children.get(childNames.indexOf(key));
+		int i = childNames.indexOf(key);
+		if (i != -1)
+			return children.get(i);
+		else
+			return null;
 	}
 	
 	public KObj_Node get(int key) {

@@ -24,12 +24,14 @@ public class RKO_Obj extends KObj_Renderable {
 	
 	public RKO_Obj(KModel model) {
 		super();
+		pointer = false;
 		obj = model;
 		//eggs = KLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 	}
 	
 	public RKO_Obj(KModel model, int id) {
 		super(id);
+		pointer = false;
 		obj = model;
 		//eggs = KLoader.loadNashShader(new File("KondionTestGame_0/testshader.nash"));
 	}

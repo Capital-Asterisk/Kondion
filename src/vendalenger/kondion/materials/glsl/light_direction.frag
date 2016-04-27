@@ -21,7 +21,7 @@ void main(){
     gl_FragData[1] = texture2D(texture2, texCoord.st);
     gl_FragData[2] = gl_FragData[2];
     
-    float b = dot((gl_FragData[1] - vec4(0.5, 0.5, 0.5, 0.0)) * 2, vec4(0.0, 1.0, 0.0, 0.0));
+    float b = dot((gl_FragData[1] - vec4(0.5, 0.5, 0.5, 0.0)) * 2, vec4(0.0, 0.7071067811865476, 0.7071067811865476, 0.0));
 	b = (b + 1) / 2;
     
     gl_FragData[3] = texture2D(texture3, texCoord.st) + color * vec4(b, b, b, 1.0);

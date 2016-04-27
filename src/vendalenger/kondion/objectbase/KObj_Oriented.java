@@ -17,6 +17,7 @@
 package vendalenger.kondion.objectbase;
 
 import org.joml.Matrix4f;
+import org.joml.Quaterniond;
 import org.joml.Vector3f;
 
 public abstract class KObj_Oriented extends KObj_Node {
@@ -54,6 +55,37 @@ public abstract class KObj_Oriented extends KObj_Node {
 		in.add(temp0);
 	}
 	
+	public void dir(Matrix4f in, float x, float y, float z, float amt, boolean local) {
+		temp0.set(x, y, z);
+		(local ? transform : actTransform).transformDirection(temp0);
+		temp0.mul(amt);
+		in.m30 += temp0.x;
+		in.m31 += temp0.y;
+		in.m32 += temp0.z;
+	}
+	
+	public void moveTo(Matrix4f tgt) {
+		transform.m30 = tgt.m30;
+		transform.m31 = tgt.m31;
+		transform.m32 = tgt.m32;
+	}
+	
+	public void moveTo(Vector3f tgt) {
+		transform.m30 = tgt.x;
+		transform.m31 = tgt.y;
+		transform.m32 = tgt.z;
+	}
+	
+	public void moveTo(float x, float y, float z) {
+		transform.m30 = x;
+		transform.m31 = y;
+		transform.m32 = z;
+	}
+	
+	public void eularYXZ(float y, float x, float z) {
+		transform.setRotationYXZ(y, x, z);
+	}
+	
 	public void multiplyByAct(Matrix4f h) {
 		h.mul(actTransform);
 	}
@@ -68,5 +100,17 @@ public abstract class KObj_Oriented extends KObj_Node {
 	
 	public float getOffsetZ() {
 		return transform.m32;
+	}
+	
+	public void setX(float x) {
+		transform.m30 = x;
+	}
+	
+	public void setY(float y) {
+		transform.m31 = y;
+	}
+	
+	public void setZ(float z) {
+		transform.m32 = z;
 	}
 }

@@ -48,7 +48,13 @@ public class NKO_Audio extends KObj_Node {
 						((KObj_Solid) parent).velocity.x,
 						((KObj_Solid) parent).velocity.y,
 						((KObj_Solid) parent).velocity.z);
+		} else {
+			AL10.alSourcei(src, AL10.AL_SOURCE_RELATIVE, AL10.AL_TRUE);
+			AL10.alSourcef(src, AL10.AL_ROLLOFF_FACTOR, 0.0f);
+			AL10.alSource3f(src, AL10.AL_POSITION, 0, 0, 0);
 		}
+		//AL10.alSourcei(src, AL10.AL_SOURCE_RELATIVE, AL10.AL_TRUE);
+		//AL10.alSourcef(src, AL10.AL_ROLLOFF_FACTOR, 0.0f);
 		AL10.alSourcef(src, AL10.AL_PITCH, pitch);
 		//AL10.alSourcePlay(src);
 	}

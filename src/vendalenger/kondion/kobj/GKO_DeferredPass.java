@@ -179,9 +179,9 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 				if (cameraOverride && camera != null) 
-					TTT.three(camera);
+					TTT.three(camera, width, height);
 				else
-					TTT.three();
+					TTT.three(width, height);
 				
 				//glPushMatrix();
 				//new KMat_Monotexture().bind(30);
@@ -200,9 +200,11 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 					}
 				}
 				
+				glViewport(0, 0, width, height);
 				glMatrixMode(GL_PROJECTION);
 				glLoadIdentity();
-				glOrtho(0, Window.getWidth(), Window.getHeight(),
+				
+				glOrtho(0, width, height,
 						0, 6.0f, -6.0f);
 				glMatrixMode(GL_MODELVIEW);
 				glLoadIdentity();
@@ -245,6 +247,8 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				glActiveTexture(GL_TEXTURE0);
 				
 				glDepthMask(true);
+				
+				glViewport(0, 0, Window.getWidth(), Window.getHeight());
 			}
 		}
 	}
@@ -285,6 +289,10 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				GL_COLOR_ATTACHMENT1_EXT, GL_TEXTURE_2D,
 				nrmId, 0);
 		texId = neat(glGenTextures(), GL_RGB, GL_RGB, GL_UNSIGNED_BYTE); // Result
+		if (!pixelate) {
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
 		glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
 				GL_COLOR_ATTACHMENT2_EXT, GL_TEXTURE_2D,
 				texId, 0);

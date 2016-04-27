@@ -16,7 +16,11 @@
 
 package vendalenger.kondion.js;
 
+import java.io.InputStreamReader;
+
 import javax.script.ScriptException;
+
+import org.joml.Vector3f;
 
 import jdk.internal.dynalink.beans.StaticClass;
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
@@ -35,6 +39,11 @@ public class KJS {
 	public final StaticClass c;
 	public final StaticClass s;
 	public final StaticClass i;
+	public final short
+		UP		= 0,
+		DOWN		= 1,
+		LEFT		= 2,
+		RIGHT		= 3;
 	public final short
 			DEFAULT		= 0,
 			DIFFUSE		= 1,
@@ -79,6 +88,15 @@ public class KJS {
 	//	Window.poopy();
 	//}
 	
+	public Object executeScript(String path) {
+		try {
+			return Kondion.getNashorn().eval(new InputStreamReader(KLoader.get(path)));
+		} catch (ScriptException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
 	public KTexture texture(String name) {
 		KTexture t = KLoader.textures.get(name);
 		if (t == null)
@@ -114,5 +132,13 @@ public class KJS {
 	
 	public float fps() {
 		return Kondion.getFramerate();
+	}
+	
+	public int width() {
+		return Window.getWidth();
+	}
+	
+	public int height() {
+		return Window.getHeight();
 	}
 }

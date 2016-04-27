@@ -276,14 +276,18 @@ public class TTT {
 	}
 
 	public static void three() {
-		three(Kondion.getCurrentCamera());
+		three(Kondion.getCurrentCamera(), Window.getWidth(), Window.getHeight());
+	}
+	
+	public static void three(int width, int height) {
+		three(Kondion.getCurrentCamera(), width, height);
 	}
 	
 	/**
 	 * Set to 3d mode
 	 */
-	public static void three(OKO_Camera_ cam) {
-		glViewport(0, 0, Window.getWidth(), Window.getHeight());
+	public static void three(OKO_Camera_ cam, int width, int height) {
+		glViewport(0, 0, width, height);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		cam.gluLookAt();

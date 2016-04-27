@@ -26,15 +26,24 @@
 		"open": ["Open a door", "key", "e"]
 	},
 	"Graphics": {
+		"titlepic": ["image/titlepic", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+	
 		"human": ["living/human", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"eggs": ["maps/noah", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"neat": ["kaytrav", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"noah": ["maps/ktt", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-		"bird": ["maps/moreeggs", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
+		"bird": ["maps/moreeggs", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"fanbot": ["models/fanbot/texture", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
 	},
 	"OBJ": {
 		"kaytrav": ["models/kaytrav", "neat"],
-		"coolthing": ["models/coolthin", "neat"]
+		"coolthing": ["models/coolthin", "neat"],
+		"durian": ["models/durian", "neat"],
+		"fanbot_base": ["models/fanbot/base", "neat"],
+		"fanbot_head": ["models/fanbot/head", "neat"],
+		"fanbot_fan": ["models/fanbot/fan", "neat"]
+		
+		
 	},
 	"Audio": {
 		"sss": ["8000:16000:50:((t/2*(((t>>4|t)>>8)%11)&255)/4+(t*(((t>>5|t)>>8)%11)&100)/2)"],

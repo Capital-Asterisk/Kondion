@@ -17,7 +17,7 @@ public class KMat_FlatColor implements KMat_erial {
 	private KShader shader;
 	private float r, g, b, a;
 	private int uni_type, uni_fog, uni_color;
-	private boolean alpha;
+	private boolean alpha = false;
 	
 	public KMat_FlatColor() {
 		shader = KLoader.shaders.get("K_FlatCol");
@@ -25,7 +25,7 @@ public class KMat_FlatColor implements KMat_erial {
 		uni_color = shader.uniformLocation("color");
 		uni_fog = shader.uniformLocation("fog");
 		//setColorf(0.4f, 1.0f, 0.0f);
-		setColorf(0.6f, 0.6f, 0.6f);
+		setColorf(0.6f, 0.6f, 0.6f); 
 	}
 	
 	/**
@@ -86,7 +86,7 @@ public class KMat_FlatColor implements KMat_erial {
 		
 		shader.useProgram();
 		//KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
-		glUniform4f(uni_color, r, g, b, a);
+		glUniform4f(uni_color, r, g, b, alpha ? a : 1.0f);
 		glUniform1f(uni_fog, Kondion.getWorld().fogIntensity);
 		glUniform1i(uni_type, type);
 		

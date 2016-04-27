@@ -112,7 +112,7 @@ public class GKO_Scene extends KObj_Node {
 			//}
 			for (int i = 0; i < allObjects.size(); i++) {
 				allObjects.get(i).update();
-				if (allObjects.get(i).killMe || allObjects.get(i).getParent().killMe) {
+				if (allObjects.get(i).killMe || (allObjects.get(i).getParent() != null && allObjects.get(i).getParent().killMe)) {
 					//System.out.println(allObjects.get(i).getParent());
 					allObjects.get(i).getParent().remove(allObjects.get(i));
 					allObjects.get(i).killMe = true;

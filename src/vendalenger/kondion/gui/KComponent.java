@@ -13,12 +13,19 @@ public abstract class KComponent {
 		SELECT = 2,
 		DOWN = 3;
 	public ScriptObjectMirror s;
+	public KComponent up, down, left, right;
 	public float x, y, width, height;
 	public float angle = 0.0f;
-	public KComponent[] directions;
+	//public KComponent[] directions = null;
 	public KComponent parent = null;
 	
 	public KComponent(ScriptObjectMirror som) {
+		
+		up = null;
+		down = null;
+		left = null;
+		right = null;
+		
 		if (som.containsKey("x")) {
 			x = Float.parseFloat(som.get("x").toString());
 			if (x == Float.NaN)

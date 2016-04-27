@@ -70,7 +70,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 		GUI			= 20;
 	
 	public final List<KComponent> gui;
-	public KComponent selected;
+	public KComponent selected = null;
 	protected List<KObj_Renderable> items;
 	protected boolean framebuffered = false;
 	protected boolean ready = false;
@@ -84,6 +84,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	public boolean disable = false;
 	public boolean auto = true;
 	public boolean cameraOverride = false;
+	public boolean pixelate = false;
 	public boolean sizeOverride = false;
 	public int width, height;
 	
@@ -178,7 +179,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 				if (cameraOverride && camera != null) 
-					TTT.three(camera);
+					TTT.three(camera, width, height);
 				else
 					TTT.three();
 				
@@ -213,6 +214,8 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 		int state = 0;
 		
 		for (int i = 0; i < gui.size(); i++) {
+			state = 0;
+			ctx.save();
 			if (gui.get(i) == selected)
 				state = KComponent.SELECT;
 			//KComponent b = gui.get(i);
@@ -221,7 +224,8 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 			//}
 			
 			gui.get(i).applyTransforms(ctx);
-			gui.get(i).draw(ctx, 0);
+			gui.get(i).draw(ctx, state);
+			ctx.restore();
 		}
 		
 	}
@@ -264,6 +268,33 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		
 		System.out.println("Retextured");
+	}
+	
+	public void guiShift(int dir) {
+		if (selected == null) {
+			selected = gui.get(0);
+		} else {
+			KComponent comp = null;
+			switch (dir) {
+				case 0: // up
+					comp = selected.up;
+					break;
+				case 1: // down
+					comp = selected.down;
+					break;
+				case 2: // left
+					comp = selected.left;
+					break;
+				case 3: // right
+					comp = selected.right;
+					break;
+				default:
+				break;
+			}
+			System.out.println(comp);
+			if (comp != null)
+				selected = comp;
+		}
 	}
 	
 	@Override

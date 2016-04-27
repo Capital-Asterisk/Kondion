@@ -36,5 +36,14 @@ void main(){
     	final = vec3((gl_ModelViewMatrix * vec4(normal, 0.0)).xyz);
     }
     
-    gl_FragColor = vec4(final, 1.0);
+    if (type != 30) {
+    	gl_FragData[0] = vec4(final, 1.0);
+    } else {
+    	//vec2 coord = texCoord.xy;
+		//coord.s = mod(coord.s + 0.2, 1.0);
+    	gl_FragData[0] = color;
+    	gl_FragData[1] = vec4(((mat3(gl_ModelViewMatrix) * normal) + 1.0) / 2, 1.0);
+    	gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
+    	gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
+    }
 }
