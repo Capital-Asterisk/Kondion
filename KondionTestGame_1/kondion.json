@@ -28,6 +28,9 @@
 	"Graphics": {
 		"titlepic": ["image/titlepic", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 	
+		"select_l": ["image/selector/left", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"select_r": ["image/selector/right", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+	
 		"human": ["living/human", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"eggs": ["maps/noah", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"neat": ["kaytrav", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],

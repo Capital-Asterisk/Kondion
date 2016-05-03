@@ -1,9 +1,9 @@
 print("woot");
 World.passes.add(new GKO_DeferredPass(0, 1));
 World.passes.add(new GKO_RenderPass(0, 2));
-//World.passes[0].width = KJS.width() / 3;
-//World.passes[0].height = KJS.height() / 3;
-//World.passes[0].sizeOverride = true;
+World.passes[0].width = KJS.width() / 3;
+World.passes[0].height = KJS.height() / 3;
+World.passes[0].sizeOverride = true;
 
 var buttonA = new GUI_Button({
 	x: 0.7140625 * KJS.width(),
@@ -46,6 +46,8 @@ World.passes[1].gui.add(buttonB);
 World.passes[1].gui.add(buttonC);
 
 KJS.texture("titlepic").load();
+KJS.texture("select_l").load();
+KJS.texture("select_r").load();
 KJS.obj("durian").load();
 
 SCN.LightB = new RKO_DirectionalLight();
@@ -89,6 +91,20 @@ World.compositor = function(ctx, passes) {
 	ctx.fillText("Selected: " + passes[1].gui.indexOf(passes[1].selected), 10, 60);
 	ctx.identity();
 	passes[1].renderGUI(ctx);
+	if (passes[1].selected != null) {
+		ctx.drawImage(KJS.texture("select_r"), 
+				passes[1].selected.x + 0.30625 / 2 * KJS.width() - 76 / 1080 * KJS.height(), 
+				passes[1].selected.y - 76 / 1080 * KJS.height() / 2, 
+				76 / 1080 * KJS.height(), 
+				76 / 1080 * KJS.height()
+				);
+		ctx.drawImage(KJS.texture("select_l"), 
+				passes[1].selected.x - 0.30625 / 2 * KJS.width(), 
+				passes[1].selected.y - 76 / 1080 * KJS.height() / 2, 
+				76 / 1080 * KJS.height(), 
+				76 / 1080 * KJS.height()
+				);
+	}
 
 	ctx.fillRgba(0.0, 1.0, 0.0, 1.0);
 	ctx.identity();

@@ -28,11 +28,12 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 
 public abstract class KObj_Node implements Map<String, KObj_Node> {
 
-	protected boolean pointer = true;
+	protected boolean pointer = false;
 	
 	protected final List<KObj_Node> children;
 	protected final List<String> childNames;
 	protected KObj_Node parent;
+	public boolean changed = false;
 	public boolean killMe = false;
 	public String name;
 	public ScriptObjectMirror s;
@@ -225,6 +226,6 @@ public abstract class KObj_Node implements Map<String, KObj_Node> {
 	};
 	
 	public void delete() {
-		
+		killMe = true;
 	}
 }

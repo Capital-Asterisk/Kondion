@@ -32,6 +32,9 @@ var GKO_RenderPass = Java.type("vendalenger.kondion.kobj.GKO_RenderPass");
 var GKO_DeferredPass = Java.type("vendalenger.kondion.kobj.GKO_DeferredPass");
 var GKO_Scene = Java.type("vendalenger.kondion.kobj.GKO_Scene");
 
+var GKO_Client = Java.type("vendalenger.kondion.kobj.GKO_Client");
+var GKO_Server = Java.type("vendalenger.kondion.kobj.GKO_Server");
+
 var NKO_Audio = Java.type("vendalenger.kondion.kobj.NKO_Audio");
 
 var OKO_Camera_ = Java.type("vendalenger.kondion.kobj.OKO_Camera_");
@@ -63,4 +66,15 @@ var patchObject = function(obj, patch) {
 var kondionInit = function() {
 	SCN.s = {};
 	delete kondionInit;
+}
+
+var serverTest = function() {
+	SCN.Server = new GKO_Server();
+	SCN.Server.start(24558, 5);
+}
+
+var connectClientTest = function() {
+	var client = new GKO_Client();
+	client.connect("localhost", 24558);
+	SCN[SCN.nextName("Client")] = client;
 }
