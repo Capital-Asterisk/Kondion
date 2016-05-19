@@ -202,7 +202,11 @@ public class GKO_Scene extends KObj_Node {
 					if (children.get(j) instanceof KObj_Solid) {
 						currentB = (KObj_Solid) children.get(j);
 						// DO I COLLIDE WITH MYSELF?
-						if (currentA != currentB) {
+						if (currentA != currentB
+							&& (
+									// Are layers valid?
+									((currentB.collideType & currentA.collideCall) == currentB.collideType)
+									|| ((currentB.collideType & currentA.collideMove) == currentB.collideType))) {
 							currentA.collisionCheck(currentB);
 							//currentA.pos.z += 0.001f;
 						}

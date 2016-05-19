@@ -67,14 +67,3 @@ var kondionInit = function() {
 	SCN.s = {};
 	delete kondionInit;
 }
-
-var serverTest = function() {
-	SCN.Server = new GKO_Server();
-	SCN.Server.start(24558, 5);
-}
-
-var connectClientTest = function() {
-	var client = new GKO_Client();
-	client.connect("localhost", 24558);
-	SCN[SCN.nextName("Client")] = client;
-}

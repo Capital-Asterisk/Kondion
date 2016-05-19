@@ -22,10 +22,6 @@ public class KMat_Monotexture implements KMat_erial  {
 	private boolean alpha;
 	
 	public KMat_Monotexture() {
-		shader = KLoader.shaders.get("K_Monotexture");
-		uni_type = shader.uniformLocation("type");
-		uni_color = shader.uniformLocation("color");
-		uni_fog = shader.uniformLocation("fog");
 		setColorf(0.4f, 1.0f, 0.0f);
 	}
 	
@@ -89,6 +85,13 @@ public class KMat_Monotexture implements KMat_erial  {
 
 	@Override
 	public int bind(int type) {
+		if (shader == null) {
+			shader = KLoader.shaders.get("K_Monotexture");
+			uni_type = shader.uniformLocation("type");
+			uni_color = shader.uniformLocation("color");
+			uni_fog = shader.uniformLocation("fog");
+			
+		}
 		if (texture != null)
 			texture.bind();
 		else

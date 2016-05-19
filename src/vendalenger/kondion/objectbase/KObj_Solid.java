@@ -22,9 +22,14 @@ import org.joml.Vector3f;
 
 public abstract class KObj_Solid extends KObj_Renderable {
 	
+	public boolean axisAlign = true;
 	public boolean collide = false;
-	public boolean dynamic = false;
-	public boolean rotate = false;
+	public boolean anchor = false;
+	public float mass = 1.0f;
+	public float friction = 100.0f;
+	public int collideType = 1; // this type
+	public int collideCall = 1; // types to call collide function
+	public int collideMove = 1; // types that move this
 	
 	public final Matrix4f prevTransform;
 	public final Quaternionf rotVelocity;

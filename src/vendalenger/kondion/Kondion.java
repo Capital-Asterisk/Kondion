@@ -210,7 +210,7 @@ public class Kondion {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
-				loadingScreen = new JFrame("KONDION Game Engine");
+				/*loadingScreen = new JFrame("KONDION Game Engine");
 				loadingScreen.setLayout(new BorderLayout());
 				loadingScreen.setUndecorated(false);
 				loadingScreen
@@ -229,10 +229,11 @@ public class Kondion {
 				loadingScreen.add(imgl);
 				loadingScreen.pack();
 				loadingScreen.setLocationRelativeTo(null);
-				loadingScreen.setVisible(true);
+				loadingScreen.setVisible(true);*/
 			}
 
 		}).start();
+		
 		gameThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -381,8 +382,8 @@ public class Kondion {
 					Window.update();
 					KLoader.load();
 
-					loadingScreen.setVisible(false);
-					loadingScreen.dispose();
+					//loadingScreen.setVisible(false);
+					//loadingScreen.dispose();
 
 					gameLoop();
 				} catch (ScriptException e) {

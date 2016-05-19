@@ -236,7 +236,9 @@ public class Window {
 		System.out.println("Data model:       " + dataModel + " bit");
 		System.out.println("CPU Cores:        "
 				+ Runtime.getRuntime().availableProcessors());
-
+		System.out.println("LWJGL version:    " + org.lwjgl.Version.getVersion());
+		
+		//System.
 		//String os = System.getProperty("os.name").toLowerCase();
 		/*
 		// Detect the Operating system then load the appropriate lwjgl natives

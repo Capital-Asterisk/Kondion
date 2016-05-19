@@ -8,7 +8,10 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
 import vendalenger.kondion.objectbase.KObj_Node;
+import vendalenger.kondion.objectbase.KObj_Oriented;
+import vendalenger.kondion.objectbase.KObj_Solid;
 
 public class GKO_Client extends KObj_Node {
 	
@@ -43,9 +46,11 @@ public class GKO_Client extends KObj_Node {
 	
 	public void connect(String host, int port) {
 		if (t == null) {
+			
 			boolean running = true;
 			sendThis = new ArrayList<String>();
 			syncObjects = new ArrayList<KObj_Node>();
+			
 			t = new Thread(new Runnable() {
 				@Override
 				public void run() {
@@ -60,14 +65,99 @@ public class GKO_Client extends KObj_Node {
 									
 								//}
 								int bite = input.readByte() & 0xFF;
+								//System.out.println("Bite: " + bite);
 								if (bite == 17) {
 									// pong
 									System.out.println("Client: Reply to ping");
 									output.writeByte(18);
-								} else {
+									// if ((bite - 1) * (bite - 2) == 0) {
+								} else if (bite == 1 || bite == 2) {
+									// sync object
+									int ind = input.readInt();
+									KObj_Oriented node = (syncObjects.size() > ind) ? (KObj_Oriented) syncObjects.get(ind) : null;
+									if (node != null) {
+										
+										node.transform.m00 = input.readFloat();
+										node.transform.m01 = input.readFloat();
+										node.transform.m02 = input.readFloat();
+										node.transform.m03 = input.readFloat();
+										
+										node.transform.m10 = input.readFloat();
+										node.transform.m11 = input.readFloat();
+										node.transform.m12 = input.readFloat();
+										node.transform.m13 = input.readFloat();
+										
+										node.transform.m20 = input.readFloat();
+										node.transform.m21 = input.readFloat();
+										node.transform.m22 = input.readFloat();
+										node.transform.m23 = input.readFloat();
+									
+										node.transform.m30 = input.readFloat();
+										node.transform.m31 = input.readFloat();
+										node.transform.m32 = input.readFloat();
+										node.transform.m33 = input.readFloat();
+										//System.out.println("00: " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat());
+										//System.out.println("10: " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat());
+										//System.out.println("20: " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat());
+										//System.out.println("30: " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat());
+										
+										if (bite == 2 && node instanceof KObj_Solid) {
+											// velocity
+											//System.out.println("velocitu!");
+											
+											((KObj_Solid) node).velocity.x = input.readFloat();
+											((KObj_Solid) node).velocity.y = input.readFloat();
+											((KObj_Solid) node).velocity.z = input.readFloat();
+											//System.out.println("Velocity: " + input.readFloat() + " " + input.readFloat() + " " + input.readFloat());
+										}
+										
+									} else {
+										input.skipBytes(4 * 4 * 4);
+										if (bite == 2) {
+											input.skipBytes(4 * 3);
+											//((KObj_Solid) node).velocity.x = input.readFloat();
+											//((KObj_Solid) node).velocity.y = input.readFloat();
+											//((KObj_Solid) node).velocity.z = input.readFloat();
+										}
+									}
+									
+								} else if (bite == 64) {
+									int ind = input.readInt();
+									//System.out.println("bite");
+									if (s != null) {
+										ScriptObjectMirror array = (ScriptObjectMirror) s.get("func");
+										if (array != null) {
+											System.out.println("Client: " + array.getSlot(ind));
+											
+										}
+										
+									}
+									
+								} else if (bite == 65) {
+									//System.out.println("bite");
+									System.out.println("Avalibele: " + input.available());
+									int ind = input.readInt();
+									int ind2 = input.readInt();
+									if (s != null) {
+										ScriptObjectMirror array = (ScriptObjectMirror) s.get("func");
+										if (array != null) {
+											//System.out.println("WOOT: " + ind);
+											ScriptObjectMirror func = (ScriptObjectMirror) array.getSlot(ind);
+											KObj_Node nd = (KObj_Node) func.call(this, 0);
+											if (nd != null) {
+	
+												while (syncObjects.size() <= ind2) {
+													syncObjects.add(null);
+												}
+												syncObjects.set(ind2, nd);
+											}
+										 	
+										}
+										
+									}
 									
 								}
-								System.out.println("Client: " + bite);
+								//System.out.println("Client: " + bite);
 							} catch (IOException e) {
 								e.printStackTrace();
 								

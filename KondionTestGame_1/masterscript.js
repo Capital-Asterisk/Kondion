@@ -2,14 +2,28 @@
  * THE KONDION masterscript.js
  * Contains everything about KONDION TEST
  * 
- * 
+ * Object types
+ * 1 - Walls
+ * 2 - Players
+ * 4 - Enemies
+ * 8 - 
+ * 16 - Bullets
  * hey paolo.
  */
+
 var init = function() {
 	KJS.issueCommand("^eggs");
 	//^kdion.js (scene.addRenderable*(new KJS.r.Board*(*)*))
 
 };
+
+var sign = function(a) {
+	if (a == 0)
+		return 0;
+	else
+		return (a < 0) ? -1 : 1;
+	
+}
 
 var fpsGuy = function() {
 	var plane = new SKO_Cube();
@@ -18,7 +32,7 @@ var fpsGuy = function() {
 	camera.transform.rotateY(-3.14159 / 2);
 	camera.mode = 0;
 	plane.drag = new SKO_Cube();
-	plane.sound = new NKO_Audio(KJS.aud("viznut"));
+	plane.sound = new NKO_Audio(KJS.aud("bang"));
 	plane.sound.volume = 0.3;
 	//plane.drag.transform.translate(0.0, 0.2, 0);
 	//plane.drag.transform.scale(0.6, 0.05, 0.05);
@@ -36,6 +50,12 @@ var fpsGuy = function() {
 		mss: 0,
 		falling: false,
 		neaat: new Mat_Monotexture(),
+		bullet: {
+			collide: function(kobj, normal) {
+				if (kobj instanceof SKO_InfinitePlane && (kobj != plane.drag || kobj != plane))
+					this.obj.killMe = true;
+			}
+		},
 		onselect: function() {
 			KJS.i.setMouseLock(true);
 			
@@ -46,7 +66,7 @@ var fpsGuy = function() {
 		},
 		onupdate: function() {
 			
-			this.obj.hidden = this.on;
+			//this.obj.hidden = this.on;
 			
 			if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
 				camera.moveSpeed = 20;
@@ -69,15 +89,13 @@ var fpsGuy = function() {
 			if (this.on && KJS.i.mouseDown(0) && this.deb >= 0.05) {
 				var eggs = new SKO_Cube();
 				eggs.velocity.set(0, 0, 0);
-				camera.dir(eggs.velocity, 0, 0, -1, 100, false);
+				camera.dir(eggs.velocity, 0, 0, -1, 20, false);
+				eggs.collideType = 4;
+				eggs.collideMove = 1 | 4;
 				//eggs.transform.set(camera.transform);
 				eggs.transform.translate(this.obj.drag.actTransform.m30, this.obj.drag.actTransform.m31, this.obj.drag.actTransform.m32);
 				eggs.transform.scale(0.1, 0.1, 0.1);
-				eggs.s = {
-					collide: function(kobj, normal) {
-						this.obj.killMe = true;
-					}
-				};
+				eggs.s = this.bullet;
 				SCN[SCN.nextName("boolet")] = eggs;
 				SCN.rescan();
 				this.deb -= 0.05;
@@ -101,7 +119,7 @@ var fpsGuy = function() {
 				}
 				
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' ')) && this.on) {
-					this.obj.velocity.y = 2;
+					this.obj.velocity.y = 8;
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p')) && this.on) {
 					camera.transform.translate(0, 0.02, 0.08)
@@ -151,9 +169,95 @@ var fpsGuy = function() {
 	return plane;
 }
 
+var betterFps = function() {
+	var guy = new SKO_Cube();
+	guy.transform.scale(1, 2, 1);
+	guy.hidden = true;
+	guy.drag = new SKO_Cube();
+	guy.sound = new NKO_Audio(KJS.aud("bang"));
+	guy.sound.volume = 0.3;
+	//plane.drag.transform.translate(0.0, 0.2, 0);
+	//plane.drag.transform.scale(0.6, 0.05, 0.05);
+	
+	guy.drag.camera = new OKO_Camera_();
+	guy.drag.camera.transform.translate(0, 1, 0);
+	guy.drag.camera.mode = 0;
+
+	guy.s = {
+		camera: guy.drag.camera,
+		ctrUp: KJS.i.getButtonIndex("up"),
+		ctrDn: KJS.i.getButtonIndex("down"),
+		ctrLf: KJS.i.getButtonIndex("left"),
+		ctrRt: KJS.i.getButtonIndex("right"),
+		p: 0,
+		y: 0,
+		on: false,
+		onground: false,
+		walkAngle: 0,
+		walkSpeed: 0,
+		walk: new Vector3f(),
+		onupdate: function() {
+			this.walkSpeed = 2;
+			
+			var moveForward = 0, moveRight = 0;
+			if (KJS.i.buttonIsDown(this.ctrUp))
+				moveForward += 1;
+			if (KJS.i.buttonIsDown(this.ctrDn))
+				moveForward -= 1;
+			if (KJS.i.buttonIsDown(this.ctrLf))
+				moveRight -= 1;
+			if (KJS.i.buttonIsDown(this.ctrRt))
+				moveRight += 1;
+			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+				this.obj.velocity.y = 8;
+			}
+			this.y = (this.y + (-KJS.i.getMouseDX() / 100)) % (Math.PI * 2);
+			this.p = Math.max(Math.min(Math.PI / 2, this.p + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2);
+			guy.drag.camera.transform.setRotationYXZ(-Math.PI / 2, this.p, 0);
+			guy.drag.transform.setRotationYXZ(this.y, 0, 0);
+			//.transform.translate(this.speed * delta, 0, 0);
+			//this.obj.drag.transform.setRotationYXZ(-Math.PI / 2, this.p, 0); // formalitites
+			
+			//guy.hidden = this.on;
+			this.walk.set(0, 0, 0);
+			//print(moveForward + " " + moveRight);
+			guy.drag.dir(this.walk, moveForward,
+					0, moveRight, this.walkSpeed, false);
+			//print(this.walk);
+			guy.velocity.x += this.walk.x;
+			guy.velocity.y += this.walk.y;
+			guy.velocity.z += this.walk.z;
+			
+		},
+		onselect: function() {
+			
+		}
+	}
+	
+	return guy;
+}
+
+var zombie = function() {
+	var zarm = new SKO_Cube();
+	zarm.transform.scale(1, 2, 1);
+	zarm.sound = new NKO_Audio(KJS.aud("bang"));
+	zarm.sound.volume = 0.3;
+	//plane.drag.transform.translate(0.0, 0.2, 0);
+	//plane.drag.transform.scale(0.6, 0.05, 0.05);
+	
+	zarm.camera = camera;
+
+	zarm.s = {
+			
+	}
+	
+	return zarm;
+}
+
 var flyingThing = function() {
 	var plane = new SKO_Cube();
 	plane.transform.rotateY(Math.PI / 2);
+	plane.hidden = true;
 	plane.mod = new RKO_Obj(KJS.obj("coolthing"));
 	plane.mod.setMaterial(new Mat_Monotexture("bird"));
 
@@ -164,12 +268,12 @@ var flyingThing = function() {
 	plane.sound = new NKO_Audio(KJS.aud("noice"));
 	plane.sound.volume = 2.0;
 
-	plane.drag = new SKO_Cube();
-	plane.drag.transform.translate(0, 2, 0);
+	//plane.drag = new SKO_Cube();
+	//plane.drag.transform.translate(0, 2, 0);
 
-	plane.drag.drag = new SKO_Cube();
-	plane.drag.drag.transform.translate(0, 2, 0);
-	plane.drag.drag.setMaterial(new Mat_Monotexture("K_Cube"));
+	//plane.drag.drag = new SKO_Cube();
+	//plane.drag.drag.transform.translate(0, 2, 0);
+	//plane.drag.drag.setMaterial(new Mat_Monotexture("K_Cube"));
 	
 	plane.s = {
 		on: false,
@@ -196,8 +300,8 @@ var flyingThing = function() {
 			var doot = normal.dot(this.up);
 			//KJS.d.wheels = "(" + Math.floor(this.up.x * 100) + ", " + Math.floor(this.up.y * 100) + ", " + Math.floor(this.up.z * 100) + ")";
 			KJS.d.wheels = doot;
-			if (doot > -0.97)
-				this.speed *= Math.pow(0.004, delta) / 1.0;
+			//if (doot > -0.97)
+			//	this.speed *= Math.pow(0.004, delta) / 1.0;
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 		},
 		onupdate: function() {
@@ -246,7 +350,7 @@ var flyingThing = function() {
 
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('v'))) {
 					//plane.rotVelocity.rotateX(-0.2 * delta);
-					this.vy -= 20 * delta;
+					this.vy -= 0.5 * delta;
 				}
 
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('f'))) {
@@ -346,20 +450,13 @@ var flyingThing = function() {
 	return plane;
 }
 
-var sign = function(a) {
-	if (a == 0)
-		return 0;
-	else
-		return (a < 0) ? -1 : 1;
-	
-}
-
 var fanbot = function() {
 	var verybase = new SKO_Cube();
 	var material = new Mat_Monotexture("fanbot");
 	var camera = new OKO_Camera_(); // third person camera
 	verybase.transform.rotateY(Math.PI / 2);
-	verybase.hidden = true;
+	//verybase.hidden = fal;
+	verybase.transform.scale(1.4, 1.4, 1.4);
 	verybase.base = new RKO_Obj(KJS.obj("fanbot_base"));
 	verybase.base.setMaterial(material);
 	verybase.base.transform.translate(0, -0.5, 0);
@@ -400,13 +497,18 @@ var fanbot = function() {
 			this.cameraP += ((Math.max(Math.min(Math.PI / 2, this.cameraP + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2)) - this.cameraP) / 8;
 			//this.headRot += (sign(this.headRot + sign(this.cameraP - this.headRot) * delta) == sign(this.headRot)) ? sign(this.cameraP - this.headRot) * delta : this.headRot - this.cameraP;
 			this.obj.base.head.transform.setRotationYXZ(0, this.cameraP, 0);
-			//this.camera.transform.translate(0, 0, 4);
+			//this.camera.transform.translate(0, 0, 4);#
 			//public void dir(Matrix4f in, float x, float y, float z, float amt, boolean local) {
 			//this.camera.transform.rotateY(0.01);
+			this.obj.changed = true;
 			this.obj.transform.setRotationYXZ(this.angle, 0, 0);
 			if (this.on) {
 				//this.speed = 0;
 				this.moving = false;
+				
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+					this.obj.velocity.y = 2;
+				}
 				
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w'))) {
 					this.prefAngle = this.cameraY;
@@ -476,3 +578,4 @@ var start = function() {
 	KJS.s.clear();
 	KJS.s.load("ktg1:scenes/gameA");
 };
+

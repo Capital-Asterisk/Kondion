@@ -9,19 +9,52 @@ World.passes.add(new GKO_DeferredPass(0));
 
 // Add light
 SCN.LightB = new RKO_DirectionalLight();
-// Add ground, and that moving thing
-SCN.Ground = new SKO_InfinitePlane();
-SCN.Wallz = new SKO_InfinitePlane();
-
-// Do stuff
-SCN.Ground.transform.rotateX(-Math.PI / 2);
-SCN.Ground.textureSize = 100;
-SCN.Ground.transform.translate(0, 0, 0);
-//SCN.LightB
 SCN.LightB.color.set(1.0, 1.0, 1.0, 1.0);
-SCN.Wallz.transform.translate(0, 0, -40);
-SCN.Wallz.textureSize = 50;
-SCN.Wallz.transform.rotateX(-Math.PI / 2);
+// Add ground and wall
+SCN.Floor = new SKO_InfinitePlane();
+SCN.Floor.transform.rotateX(-Math.PI / 2);
+SCN.Floor.textureSize = 128;
+SCN.Floor.transform.translate(0, 0, -64);
+
+SCN.Ceil = new SKO_InfinitePlane();
+SCN.Ceil.transform.rotateX(Math.PI / 2);
+SCN.Ceil.textureSize = 128;
+SCN.Ceil.transform.translate(0, 0, -64);
+
+// shape generator thing
+var sides = 6;
+for (var i = 0; i < sides; i++) {
+	
+	var wall = new SKO_InfinitePlane();
+	wall.transform.rotateY((Math.PI * 2) / sides * i);
+	wall.textureSize = 128;
+	wall.transform.translate(0, 0, -300);
+	wall.collideType = 4;
+	SCN[SCN.nextName("Side")] = wall;
+	
+}
+
+//SCN.Wallz.transform.translate(0, 0, -40);
+//SCN.Wallz.textureSize = 50;
+//SCN.Wallz.transform.rotateX(-Math.PI / 2);
+
+SCN.Platform = new SKO_Cube();
+SCN.Platform.transform.translate(0, 10, 0);
+SCN.Platform.transform.scale(3, 9, 3);
+SCN.Platform.anchor = true;
+SCN.Platform.setMaterial(new Mat_Monotexture("K_Cube"));
+SCN.Platform.s = {
+	onupdate: function() {
+		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('b')))
+			this.obj.rotVelocity.x = 0.1;
+	}
+}
+
+//SCN.PlatformB = new SKO_Cube();
+//SCN.PlatformB.transform.translate(0, -10, 0);
+//SCN.PlatformB.transform.scale(3, 3, 3);
+//SCN.PlatformB.anchor = true;
+//SCN.PlatformB.setMaterial(new Mat_Monotexture("K_Cube"));
 
 KJS.d["------ Controls ------"] = 0;
 KJS.d["Z: Hold to switch camera / character"] = 0;
@@ -32,17 +65,18 @@ KJS.d["QE: YAW"] = 0;
 KJS.d["V: Do not press"] = 0;
 KJS.d["----------------------"] = 0;
 
-SCN.guy = fpsGuy();
+SCN.guy = betterFps();
 SCN.planeA = flyingThing();
 SCN.planeB = flyingThing();
 SCN.FanBot = fanbot();
+SCN.guy.transform.m30 = 40;
 SCN.FanBot.transform.m30 = 20;
 SCN.planeB.transform.m30 = 6211000;
 SCN.s.players = [SCN.guy, SCN.planeA, SCN.FanBot, SCN.planeB];
 SCN.guy.s.on = true;
 SCN.s.currentPlayer = 0;
 
-for (var i = 0; i < 2; i++) {
+for (var i = 0; i < 20; i++) {
 	var cube = new SKO_Cube();
 	cube.morecube = new SKO_Cube(0);
 	cube.transform.translate((i - 50) * 7, Math.random() * 20, Math.random() * 100);
@@ -114,10 +148,10 @@ World.compositor = function(ctx, passes) {
 }
 SCN.Camera = new OKO_Camera_();
 SCN.Camera.moveTo(0, 4, 0);
-SCN.Durian = new SKO_Cube();
+
 SCN.s.onupdate = function() {
 	//SCN.eggs.transform.rotateZ(0.01);
-	SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
+	//SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
 	World.camera = this.players[this.currentPlayer].s.camera;
 	if (KJS.i.mouseDown(1)) {
 		KJS.i.setMouseLock(false);
@@ -139,3 +173,42 @@ SCN.s.onupdate = function() {
 }
 
 SCN.rescan();
+
+
+var serverTest = function() {
+	SCN.Server = new GKO_Server();
+	SCN.Server.start(24558, 5);
+	//SCN.Server.track(SCN.FanBot, 1);
+}
+
+var connectClientTest = function(host) {
+	var client = new GKO_Client();
+	client.s = {
+		func: [
+			function() { // make fan
+				return null;
+			},
+			function() { // make fan
+				var verybase = new SKO_Cube();
+				var material = new Mat_Monotexture("fanbot");
+				var camera = new OKO_Camera_(); // third person camera
+				verybase.transform.rotateY(Math.PI / 2);
+				verybase.hidden = true;
+				verybase.base = new RKO_Obj(KJS.obj("fanbot_base"));
+				verybase.base.setMaterial(material);
+				verybase.base.transform.translate(0, -0.5, 0);
+				verybase.base.head = new RKO_Obj(KJS.obj("fanbot_head"));
+				verybase.base.head.setMaterial(material);
+				verybase.base.head.transform.translate(0, 1.1, 0.25);
+				verybase.base.head.fan = new RKO_Obj(KJS.obj("fanbot_fan"));
+				verybase.base.head.fan.setMaterial(material);
+				verybase.base.head.fan.transform.translate(0, 1.85961 - 1.1, 0.31 - 0.25);
+				SCN[SCN.nextName("Fans")] = verybase;
+				return verybase;
+			}
+		]
+	}
+	
+	client.connect(host, 24558);
+	SCN[SCN.nextName("Client")] = client;
+}

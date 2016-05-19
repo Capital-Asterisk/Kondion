@@ -29,7 +29,6 @@ import jdk.nashorn.api.scripting.ScriptObjectMirror;
 public abstract class KObj_Node implements Map<String, KObj_Node> {
 
 	protected boolean pointer = false;
-	
 	protected final List<KObj_Node> children;
 	protected final List<String> childNames;
 	protected KObj_Node parent;
