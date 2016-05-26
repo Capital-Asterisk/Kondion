@@ -1,37 +1,33 @@
 package vendalenger.kondion.materials;
 
-import static org.lwjgl.opengl.GL11.*;
-import static org.lwjgl.opengl.GL20.*;
-import static org.lwjgl.opengl.EXTFramebufferObject.*;
+import static org.lwjgl.opengl.GL20.glUniform1f;
+import static org.lwjgl.opengl.GL20.glUniform1i;
+import static org.lwjgl.opengl.GL20.glUniform4f;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.resource.KLoader;
 import vendalenger.kondion.lwjgl.resource.KShader;
+import vendalenger.kondion.lwjgl.resource.KTexture;
 
 /**
  * 
  * 
  */
-public class KMat_FlatColor implements KMat_erial {
-	
+public class KMat_Water implements KMat_erial  {
+
+	public KTexture texture;
 	private KShader shader;
 	private float r, g, b, a;
 	private int uni_type, uni_fog, uni_color;
-	private boolean alpha = false;
+	private boolean alpha;
 	
-	public KMat_FlatColor() {
-		this(0.6f, 0.6f, 0.6f);
-		//setColorf(0.4f, 1.0f, 0.0f);
-		//setColorf(0.6f, 0.6f, 0.6f); 
+	public KMat_Water() {
+		setColorf(0.4f, 1.0f, 0.0f);
 	}
 	
-	public KMat_FlatColor(float r, float g, float b) {
-		shader = KLoader.shaders.get("K_FlatCol");
-		uni_type = shader.uniformLocation("type");
-		uni_color = shader.uniformLocation("color");
-		uni_fog = shader.uniformLocation("fog");
-		//setColorf(0.4f, 1.0f, 0.0f);
-		setColorf(r, g, b); 
+	public KMat_Water(String nom) {
+		this();
+		texture = Kondion.kjs.texture(nom);
 	}
 	
 	/**
@@ -89,13 +85,22 @@ public class KMat_FlatColor implements KMat_erial {
 
 	@Override
 	public int bind(int type) {
-		
+		if (shader == null) {
+			shader = KLoader.shaders.get("K_Monotexture");
+			uni_type = shader.uniformLocation("type");
+			uni_color = shader.uniformLocation("color");
+			uni_fog = shader.uniformLocation("fog");
+			
+		}
+		if (texture != null)
+			texture.bind();
+		else
+			KLoader.getMissingTexture().bind();
 		shader.useProgram();
 		//KondionShader.uniform1i(eggs, (int) Kondion.getFrame());
-		glUniform4f(uni_color, r, g, b, alpha ? a : 1.0f);
+		glUniform4f(uni_color, r, g, b, a);
 		glUniform1f(uni_fog, Kondion.getWorld().fogIntensity);
 		glUniform1i(uni_type, type);
-		
 		return 0;
 	}
 

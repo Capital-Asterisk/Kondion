@@ -64,12 +64,13 @@ public class SKO_Cube extends KObj_Solid {
 			// rotVelocity.x *= 0.992;
 			// rotVelocity.y *= 0.992;
 			// rotVelocity.z *= 0.992;
-
-			velocity.y -= Kondion.getDelta() * 9.806;
 			rotVelocity.normalize();
-			transform.m30 += velocity.x * Kondion.getDelta();
-			transform.m31 += velocity.y * Kondion.getDelta();
-			transform.m32 += velocity.z * Kondion.getDelta();
+			if (!anchor) {
+				velocity.y -= Kondion.getDelta() * 9.806;
+				transform.m30 += velocity.x * Kondion.getDelta();
+				transform.m31 += velocity.y * Kondion.getDelta();
+				transform.m32 += velocity.z * Kondion.getDelta();
+			}
 			// rotVelocity.
 		}
 
@@ -78,7 +79,7 @@ public class SKO_Cube extends KObj_Solid {
 	@Override
 	public CollisionData collisionCheck(KObj_Solid kobj) {
 
-		if (kobj instanceof SKO_InfinitePlane) {
+		if (kobj instanceof SKO_InfinitePlane && !anchor) {
 			// actTransform.
 			/*temp1.set(actTransform.m30, actTransform.m31, actTransform.m32);
 			// temp1.mulPoint(actTransform);
@@ -141,9 +142,10 @@ public class SKO_Cube extends KObj_Solid {
 					dirs[2] = (velocity.z == 0) ? 0 : ((velocity.z < 0) ? (byte) 1 : (byte) -1);
 					if (!(dirs[0] == 0 && dirs[1] == 0 && dirs[2] == 0)) {
 						velocity.normalize(temp1);
-						temp1.mul(friction + kobj.friction);
-						temp1.mul(Kondion.getDelta());
+						temp1.div(divFriction * kobj.divFriction);
+						//temp1.mul();
 						//System.out.println(temp1.x);
+						temp1.mul(1 - Math.min(Kondion.getDelta(), 1));
 						velocity.sub(temp1);
 						if (((dirs[0] >= 0) ^ (velocity.x < 0)))
 							velocity.x = 0;
@@ -267,9 +269,30 @@ public class SKO_Cube extends KObj_Solid {
 							}
 							
 						}
+						
 					}
 					
-					
+					dirs[0] = (velocity.x == 0) ? 0 : ((velocity.x < 0) ? (byte) 1 : (byte) -1);
+					dirs[1] = (velocity.y == 0) ? 0 : ((velocity.y < 0) ? (byte) 1 : (byte) -1);
+					dirs[2] = (velocity.z == 0) ? 0 : ((velocity.z < 0) ? (byte) 1 : (byte) -1);
+					if (!(dirs[0] == 0 && dirs[1] == 0 && dirs[2] == 0)) {
+						velocity.normalize(temp1);
+						temp1.div(divFriction * kobj.divFriction);
+						//temp1.mul();
+						//System.out.println(temp1.x);
+						temp1.mul(1 - Math.min(Kondion.getDelta(), 1));
+						velocity.sub(temp1);
+						//System.out.println(temp1.x);
+						velocity.sub(temp1);
+						if (((dirs[0] >= 0) ^ (velocity.x < 0)))
+							velocity.x = 0;
+						if (((dirs[1] >= 0) ^ (velocity.y < 0)))
+							velocity.y = 0;
+						if (((dirs[2] >= 0) ^ (velocity.z < 0)))
+							velocity.z = 0;
+						
+						
+					}
 					//velocity.x *= dirs[0] * -1;
 					//velocity.y *= dirs[1] * -1;
 					//velocity.z *= dirs[2] * -1;
@@ -312,8 +335,11 @@ public class SKO_Cube extends KObj_Solid {
 		//actTransform.getRotation(dest)
 		buffer.clear();
 		//actTransform.transform(v)
+		//GL11.glLoadMatrix
 		actTransform.get(buffer);
 		glMultMatrixf(buffer);
+		
+		//GL11.glLoadMatrixf(buffer);
 		// eggs.useProgram();
 		if (material != null)
 			material.bind(type);
@@ -326,7 +352,7 @@ public class SKO_Cube extends KObj_Solid {
 			material.unbind();
 		glPopMatrix();
 		
-		glPushMatrix();
+		/*glPushMatrix();
 		// Render bounding box
 		GL11.glLineWidth(1.0f);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
@@ -345,11 +371,23 @@ public class SKO_Cube extends KObj_Solid {
 		GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glPopMatrix();
 		
-		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);
+		GL11.glPolygonMode(GL11.GL_FRONT_AND_BACK, GL11.GL_FILL);*/
 	}
 
 	@Override
 	public void updateB() {
 		defaultUpdateB();
+	}
+
+	@Override
+	public boolean checkPoint(float x, float y, float z) {
+		temp1.set(
+				(Math.abs(actTransform.m00) + Math.abs(actTransform.m10) + Math.abs(actTransform.m20)) / 2.0f,
+				(Math.abs(actTransform.m01) + Math.abs(actTransform.m11) + Math.abs(actTransform.m21)) / 2.0f,
+				(Math.abs(actTransform.m02) + Math.abs(actTransform.m12) + Math.abs(actTransform.m22)) / 2.0f);
+		
+		return (temp1.x > Math.abs(x - actTransform.m30)
+				&& temp1.y > Math.abs(y - actTransform.m31)
+				&& temp1.z > Math.abs(z - actTransform.m32));
 	}
 }

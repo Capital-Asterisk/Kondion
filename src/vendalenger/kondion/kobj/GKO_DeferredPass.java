@@ -191,10 +191,13 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 				//glPopMatrix();
 				
 				for (int i = 0; i < items.size(); i++) {
-					if (!items.get(i).killMe)
-						if (!items.get(i).hidden)
+					if (!items.get(i).killMe) {
+						if (!items.get(i).hidden) {
 							items.get(i).render(30, this);
-					else {
+						}
+							
+					} else {
+						System.out.println("Remove: " + i);
 						items.remove(i);
 						i --;
 					}

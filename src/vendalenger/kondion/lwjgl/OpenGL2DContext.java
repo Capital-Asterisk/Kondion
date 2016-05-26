@@ -165,7 +165,7 @@ public class OpenGL2DContext extends JSContext2D {
 
 	@Override
 	public void rotate(float angle) {
-		glRotatef(angle, 0, 0, 1);
+		glRotatef(angle * 57.295779513f, 0, 0, 1);
 	}
 
 	@Override

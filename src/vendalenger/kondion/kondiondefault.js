@@ -47,6 +47,7 @@ var SKO_InfinitePlane = Java.type("vendalenger.kondion.kobj.SKO_InfinitePlane");
 
 var Mat_FlatColor = Java.type("vendalenger.kondion.materials.KMat_FlatColor");
 var Mat_Monotexture = Java.type("vendalenger.kondion.materials.KMat_Monotexture");
+var Mat_Strange = Java.type("vendalenger.kondion.materials.KMat_Strange");
 
 var RKO_AmbientLight = Java.type("vendalenger.kondion.kobj.RKO_Light");
 var RKO_DirectionalLight = Java.type("vendalenger.kondion.kobj.RKO_DirLight");
@@ -65,5 +66,9 @@ var patchObject = function(obj, patch) {
 
 var kondionInit = function() {
 	SCN.s = {};
+	Math.sign = function(a) {
+		// This wasn't in nashorn and I considered it important
+		return (a == 0) ? 0 : ((a > 0) ? 1 : -1);
+	}
 	delete kondionInit;
 }

@@ -44,7 +44,9 @@ import static org.lwjgl.system.MemoryUtil.NULL;
 
 import java.io.File;
 import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 
 import org.joml.Matrix4f;
@@ -54,13 +56,13 @@ import org.lwjgl.glfw.GLFWKeyCallback;
 import org.lwjgl.glfw.GLFWVidMode;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.AL11;
 import org.lwjgl.openal.ALC;
 import org.lwjgl.openal.ALC10;
 import org.lwjgl.openal.ALC11;
 import org.lwjgl.openal.ALCCapabilities;
 import org.lwjgl.openal.ALCapabilities;
-import org.lwjgl.openal.ALContext;
-import org.lwjgl.openal.ALDevice;
+import org.lwjgl.openal.ALUtil;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.objectbase.KObj_Solid;
@@ -69,12 +71,13 @@ public class Window {
 	
 	private static int windowWidth, windowHeight;
 	private static long window;
-	private static ALContext ac;
+	//private static ALContext ac;
 	private static GLFWKeyCallback keyCallback;
 
 	public static void end() {
 		//ac.destroy();
-		AL.destroy(ac);
+		
+		//AL.destroy(ac);
 		glfwDestroyWindow(Window.getWindow());
 	}
 
@@ -122,7 +125,7 @@ public class Window {
 		windowHeight = height;
 		GLFWErrorCallback errorCallback;
 		glfwSetErrorCallback(errorCallback = GLFWErrorCallback.createPrint(System.err));
-		if (glfwInit() != GL_TRUE) {
+		if (!glfwInit()) {
 			throw new IllegalStateException(
 					"Error in initializing GLFW Error callback");
 		}
@@ -143,7 +146,7 @@ public class Window {
 			public void invoke(long window, int key, int scancode, int action,
 					int mods) {
 				if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
-					glfwSetWindowShouldClose(window, GL_TRUE); // We will detect
+					glfwSetWindowShouldClose(window, true); // We will detect
 																// this in our
 																// rendering
 																// loop
@@ -163,48 +166,95 @@ public class Window {
 		
 		System.out.println("Initialize OpenAL...");
 		
+		//AL.createCapabilities(null);
+		//ALC.destroy();
+		//ALC.create();
 		//ALC.create();
 		//if (devnotsdaorsdb == NULL) {
 		//	System.err.println("Unable to open sound device");
 		//}
-		ac = ALContext.create();
-		System.out.println(ac.getCapabilities().OpenAL10);
-		System.out.println(ac.getCapabilities().OpenAL11);
-		System.out.println(ac.isCurrent());
+		
+		
+		
+		//System.out.println(success + " " + ALC10.alcGetCurrentContext() + " " + context);
+		
+		//ALC10.alcDestroyContext(context);
+		//System.out.println(ALC10.alcGetString(0, ALC10.ALC_DEVICE_SPECIFIER));
+		//long a = ALC10.alcOpenDevice("OpenAL");
+		//System.out.println("woot: " + a);
+		//ALC10.alcCreateContext(a, new int[] {});
+		//ac = ALContext.create();
+		//System.out.println(ac.getCapabilities().OpenAL10);
+		//System.out.println(ac.getCapabilities().OpenAL11);
+		//System.out.println(ac.isCurrent());
 		
 		//long devnotsdaorsdb = ALC10.alcOpenDevice((ByteBuffer) null);
-		//ALC10.alcOpenDevice(deviceSpecifier)
-		System.out.println(AL10.AL_NO_ERROR);
-		/*int buff = AL10.alGenBuffers();
+		
+		//System.out.println(AL10.AL_NO_ERROR);
+		//long device = ALC10.nalcOpenDevice(devnotsdaorsdb);
+		//long context = ALC10.alcCreateContext(devnotsdaorsdb, (IntBuffer) null);
+		//boolean success = ALC10.alcMakeContextCurrent(context);
+		//System.out.println("success: " + success);
+		//AL.
+		
+		long device = ALC10.alcOpenDevice((ByteBuffer)null);
+		if ( device == NULL )
+			throw new IllegalStateException("Failed to open the default device.");
+		ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+		
+		System.out.println("OpenALC10: " + deviceCaps.OpenALC10);
+		System.out.println("OpenALC11: " + deviceCaps.OpenALC11);
+		System.out.println("caps.ALC_EXT_EFX = " + deviceCaps.ALC_EXT_EFX);
+		
+		if ( deviceCaps.OpenALC11 ) {
+			List<String> devices = ALUtil.getStringList(NULL, ALC11.ALC_ALL_DEVICES_SPECIFIER);
+			if (devices == null)
+				System.out.println("oh no");
+			else {
+				System.out.println("Audio Devices detected:");
+				for ( int i = 0; i < devices.size(); i++ )
+					System.out.println((i + 1) + ": " + devices.get(i));
+			}
+		}
+
+		String defaultDeviceSpecifier = ALC10.alcGetString(NULL, ALC10.ALC_DEFAULT_DEVICE_SPECIFIER);
+		//assertTrue(defaultDeviceSpecifier != null);
+		System.out.println("Default device: " + defaultDeviceSpecifier);
+
+		long context = ALC10.alcCreateContext(device, (IntBuffer)null);
+		ALC10.alcMakeContextCurrent(context);
+		AL.createCapabilities(deviceCaps);
+		
+		//int buff = AL10.alGenBuffers();
 		//ByteBuffer buffy = BufferUtils.createByteBuffer(80000);
-		int size = 3000;
-		ByteBuffer buffy = BufferUtils.createByteBuffer(size);
-		for (int t = 0; t < size; t++) {
-			buffy.put((byte) ((Math.random() * 255 * ((double) (t - size) / size)) - 127));
+		//int size = 3000;
+		//ByteBuffer buffy = BufferUtils.createByteBuffer(size);
+		//for (int t = 0; t < size; t++) {
+		//	buffy.put((byte) ((Math.random() * 255 * ((double) (t - size) / size)) - 127));
 			
 			//buffy.put((byte)(((i / 6) % 2) * Byte.MAX_VALUE - 127));
 			//buffy.put((byte) ((t / 2 * (((t >> 4 | t) >> 8) % 11) & 255) / 4 + (t * (((t >> 5 | t) >> 8) % 11) & 100) / 2));
 			//new Random().
-		}
+		//}
 		//byte[] f = new byte[1000];
 		//for (int i = 0; i < f.length; i++) {
 		//	f[i] *= i / 1000;
 		//}
 		//new Random().nextBytes(f);
 		//buffy.put(f);
-		buffy.flip();
-		AL10.alBufferData(buff, AL10.AL_FORMAT_MONO8, buffy, 16000);
-		System.out.println(AL10.alGetError());
-		src = AL10.alGenSources();
-		AL10.alSourcei(src, AL10.AL_BUFFER, buff);
-		AL10.alSourcef(src, AL10.AL_PITCH, 1.0f);
-		AL10.alSourcef(src, AL10.AL_GAIN, 1.0f);
-		AL10.alSource3f(src, AL10.AL_POSITION, 0.0f, 0.0f, 0.0f);
-		AL10.alSource3f(src, AL10.AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-		AL10.alSourcePlay(src);
-		System.out.println("Sources: " + ALC11.ALC_MONO_SOURCES);
-		System.out.println(AL10.alGetError());
-		// TTT.Two();*/
+		//buffy.flip();
+		//AL10.alBufferData(buff, AL10.AL_FORMAT_MONO8, buffy, 16000);
+		//System.out.println(AL10.alGetError());
+		//int src = AL10.alGenSources();
+		//AL10.alSourcei(src, AL10.AL_BUFFER, buff);
+		//AL10.alSourcef(src, AL10.AL_PITCH, 1.0f);
+		//AL10.alSourcef(src, AL10.AL_GAIN, 1.0f);
+		//AL10.alSource3f(src, AL10.AL_POSITION, 0.0f, 0.0f, 0.0f);
+		//AL10.alSource3f(src, AL10.AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+		//AL10.alSourcePlay(src);
+		//System.out.println("Sources: " + ALC11.ALC_MONO_SOURCES);
+		//System.out.println(AL10.alGetError());
+		// TTT.Two();
 	}
 	/*public static int src;
 	public static void poopy() {

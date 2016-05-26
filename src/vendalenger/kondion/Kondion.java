@@ -33,6 +33,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.function.Function;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -50,6 +51,8 @@ import argo.jdom.JdomParser;
 import argo.jdom.JsonNode;
 import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
+import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import jdk.nashorn.internal.ir.FunctionNode;
 import jdk.nashorn.internal.parser.JSONParser;
 import vendalenger.kondion.js.KJS;
 import vendalenger.kondion.kobj.GKO_Scene;
@@ -118,7 +121,7 @@ public class Kondion {
 		
 		startTime = System.currentTimeMillis();
 		
-		while (glfwWindowShouldClose(Window.getWindow()) == GL_FALSE) {
+		while (glfwWindowShouldClose(Window.getWindow()) == false) {
 			
 			prevTime = System.nanoTime();
 			delta = time / 1000000000.0f;
@@ -178,7 +181,10 @@ public class Kondion {
 	}
 
 	public static float getDelta() {
-		return delta;
+		if (world.fixFrame > 0) {
+			return 1.0f / (float) world.fixFrame;
+		} else
+			return delta;
 	}
 	
 	/**
@@ -252,12 +258,14 @@ public class Kondion {
 					GL.createCapabilities();
 					GLDrawing.setup();
 					///FlatDrawing.
-					
 					jsEngine = new ScriptEngineManager()
 							.getEngineByName("nashorn");
 
-					System.out.print("Loading Javascript...");
-
+					System.out.println("Loading Javascript...");
+					
+					//((ScriptObjectMirror) jsEngine.get("Math")).setMember("sign", );
+					
+					//System.out.println((((ScriptObjectMirror) jsEngine.get("wurla")).get("eggs").getClass()));
 					jsEngine.eval(new BufferedReader(
 							new InputStreamReader(getClass()
 									.getResourceAsStream("kondiondefault.js"))));

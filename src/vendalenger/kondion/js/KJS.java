@@ -30,6 +30,7 @@ import vendalenger.kondion.lwjgl.resource.KAudio;
 import vendalenger.kondion.lwjgl.resource.KLoader;
 import vendalenger.kondion.lwjgl.resource.KModel;
 import vendalenger.kondion.lwjgl.resource.KTexture;
+import vendalenger.kondion.objectbase.KObj_Solid;
 import vendalenger.port.Command;
 
 public class KJS {
@@ -112,6 +113,24 @@ public class KJS {
 	public KAudio aud(String name) {
 		KAudio t = KLoader.aud.get(name);
 		return t;
+	}
+	
+	public KObj_Solid raycast(Vector3f result, float sx, float sy, float sz, float tx, float ty, float tz, int steps, int types) {
+		
+		Vector3f testPoint = new Vector3f();
+		
+		for (int i = 0; i < steps; i ++) {
+			result.set(sx + tx * i, sy + ty * i, sz + tz * i);
+			KObj_Solid f = Kondion.getCurrentScene().checkPointCollision(result.x, result.y, result.z, types);
+			
+			if (f != null) {
+				
+				return f;
+			}
+			
+		}
+		
+		return null;
 	}
 	
 	public long currentTime() {

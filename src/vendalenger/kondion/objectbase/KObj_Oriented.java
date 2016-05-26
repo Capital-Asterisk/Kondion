@@ -23,6 +23,7 @@ import org.joml.Vector3f;
 public abstract class KObj_Oriented extends KObj_Node {
 	
 	//public static final int 
+	public boolean transferScale = true;
 	private final Vector3f temp0 = new Vector3f();
 	public final Matrix4f transform = new Matrix4f();
 	public final Matrix4f actTransform = new Matrix4f();
@@ -34,6 +35,9 @@ public abstract class KObj_Oriented extends KObj_Node {
 		actTransform.identity();
 		if (parent instanceof KObj_Oriented) {
 			((KObj_Oriented) parent).multiplyByAct(actTransform);
+			if (!transferScale) {
+				actTransform.normalize3x3();
+			}
 		}
 		//System.out.println("PARENT: " + parent);
 		actTransform.mul(transform);

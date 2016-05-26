@@ -23,20 +23,23 @@
 		"down": ["Down Button", "key", "s"],
 		"left": ["Left Button", "key", "a"],
 		"right": ["Right button", "key", "d"],
-		"open": ["Open a door", "key", "e"]
+		"open": ["Open a door", "key", "e"],
+		"select": ["Press buttons", "key", " "]
 	},
 	"Graphics": {
 		"titlepic": ["image/titlepic", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 	
 		"select_l": ["image/selector/left", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"select_r": ["image/selector/right", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"select": ["image/selector/selector", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 	
 		"human": ["living/human", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"eggs": ["maps/noah", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"neat": ["kaytrav", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"noah": ["maps/ktt", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"bird": ["maps/moreeggs", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-		"fanbot": ["models/fanbot/texture", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
+		"fanbot": ["models/fanbot/texture", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"d4l558": ["models/wepon/4l558/uv", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
 	},
 	"OBJ": {
 		"kaytrav": ["models/kaytrav", "neat"],
@@ -44,8 +47,8 @@
 		"durian": ["models/durian", "neat"],
 		"fanbot_base": ["models/fanbot/base", "neat"],
 		"fanbot_head": ["models/fanbot/head", "neat"],
-		"fanbot_fan": ["models/fanbot/fan", "neat"]
-		
+		"fanbot_fan": ["models/fanbot/fan", "neat"],
+		"deli_4l558": ["models/wepon/4l558/D4L558", "neat"]
 		
 	},
 	"Audio": {

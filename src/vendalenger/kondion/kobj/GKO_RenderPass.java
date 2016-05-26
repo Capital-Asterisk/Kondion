@@ -270,6 +270,11 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 		System.out.println("Retextured");
 	}
 	
+	public void guiClick(int button, boolean mouse) {
+		if (selected != null)
+			selected.click(button, mouse);
+	}
+	
 	public void guiShift(int dir) {
 		if (selected == null) {
 			selected = gui.get(0);
@@ -291,7 +296,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				default:
 				break;
 			}
-			System.out.println(comp);
+			//System.out.println(comp);
 			if (comp != null)
 				selected = comp;
 		}

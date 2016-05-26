@@ -17,14 +17,6 @@ var init = function() {
 
 };
 
-var sign = function(a) {
-	if (a == 0)
-		return 0;
-	else
-		return (a < 0) ? -1 : 1;
-	
-}
-
 var fpsGuy = function() {
 	var plane = new SKO_Cube();
 	var camera = new OKO_Camera_();
@@ -176,13 +168,29 @@ var betterFps = function() {
 	guy.drag = new SKO_Cube();
 	guy.sound = new NKO_Audio(KJS.aud("bang"));
 	guy.sound.volume = 0.3;
+	guy.divFriction = 1.1;
+	guy.collideType = 2;
 	//plane.drag.transform.translate(0.0, 0.2, 0);
 	//plane.drag.transform.scale(0.6, 0.05, 0.05);
 	
 	guy.drag.camera = new OKO_Camera_();
-	guy.drag.camera.transform.translate(0, 1, 0);
+	guy.drag.camera.transferScale = false;
+	guy.drag.camera.transform.translate(0, 0.25, 0);
 	guy.drag.camera.mode = 0;
-
+	
+	guy.drag.camera.weapon = new RKO_Obj(KJS.obj("deli_4l558"));
+	guy.drag.camera.weapon.setMaterial(new Mat_Monotexture("d4l558"));
+	guy.drag.camera.weapon.transform.translate(0.5, -0.2, -0.8);
+	guy.drag.camera.weapon.transform.rotateX(Math.PI / 2);
+	guy.drag.camera.weapon.transform.rotateZ(Math.PI);
+	guy.drag.camera.weapon.transform.scale(0.05, 0.05, 0.05);
+	
+	SCN.TargetBlock = new SKO_Cube();
+	SCN.TargetBlock.collideType = 32;
+	SCN.TargetBlock.collideMove = 32;
+	SCN.TargetBlock.collideCall = 32;
+	SCN.TargetBlock.anchor = true;
+	
 	guy.s = {
 		camera: guy.drag.camera,
 		ctrUp: KJS.i.getButtonIndex("up"),
@@ -191,43 +199,113 @@ var betterFps = function() {
 		ctrRt: KJS.i.getButtonIndex("right"),
 		p: 0,
 		y: 0,
+		mss: 0,
+		falling: false,
 		on: false,
 		onground: false,
 		walkAngle: 0,
-		walkSpeed: 0,
+		walkSpeed: 13,
 		walk: new Vector3f(),
+		bob: 0,
+		bobInfl: 0,
+		trace: new Vector3f(),
+		dir: new Vector3f(),
+		collide: function(kobj, normal) {
+			
+			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
+			//print(this.mss);
+			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
+			
+		},
+		onupdateb: function() {
+			this.falling = this.mss > -0.6;
+			KJS.d.IAMFALLING = this.falling;
+			
+			this.trace.set(0, 0, 0);
+			this.dir.set(0, 0, 0);
+			guy.drag.camera.dir(this.dir, 0, 0, -1, 1, false);
+			KJS.raycast(this.trace, guy.drag.camera.actTransform.m30, guy.drag.camera.actTransform.m31, guy.drag.camera.actTransform.m32,
+					this.dir.x / 10,
+					this.dir.y / 10,
+					this.dir.z / 10, 1000, 1);
+			
+			KJS.d.spamwoot = this.trace;
+			SCN.TargetBlock.transform.m30 = this.trace.x;
+			SCN.TargetBlock.transform.m31 = this.trace.y;
+			SCN.TargetBlock.transform.m32 = this.trace.z;
+		},
 		onupdate: function() {
-			this.walkSpeed = 2;
 			
-			var moveForward = 0, moveRight = 0;
-			if (KJS.i.buttonIsDown(this.ctrUp))
-				moveForward += 1;
-			if (KJS.i.buttonIsDown(this.ctrDn))
-				moveForward -= 1;
-			if (KJS.i.buttonIsDown(this.ctrLf))
-				moveRight -= 1;
-			if (KJS.i.buttonIsDown(this.ctrRt))
-				moveRight += 1;
-			if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
-				this.obj.velocity.y = 8;
+			guy.drag.hidden = this.on;
+			//print(guy.drag.hidden);
+		
+			if (this.on) {
+					
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('o'))) {
+					this.walkSpeed += 1;
+					print(this.walkSpeed)
+				}
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('l'))) {
+					this.walkSpeed -= 1;
+					print(this.walkSpeed)
+				}
+				
+				var moveForward = 0, moveRight = 0;
+				if (KJS.i.buttonIsDown(this.ctrUp))
+					moveForward += 1;
+				if (KJS.i.buttonIsDown(this.ctrDn))
+					moveForward -= 1;
+				if (KJS.i.buttonIsDown(this.ctrLf))
+					moveRight -= 1;
+				if (KJS.i.buttonIsDown(this.ctrRt))
+					moveRight += 1;
+		
+				if (!this.falling) {
+					if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
+						this.obj.velocity.y = 8;
+					}
+					//.transform.translate(this.speed * delta, 0, 0);
+					//this.obj.drag.transform.setRotationYXZ(-Math.PI / 2, this.p, 0); // formalitites
+					
+					//guy.hidden = this.on;
+				}
+				
+				this.walk.set(0, 0, 0);
+				//print(moveForward + " " + moveRight);
+				
+				if (moveForward | moveRight != 0) {
+					var mag = Math.sqrt(moveForward * moveForward + moveRight * moveRight);
+					moveForward /= mag;
+					moveRight /= mag;
+					//print(mag);
+					this.bob += delta;
+					this.bobInfl = Math.min(1, this.bobInfl + delta);
+					guy.drag.dir(this.walk, moveForward,
+							0, moveRight, this.walkSpeed, false);
+					//print(this.walk);
+					if (this.falling)
+						guy.accelerateTo(this.walk.x, this.walk.y, this.walk.z, delta * 40, true, false, true);
+					else
+						guy.accelerateTo(this.walk.x, this.walk.y, this.walk.z, delta * 100, true, false, true);
+					//guy.velocity.x += this.walk.x;
+					//guy.velocity.y += this.walk.y;
+					//guy.velocity.z += this.walk.z;
+				} else {
+					this.bobInfl *= Math.pow(0.00004, delta) / 1.2;
+				}
+				
+				this.y = (this.y + (-KJS.i.getMouseDX() / 100)) % (Math.PI * 2);
+				this.p = Math.max(Math.min(Math.PI / 2, this.p + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2);
+				guy.drag.camera.transform.setRotationYXZ(-Math.PI / 2, this.p, 0);
+				guy.drag.transform.setRotationYXZ(this.y, 0, 0);
 			}
-			this.y = (this.y + (-KJS.i.getMouseDX() / 100)) % (Math.PI * 2);
-			this.p = Math.max(Math.min(Math.PI / 2, this.p + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2);
-			guy.drag.camera.transform.setRotationYXZ(-Math.PI / 2, this.p, 0);
-			guy.drag.transform.setRotationYXZ(this.y, 0, 0);
-			//.transform.translate(this.speed * delta, 0, 0);
-			//this.obj.drag.transform.setRotationYXZ(-Math.PI / 2, this.p, 0); // formalitites
 			
-			//guy.hidden = this.on;
-			this.walk.set(0, 0, 0);
-			//print(moveForward + " " + moveRight);
-			guy.drag.dir(this.walk, moveForward,
-					0, moveRight, this.walkSpeed, false);
-			//print(this.walk);
-			guy.velocity.x += this.walk.x;
-			guy.velocity.y += this.walk.y;
-			guy.velocity.z += this.walk.z;
+			guy.drag.camera.weapon.transform.m30 = 0.5 + Math.sin(this.bob * 2 * Math.PI) / 18 * this.bobInfl;
+			guy.drag.camera.weapon.transform.m31 = -0.2 - Math.cos(this.bob * 4 * Math.PI) / 28 * this.bobInfl;
+			guy.drag.camera.weapon.transform.m32 = -0.8;
 			
+			this.mss = 0;
+			this.falling = true;
 		},
 		onselect: function() {
 			
@@ -300,8 +378,8 @@ var flyingThing = function() {
 			var doot = normal.dot(this.up);
 			//KJS.d.wheels = "(" + Math.floor(this.up.x * 100) + ", " + Math.floor(this.up.y * 100) + ", " + Math.floor(this.up.z * 100) + ")";
 			KJS.d.wheels = doot;
-			//if (doot > -0.97)
-			//	this.speed *= Math.pow(0.004, delta) / 1.0;
+			if (doot > -0.97)
+				this.speed *= Math.pow(0.004, delta) / 1.0;
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 		},
 		onupdate: function() {
@@ -375,7 +453,7 @@ var flyingThing = function() {
 					this.speed = Math.max(0, this.speed - delta * 10);
 				}
 
-				plane.sound.pitch = Math.max(0.02, this.speed / 2000);
+				plane.sound.pitch = Math.max(0.02, this.speed * this.speed / 44 / 2000);
 
 				this.forward.set(0, 0, 0);
 				this.up.set(0, 0, 0); // how upsetting
@@ -422,7 +500,7 @@ var flyingThing = function() {
 				this.vy *= Math.pow(0.00004, delta) / 1.5;
 				
 				this.obj.camera.transform.identity();
-				this.obj.camera.transform.setRotationYXZ(-this.vy * 1.4 + Math.sin(this.bcam) * Math.PI, -this.vp * 1.4, -this.vr * 1.4);
+				this.obj.camera.transform.setRotationYXZ(-this.vy * 3 + Math.sin(this.bcam) * Math.PI, -this.vp * 1.4, -this.vr * 3);
 				this.obj.camera.transform.translate(0, 3 * this.mul, 16 * this.mul);
 
 				plane.transform.rotateX(this.vp);
@@ -495,7 +573,7 @@ var fanbot = function() {
 			verybase.base.head.fan.transform.rotateZ(delta * this.fanspeed);
 			this.cameraY += (((this.cameraY + (-KJS.i.getMouseDX() / 100))) - this.cameraY) / 8;
 			this.cameraP += ((Math.max(Math.min(Math.PI / 2, this.cameraP + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2)) - this.cameraP) / 8;
-			//this.headRot += (sign(this.headRot + sign(this.cameraP - this.headRot) * delta) == sign(this.headRot)) ? sign(this.cameraP - this.headRot) * delta : this.headRot - this.cameraP;
+			//this.headRot += (Math.sign(this.headRot + Math.sign(this.cameraP - this.headRot) * delta) == Math.sign(this.headRot)) ? Math.sign(this.cameraP - this.headRot) * delta : this.headRot - this.cameraP;
 			this.obj.base.head.transform.setRotationYXZ(0, this.cameraP, 0);
 			//this.camera.transform.translate(0, 0, 4);#
 			//public void dir(Matrix4f in, float x, float y, float z, float amt, boolean local) {
@@ -538,10 +616,10 @@ var fanbot = function() {
 				var diff = Math.atan2(Math.sin(this.prefAngle - this.angle), Math.cos(this.prefAngle - this.angle));
 				
 				KJS.d.sinthing = Math.floor(diff * 1000) / 1000;
-				KJS.d.thing = Math.floor(this.angle * 1000) / 1000 + " " + Math.floor((this.angle + sign(diff) * delta) * 1000) / 1000
+				KJS.d.thing = Math.floor(this.angle * 1000) / 1000 + " " + Math.floor((this.angle + Math.sign(diff) * delta) * 1000) / 1000
 				if (Math.abs(diff) > 0.01) {
-					if (sign(this.angle - this.prefAngle + sign(diff) * delta) == sign(this.angle - this.prefAngle)) {
-						this.angle += sign(diff) * delta;
+					if (Math.sign(this.angle - this.prefAngle + Math.sign(diff) * delta) == Math.sign(this.angle - this.prefAngle)) {
+						this.angle += Math.sign(diff) * delta;
 						//this.speed = Math.max(0, this.speed - delta * 40);
 						if (Math.abs(diff) > 1.58)
 						this.turning = true;
@@ -565,7 +643,7 @@ var fanbot = function() {
 				this.camera.transform.translate(1, 0, 4);
 			}
 			
-			this.fanspeed += sign(this.speed - this.fanspeed) * delta;//Math.max(2, this.fanspeed - delta * 3);
+			this.fanspeed += Math.sign(this.speed - this.fanspeed) * delta * 3;//Math.max(2, this.fanspeed - delta * 3);
 			
 		}
 	};
@@ -574,8 +652,9 @@ var fanbot = function() {
 }
 
 var start = function() {
+	//World.fixFrame = 60;
 	KJS.i.setMouseLock(true);
 	KJS.s.clear();
-	KJS.s.load("ktg1:scenes/gameA");
+	KJS.s.load("ktg1:scenes/menu");
 };
 

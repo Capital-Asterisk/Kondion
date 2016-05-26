@@ -44,7 +44,7 @@ void main(){
     	//vec2 coord = texCoord.xy;
 		//coord.s = mod(coord.s + 0.2, 1.0);
     	gl_FragData[0] = texture2D(texture0, texCoord.xy);
-    	gl_FragData[1] = vec4(((mat3(gl_ModelViewMatrix) * normal) + 1.0) / 2, 1.0);
+    	gl_FragData[1] = vec4((normalize(mat3(gl_ModelViewMatrix) * normal) + 1.0) / 2, 1.0);
     	gl_FragData[2] = vec4(0.0, 0.0, 0.0, 1.0);
     	gl_FragData[3] = vec4(0.0, 0.0, 0.0, 1.0);
     }

@@ -200,7 +200,7 @@ public class KLoader {
 			ByteBuffer bloat = IOUtil.ioResourceToByteBuffer("vendalenger/kondion/lwjgl/resource/UbuntuMono-R.ttf", 205748);
 			ByteBuffer porn = BufferUtils.createByteBuffer(512 * 512);
 			System.out.println(bloat.remaining());
-			STBTTBakedChar.Buffer stbttseemsneat = STBTTBakedChar.mallocBuffer(96);
+			STBTTBakedChar.Buffer stbttseemsneat = STBTTBakedChar.malloc(96);
 			STBTruetype.stbtt_BakeFontBitmap(bloat, 32, porn, 512, 512, 32, stbttseemsneat);
 			
 			int tex = glGenTextures();

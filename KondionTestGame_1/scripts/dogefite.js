@@ -11,36 +11,19 @@ World.passes.add(new GKO_DeferredPass(0));
 SCN.LightB = new RKO_DirectionalLight();
 SCN.LightB.color.set(1.0, 1.0, 1.0, 1.0);
 // Add ground and wall
-SCN.Floor = new SKO_InfinitePlane();
-SCN.Floor.transform.rotateX(-Math.PI / 2);
-SCN.Floor.textureSize = 1;
-SCN.Floor.transform.translate(0, 0, -64);
-
-SCN.Ceil = new SKO_InfinitePlane();
-SCN.Ceil.transform.rotateX(Math.PI / 2);
-SCN.Ceil.textureSize = 128;
-SCN.Ceil.transform.translate(0, 0, -64);
-
-// shape generator thing
-var sides = 6;
-for (var i = 0; i < sides; i++) {
-	
-	var wall = new SKO_InfinitePlane();
-	wall.transform.rotateY((Math.PI * 2) / sides * i);
-	wall.textureSize = 128;
-	wall.transform.translate(0, 0, -300);
-	//wall.collideType = 4;
-	SCN[SCN.nextName("Side")] = wall;
-	
-}
+SCN.Ocean = new SKO_InfinitePlane();
+SCN.Ocean.transform.rotateX(-Math.PI / 2);
+SCN.Ocean.textureSize = 2;
+SCN.Ocean.transform.translate(0, 0, -64);
+SCN.Ocean.material = new Mat_Strange();//Mat_FlatColor(58 / 255, 189 / 255, 232 / 255);
 
 //SCN.Wallz.transform.translate(0, 0, -40);
 //SCN.Wallz.textureSize = 50;
 //SCN.Wallz.transform.rotateX(-Math.PI / 2);
 
-/*SCN.Platform = new SKO_Cube();
-SCN.Platform.transform.translate(0, -64 + 30 / 2, 0);
-SCN.Platform.transform.scale(30, 30, 30);
+SCN.Platform = new SKO_Cube();
+SCN.Platform.transform.translate(0, 10, 0);
+SCN.Platform.transform.scale(3, 9, 3);
 SCN.Platform.anchor = true;
 SCN.Platform.setMaterial(new Mat_Monotexture("K_Cube"));
 SCN.Platform.s = {
@@ -48,7 +31,7 @@ SCN.Platform.s = {
 		if (KJS.i.keyboardDown(KJS.i.toGLFWCode('b')))
 			this.obj.rotVelocity.x = 0.1;
 	}
-}*/
+}
 
 //SCN.PlatformB = new SKO_Cube();
 //SCN.PlatformB.transform.translate(0, -10, 0);
@@ -69,37 +52,14 @@ SCN.guy = betterFps();
 SCN.planeA = flyingThing();
 SCN.planeB = flyingThing();
 SCN.FanBot = fanbot();
-//SCN.guy.transform.m30 = 40;
+SCN.guy.transform.m30 = 40;
 SCN.FanBot.transform.m30 = 20;
 SCN.planeB.transform.m30 = 6211000;
 SCN.s.players = [SCN.guy, SCN.planeA, SCN.FanBot, SCN.planeB];
 SCN.guy.s.on = true;
 SCN.s.currentPlayer = 0;
 
-var fun = 7;
-var randomSize = 0;
-var mat = new Mat_Monotexture("K_Cube");
-
-for (var i = -fun; i < fun; i++) {
-	for (var j = -fun; j < fun; j++) {
-		
-		randomSize = Math.floor(Math.random() * 12 + 1);
-		heightAdd = 0;
-		if (Math.random() > 0.85) {
-			heightAdd += Math.floor(Math.random() * 30 + 8);
-		}
-		var plat = new SKO_Cube();
-		//plat = new SKO_Cube();
-		plat.transform.translate(j * 18, -64 + (randomSize + heightAdd) / 2, i * 18);
-		plat.transform.scale(randomSize, randomSize + heightAdd, randomSize);
-		plat.anchor = true;
-		plat.setMaterial(mat);
-		SCN[SCN.nextName("RANDOMCUBE_")] = plat;
-	}
-	
-}
-
-for (var i = 0; i < 0; i++) {
+for (var i = 0; i < 20; i++) {
 	var cube = new SKO_Cube();
 	cube.morecube = new SKO_Cube(0);
 	cube.transform.translate((i - 50) * 7, Math.random() * 20, Math.random() * 100);
@@ -118,13 +78,11 @@ KJS.obj("coolthing").load();
 KJS.obj("fanbot_base").load();
 KJS.obj("fanbot_head").load();
 KJS.obj("fanbot_fan").load();
-KJS.obj("deli_4l558").load();
 
 KJS.texture("fanbot").load();
 KJS.texture("noah").load();
 KJS.texture("human").load();
 KJS.texture("bird").load();
-KJS.texture("d4l558").load();
 KJS.aud("sss").load();
 KJS.aud("viznut").load();
 KJS.aud("noice").load();

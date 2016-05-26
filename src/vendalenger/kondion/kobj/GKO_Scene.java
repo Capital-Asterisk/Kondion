@@ -169,6 +169,24 @@ public class GKO_Scene extends KObj_Node {
 		
 	}
 	
+	public KObj_Solid checkPointCollision(float x, float y, float z, int type) {
+		
+		
+		for (int i = 0; i < children.size(); i++) {
+			// Is it solid?
+			if (children.get(i) instanceof KObj_Solid) {
+				if (((((KObj_Solid) children.get(i)).collideType & type) == ((KObj_Solid) children.get(i)).collideType)
+						&& ((KObj_Solid) children.get(i)).checkPoint(x, y, z)) {
+					return (KObj_Solid) children.get(i);
+				}
+			} else {
+				// TODO warning?
+			}
+		}
+		
+		return null;
+	}
+	
 	private void setListener(KObj_Oriented ear) {
 		if (ear != null) {
 			AL10.alListener3f(AL10.AL_POSITION, ear.actTransform.m30, ear.actTransform.m31, ear.actTransform.m32);

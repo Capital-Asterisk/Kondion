@@ -34,6 +34,7 @@ public class KondionWorld {
 	public final Vector4f clearColor;
 	public final Vector4f skyColor;
 	
+	public int fixFrame;
 	public ScriptObjectMirror compositor;
 	public ScriptObjectMirror s;
 	public OKO_Camera_ camera;

@@ -223,7 +223,7 @@ public class KModel {
 		createVbo();
 	}
 	
-	public void unload() {
+	public void unLoad() {
 		
 	}
 	

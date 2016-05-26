@@ -1,0 +1,13 @@
+{
+	"Name": "Bird crushing game",
+	"Scripts": ["scripts/dogefite"],
+	"Content": {
+		"Ground": {"type": 0, "tf":
+		[0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0,
+		0.0, 0.0, 0.0, 0.0],
+		"s":{}},
+		
+	}
+}

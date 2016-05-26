@@ -28,7 +28,8 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	private FloatBuffer buffer;
 	public int size;
 	public float textureSize;
-	private Matrix4f temp0;
+	private static Matrix4f temp0;
+	private static Vector3f temp1;
 	
 	KShader eggs;
 	
@@ -37,6 +38,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 		size = 10000;
 		textureSize = 1f;
 		temp0 = new Matrix4f();
+		temp1 = new Vector3f();
 		buffer = null;
 	}
 	
@@ -68,6 +70,8 @@ public class SKO_InfinitePlane extends KObj_Solid {
 			material.bind(type);
 		else
 			material = new KMat_Monotexture();
+		if (fogIntensity > 0.0f)
+			material.fogOverride(fogIntensity);
 		//System.out.println("RENDER!");
 		float addx = -(-temp1.x + temp2.x) / textureSize;
 		float addy = -(-temp1.y + temp2.y) / textureSize;
@@ -102,5 +106,15 @@ public class SKO_InfinitePlane extends KObj_Solid {
 	public void updateB() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public boolean checkPoint(float x, float y, float z) {
+
+		temp1.set(x, y, z);
+		actTransform.invert(temp0);
+		temp1.mulPoint(temp0);
+		//System.out.println(temp1.z);
+		return (temp1.z < 0);
 	}
 }
