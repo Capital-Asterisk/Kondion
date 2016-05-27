@@ -52,6 +52,24 @@ public abstract class KObj_Oriented extends KObj_Node {
 		}
 	}
 	
+	public void stretchSimple(float fx, float fy, float fz, float tx, float ty, float tz, float thickness) {
+		transform.identity();
+		
+		temp0.set(fx - tx, fy - ty, fz - tz);
+		//temp0.length();
+		
+		transform.m30 = fx - temp0.x / 2;
+		transform.m31 = fy - temp0.y / 2;
+		transform.m32 = fz - temp0.z / 2;
+		float b = temp0.length();
+		float a = (float) Math.sqrt(temp0.x * temp0.x + temp0.z * temp0.z);
+		transform.rotateY((float) Math.atan2(transform.m30 - fx, transform.m32 - fz));
+		transform.rotateX((float) (Math.atan(temp0.y / a) + Math.PI / 2));
+		transform.scale(thickness, b, thickness);
+		
+		applyTransform();
+	}
+	
 	public void dir(Vector3f in, float x, float y, float z, float amt, boolean local) {
 		temp0.set(x, y, z);
 		(local ? transform : actTransform).transformDirection(temp0);

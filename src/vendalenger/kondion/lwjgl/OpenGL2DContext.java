@@ -222,6 +222,7 @@ public class OpenGL2DContext extends JSContext2D {
 
 	@Override
 	public void drawImage(JSDrawable img, float x, float y) {
+		blendModes();
 		if (img instanceof KTexture) {
 			drawImage(img, x, y, ((KTexture) img).getImageWidth(), ((KTexture) img).getImageHeight());
 		} else if (img instanceof GKO_RenderPass) {
@@ -232,6 +233,7 @@ public class OpenGL2DContext extends JSContext2D {
 	@Override
 	public void drawImage(JSDrawable img, float x, float y, float width, float height) {
 		img.bind();
+		blendModes();
 		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
 		glTranslatef(x + width / 2, y + height / 2, 0);
 		GLDrawing.renderQuad(width, height);
@@ -288,6 +290,17 @@ public class OpenGL2DContext extends JSContext2D {
 	
 	private void applyFillColor() {
 		glColor4f(fillColor.x, fillColor.y, fillColor.z, fillColor.w);
+	}
+	
+	private void blendModes() {
+		if (globalCompositeOperation != null) {
+			if (Integer.valueOf(globalCompositeOperation.toString()) == 1) {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				System.out.println("ADD");
+			} else {
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			}
+		}
 	}
 	
 	/*public void deferredRender(JSDrawable diffuse, JSDrawable depth, JSDrawable normals,

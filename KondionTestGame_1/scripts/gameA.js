@@ -1,4 +1,6 @@
-World.passes.add(new GKO_DeferredPass(0));
+World.passes.add(new GKO_DeferredPass(1));
+World.passes.add(new GKO_RenderPass(2, KJS.DIFFUSE));
+World.passes[1].depthMask = World.passes[0];
 /*World.passes[0].gui.add(new GUI_Button({
 	x: 500,
 	y: 500,
@@ -125,6 +127,8 @@ KJS.texture("noah").load();
 KJS.texture("human").load();
 KJS.texture("bird").load();
 KJS.texture("d4l558").load();
+KJS.texture("laser").load();
+KJS.texture("flare").load();
 KJS.aud("sss").load();
 KJS.aud("viznut").load();
 KJS.aud("noice").load();
@@ -132,7 +136,7 @@ KJS.aud("bang").load();
 
 World.fogIntensity = 0.0001;
 World.clearColor.set(0, 0, 0, 1);
-World.skyColor.set(1, 1, 1, 1);
+World.skyColor.set(0, 0, 0, 1);
 World.compMode = KJS.DEBUG;
 World.s = {fpav: 0};
 
@@ -141,6 +145,7 @@ World.compositor = function(ctx, passes) {
 	//print(passes);
 	ctx.fillRgb(1.0, 1.0, 1.0);
 	passes[0].render();
+	passes[1].render();
 	//passes[1].render();
 	//passes[2].render();
 	ctx.next();
@@ -152,6 +157,9 @@ World.compositor = function(ctx, passes) {
 	this.s.fpav -= (this.s.fpav - eggs) / 20;//Math.floor(this.s.fpav - KJS.fps());
 	//print("eggs: " + (this.s.fpav - Math.round(Math.floor(KJS.fps()) / 60)));
 	ctx.drawImage(passes[0], 0, 0, passes[0].width, passes[0].height);
+	ctx.globalCompositeOperation = KJS.ADD;
+	ctx.drawImage(passes[1], 0, 0, passes[0].width, passes[0].height);
+	ctx.globalCompositeOperation = KJS.DEFAULT;
 	//ctx.drawImage(passes[1], passes[0].width / 2, 0, passes[1].width / 6, passes[1].height / 6);
 	//ctx.deferredRender(passes[0], passes[2], passes[1],
 	//	0, 0, 0, 0, 0, 0,

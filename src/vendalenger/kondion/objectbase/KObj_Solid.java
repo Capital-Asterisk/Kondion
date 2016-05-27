@@ -37,7 +37,7 @@ public abstract class KObj_Solid extends KObj_Renderable {
 	public final Vector3f velocity;
 	
 	public KObj_Solid() {
-		this(0);
+		this(1);
 	}
 	
 	public KObj_Solid(int id) {

@@ -39,7 +39,9 @@
 		"noah": ["maps/ktt", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"bird": ["maps/moreeggs", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"fanbot": ["models/fanbot/texture", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-		"d4l558": ["models/wepon/4l558/uv", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
+		"d4l558": ["models/wepon/4l558/uv", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"laser": ["graphics/bullet/laser", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"flare": ["graphics/bullet/flare", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
 	},
 	"OBJ": {
 		"kaytrav": ["models/kaytrav", "neat"],

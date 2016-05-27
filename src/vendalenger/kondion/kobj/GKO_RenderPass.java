@@ -87,6 +87,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	public boolean pixelate = false;
 	public boolean sizeOverride = false;
 	public int width, height;
+	public GKO_RenderPass depthMask;
 	
 	public GKO_RenderPass() {
 		this(0, 0, true, null);
@@ -105,6 +106,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	}
 	
 	public GKO_RenderPass(int id, int t, boolean a, GKO_RenderPass depth) {
+		depthMask = depth;
 		gui = new ArrayList<KComponent>();
 		items = new ArrayList<KObj_Renderable>();
 		type = t;
@@ -127,7 +129,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 	}
 	
 	public void consider(KObj_Renderable f) {
-		if ((id & f.getId()) == id)
+		if ((id & f.id) == id)
 			items.add(f);
 	}
 	
@@ -176,12 +178,22 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fboId);
 				glClearColor(Kondion.getWorld().skyColor.x, Kondion.getWorld().skyColor.y,
 						Kondion.getWorld().skyColor.z, Kondion.getWorld().skyColor.w);
+				
+				glFramebufferRenderbufferEXT(GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, drbId);
+				
 				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			
 				if (cameraOverride && camera != null) 
 					TTT.three(camera, width, height);
 				else
 					TTT.three();
+				
+				boolean deep = depthMask != null;
+				if (deep) {
+					glFramebufferTexture2DEXT(GL_FRAMEBUFFER_EXT,
+							GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D,
+							((GKO_DeferredPass) depthMask).depId, 0);
+				}
 				
 				//glPushMatrix();
 				//new KMat_Monotexture().bind(type);
@@ -191,6 +203,7 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				//glPopMatrix();
 				
 				for (int i = 0; i < items.size(); i++) {
+					//glDepthMask(false);
 					if (!items.get(i).killMe)
 						items.get(i).render(type, this);
 					else {
@@ -198,6 +211,8 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 						i --;
 					}
 				}
+				
+				glDepthMask(true);
 			}
 			//glDisable(GL_DEPTH_TEST);
 			/*for (KObj_Renderable kobj : items) {

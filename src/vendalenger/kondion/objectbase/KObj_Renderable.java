@@ -29,10 +29,10 @@ public abstract class KObj_Renderable extends KObj_Oriented {
 	public boolean hidden = false;
 	public float fogIntensity;
 	protected KMat_erial material = new KMat_Monotexture();
-	protected int id;
+	public int id;
 	
 	public KObj_Renderable() {
-		this(0);
+		this(1);
 	}
 	
 	public KObj_Renderable(int id) {
@@ -45,15 +45,7 @@ public abstract class KObj_Renderable extends KObj_Oriented {
 			}
 		}
 	}
-	
-	public void setId(int id) {
-		this.id = id;
-	}
-	
-	public int getId() {
-		return id;
-	}
-	
+
 	public KMat_erial getMaterial() {
 		return material;
 	}

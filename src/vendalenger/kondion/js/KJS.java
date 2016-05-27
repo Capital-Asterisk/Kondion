@@ -63,6 +63,10 @@ public class KJS {
 			QUADSPLIT = 5,
 			VR = 		6;
 	public final short
+			ADD = 	1,
+			MUL = 	2,
+			SUB = 	3;
+	public final short
 			ZYX = 0,
 			ZXY = 1,
 			YXZ = 2,

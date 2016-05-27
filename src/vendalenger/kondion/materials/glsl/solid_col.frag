@@ -26,14 +26,14 @@ void main(){
 		float eggs = dot(normalize(gl_ModelViewMatrix * vec4(normal, 0.0)), -vec4(0.0, -1.0, 0.0, 0.0));
 		b += (eggs + 1) / 2;
 	    //final = vec3(texture2D(texture1, texCoord.st).xyz) * vec3(b, b, b);
-	    final = vec3(color.xyz) * vec3(b, b, b);
+	    final = color.xyz * vec3(b, b, b);
 	    if (fog != 0.0) {
 		    final = mix(vec3(1.0, 1.0, 1.0), final, clamp(1.0 / exp(length(viewPos) * fog), 0.0, 1.0));
 	    }
     } else if (type == 1) {
     	final = color.xyz;
     } else if (type == 3) {
-    	final = vec3((gl_ModelViewMatrix * vec4(normal, 0.0)).xyz);
+    	final = (gl_ModelViewMatrix * vec4(normal, 0.0)).xyz;
     }
     
     if (type != 30) {

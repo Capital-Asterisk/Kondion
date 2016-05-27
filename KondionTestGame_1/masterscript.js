@@ -185,11 +185,32 @@ var betterFps = function() {
 	guy.drag.camera.weapon.transform.rotateZ(Math.PI);
 	guy.drag.camera.weapon.transform.scale(0.05, 0.05, 0.05);
 	
-	SCN.TargetBlock = new SKO_Cube();
-	SCN.TargetBlock.collideType = 32;
-	SCN.TargetBlock.collideMove = 32;
-	SCN.TargetBlock.collideCall = 32;
-	SCN.TargetBlock.anchor = true;
+	var dog = new Mat_Monotexture("laser");
+	dog.alphaBlend = 1;
+	SCN.TargetBlock = new RKO_Board(2);
+	SCN.TargetBlock.setMaterial(dog);
+	//SCN.TargetBlock.plant = 
+	//SCN.TargetBlock.plant.transform.rotateY(Math.PI / 2);
+	//SCN.TargetBlock.plant.setMaterial(dog);
+	
+	var lasers = 8;
+	for (var i = 0; i < lasers; i++) {
+		var wall = new RKO_Board(2);
+		wall.setMaterial(dog);
+		wall.transform.rotateY((Math.PI * 2) / lasers * i);
+		SCN.TargetBlock[SCN.TargetBlock.nextName("plant")] = wall;
+	}
+	
+	guy.drag.camera.weapon.flare = new RKO_Board(2);
+	guy.drag.camera.weapon.flare.setMaterial(new Mat_Monotexture("flare"));
+	guy.drag.camera.weapon.flare.material.alphaBlend = 1;
+	guy.drag.camera.weapon.flare.transform.translate(0, -1, 0);
+	guy.drag.camera.weapon.flare.transform.scale(20, 20, 20);
+	guy.drag.camera.weapon.flare.transform.rotateX(Math.PI / 2);
+	//SCN.TargetBlock.collideType = 32;
+	//SCN.TargetBlock.collideMove = 32;
+	//SCN.TargetBlock.collideCall = 32;
+	//SCN.TargetBlock.anchor = true;
 	
 	guy.s = {
 		camera: guy.drag.camera,
@@ -220,16 +241,29 @@ var betterFps = function() {
 		onupdateb: function() {
 			this.falling = this.mss > -0.6;
 			KJS.d.IAMFALLING = this.falling;
-			
 			this.trace.set(0, 0, 0);
 			this.dir.set(0, 0, 0);
 			guy.drag.camera.dir(this.dir, 0, 0, -1, 1, false);
-			KJS.raycast(this.trace, guy.drag.camera.actTransform.m30, guy.drag.camera.actTransform.m31, guy.drag.camera.actTransform.m32,
+			var tgt = KJS.raycast(this.trace, guy.drag.camera.weapon.actTransform.m30,
+					guy.drag.camera.weapon.actTransform.m31,
+					guy.drag.camera.weapon.actTransform.m32,
 					this.dir.x / 10,
 					this.dir.y / 10,
 					this.dir.z / 10, 1000, 1);
 			
 			KJS.d.spamwoot = this.trace;
+			SCN.TargetBlock.stretchSimple(
+					guy.drag.camera.weapon.actTransform.m30,
+					guy.drag.camera.weapon.actTransform.m31,
+					guy.drag.camera.weapon.actTransform.m32,
+					this.trace.x, this.trace.y, this.trace.z, 0.5);
+			if (tgt != null) {
+				tgt.killMe = true;
+			}
+			var arr = SCN.TargetBlock.values();
+			for (var i = 0; i < arr.size(); i++) {
+				arr[i].applyTransform();
+			}
 			SCN.TargetBlock.transform.m30 = this.trace.x;
 			SCN.TargetBlock.transform.m31 = this.trace.y;
 			SCN.TargetBlock.transform.m32 = this.trace.z;
@@ -242,8 +276,7 @@ var betterFps = function() {
 			if (this.on) {
 					
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('o'))) {
-					this.walkSpeed += 1;
-					print(this.walkSpeed)
+					guy.drag.camera.weapon.transform.rotateY(delta);
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('l'))) {
 					this.walkSpeed -= 1;

@@ -71,7 +71,7 @@ public abstract class JSContext2D {
 	public abstract ScriptObjectMirror putImageData();
 	
 	public float globalAlpha = 1.0f;
-	public ScriptObjectMirror globalCompositeOperation = null;
+	public Object globalCompositeOperation = null;
 	
 	public abstract void save();
 	public abstract void restore();

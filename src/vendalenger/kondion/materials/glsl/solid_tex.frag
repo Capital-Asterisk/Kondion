@@ -34,6 +34,7 @@ void main(){
 	    }
     } else if (type == 1) {
     	final = texture2D(texture0, texCoord.st);
+    	//final.w = 0.4;
     } else if (type == 3) {
     	final = vec4(((gl_ModelViewProjectionMatrix * vec4(normal, 1.0)).xyz + 0.5) / 2, 1.0);
     }

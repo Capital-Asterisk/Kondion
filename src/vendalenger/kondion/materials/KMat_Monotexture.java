@@ -1,8 +1,14 @@
 package vendalenger.kondion.materials;
 
+import static org.lwjgl.opengl.GL11.GL_ONE_MINUS_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.GL_SRC_ALPHA;
+import static org.lwjgl.opengl.GL11.*;
+import static org.lwjgl.opengl.GL11.glBlendFunc;
 import static org.lwjgl.opengl.GL20.glUniform1f;
 import static org.lwjgl.opengl.GL20.glUniform1i;
 import static org.lwjgl.opengl.GL20.glUniform4f;
+
+import org.lwjgl.opengl.GL11;
 
 import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.resource.KLoader;
@@ -15,6 +21,7 @@ import vendalenger.kondion.lwjgl.resource.KTexture;
  */
 public class KMat_Monotexture implements KMat_erial  {
 
+	public int alphaBlend = 0;
 	public KTexture texture;
 	private KShader shader;
 	private float r, g, b, a;
@@ -90,8 +97,8 @@ public class KMat_Monotexture implements KMat_erial  {
 			uni_type = shader.uniformLocation("type");
 			uni_color = shader.uniformLocation("color");
 			uni_fog = shader.uniformLocation("fog");
-			
 		}
+		
 		if (texture != null)
 			texture.bind();
 		else
@@ -101,6 +108,19 @@ public class KMat_Monotexture implements KMat_erial  {
 		glUniform4f(uni_color, r, g, b, a);
 		glUniform1f(uni_fog, Kondion.getWorld().fogIntensity);
 		glUniform1i(uni_type, type);
+		
+		switch (alphaBlend) {
+			case 1:
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+				glDepthMask(false);
+				//GL11.glDisable(GL11.GL_DEPTH_TEST);
+				break;
+
+			default:
+				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+				break;
+		}
+		
 		return 0;
 	}
 
@@ -113,6 +133,8 @@ public class KMat_Monotexture implements KMat_erial  {
 	@Override
 	public int unbind() {
 		shader.unbind();
+		glDepthMask(true);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		return 0;
 	}
 

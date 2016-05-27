@@ -71,12 +71,12 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	//protected int texId = 0;
 	// texId is result
 	// drbId is unused
-	private int briId = 0; // Brightness
-	private int depId = 0; // Depth texture
-	private int dffId = 0; // Diffuse texture
-	private int nrmId = 0; // Normal texture
-	private int skyUni = 0;
-	private int fogUni = 0;
+	protected int briId = 0; // Brightness
+	protected int depId = 0; // Depth texture
+	protected int dffId = 0; // Diffuse texture
+	protected int nrmId = 0; // Normal texture
+	protected int skyUni = 0;
+	protected int fogUni = 0;
 	protected IntBuffer ducks;
 	protected List<KObj_Renderable> lights;
 	private KShader program;
@@ -129,7 +129,7 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 			lights.add(f);
 			System.out.print(f);
 		} else if ((f instanceof KObj_Renderable)
-				&& (id & ((KObj_Renderable) f).getId()) == id)
+				&& (id & ((KObj_Renderable) f).id) == id)
 			items.add((KObj_Renderable) f);
 	}
 	

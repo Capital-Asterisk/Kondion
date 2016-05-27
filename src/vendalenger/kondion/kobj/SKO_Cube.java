@@ -38,7 +38,7 @@ public class SKO_Cube extends KObj_Solid {
 	//private static Vector3f temp4 = new Vector3f();
 
 	public SKO_Cube() {
-		this(0);
+		this(1);
 	}
 
 	public SKO_Cube(int eggs) {
