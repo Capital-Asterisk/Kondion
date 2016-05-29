@@ -216,7 +216,7 @@ public class KLoader {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		System.out.println("EGGSUS");
+		
 		for (int i = 0; i < queue.size(); i++) {
 			if ((boolean) queue.get(i)[0]) {
 				// its a shader

@@ -83,7 +83,7 @@ public class SKO_InfinitePlane extends KObj_Solid {
 				addx, addy,
 				size / textureSize + addx, addy});
 		//if (material == null)
-			GLDrawing.renderQuad(size, -size, KLoader.getMissingTexture());
+			GLDrawing.renderQuad(size, -size);
 		//else
 			//GLDrawing.renderQuad(size, -size);
 		//System.out.println(textureSize);

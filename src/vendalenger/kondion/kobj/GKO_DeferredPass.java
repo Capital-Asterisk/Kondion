@@ -148,7 +148,8 @@ public class GKO_DeferredPass extends GKO_RenderPass {
 	public void render() {
 		if (!sizeOverride) {
 			// No multiple window support yet!
-			width = Window.getWidth();
+			width = Window.getWidth
+					();
 			height = Window.getHeight();
 		}
 		if (!ready) {

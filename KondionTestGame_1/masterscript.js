@@ -8,6 +8,7 @@
  * 4 - Enemies
  * 8 - 
  * 16 - Bullets
+ * 32 - woot
  * hey paolo.
  */
 
@@ -53,7 +54,8 @@ var fpsGuy = function() {
 			
 		},
 		collide: function(kobj, normal) {
-			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
+			if (normal != null)
+				this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 		},
 		onupdate: function() {
@@ -193,7 +195,7 @@ var betterFps = function() {
 	//SCN.TargetBlock.plant.transform.rotateY(Math.PI / 2);
 	//SCN.TargetBlock.plant.setMaterial(dog);
 	
-	var lasers = 8;
+	var lasers = 10;
 	for (var i = 0; i < lasers; i++) {
 		var wall = new RKO_Board(2);
 		wall.setMaterial(dog);
@@ -204,13 +206,98 @@ var betterFps = function() {
 	guy.drag.camera.weapon.flare = new RKO_Board(2);
 	guy.drag.camera.weapon.flare.setMaterial(new Mat_Monotexture("flare"));
 	guy.drag.camera.weapon.flare.material.alphaBlend = 1;
-	guy.drag.camera.weapon.flare.transform.translate(0, -1, 0);
+	guy.drag.camera.weapon.flare.transform.translate(0, 12.3, 3.30367);
 	guy.drag.camera.weapon.flare.transform.scale(20, 20, 20);
 	guy.drag.camera.weapon.flare.transform.rotateX(Math.PI / 2);
+	guy.drag.camera.weapon.sound = new NKO_Audio(KJS.aud("hicol"));
+	guy.drag.camera.weapon.sound.volume = 19;
 	//SCN.TargetBlock.collideType = 32;
 	//SCN.TargetBlock.collideMove = 32;
 	//SCN.TargetBlock.collideCall = 32;
 	//SCN.TargetBlock.anchor = true;
+	
+	guy.drag.camera.weapon.s = {
+		seq: 0,
+		alt: false,
+		trace: new Vector3f(),
+		dir: new Vector3f(),
+		fire: function() {
+			if (this.seq < 0.3) {
+				guy.drag.camera.weapon.sound.play();
+				this.seq = 1;
+				SCN.TargetBlock.hideAll(false);
+				this.alt = false;
+			}
+		},
+	
+		altfire: function() {
+			this.seq = 1;
+			SCN.TargetBlock.hideAll(false);
+			this.alt = true;
+		},
+		
+		onupdate: function() {
+			
+			guy.drag.camera.weapon.transform.translate(0, -Math.pow(this.seq, 6) * 6, 0);
+		},
+		
+		onupdateb: function() {
+			
+			if (this.seq > 0) {
+				this.trace.set(0, 0, 0);
+				this.dir.set(0, 0, 0);
+				guy.drag.camera.weapon.flare.dir(this.dir, 0, 0, -1, 1, false);
+				var tgt = KJS.raycast(this.trace, guy.drag.camera.weapon.flare.actTransform.m30,
+						guy.drag.camera.weapon.flare.actTransform.m31,
+						guy.drag.camera.weapon.flare.actTransform.m32,
+						this.dir.x / 10,
+						this.dir.y / 10,
+						this.dir.z / 10, 1000, 1 | 4);
+				
+				KJS.d.spamwoot = this.trace;
+				SCN.TargetBlock.stretchSimple(
+						guy.drag.camera.weapon.flare.actTransform.m30,
+						guy.drag.camera.weapon.flare.actTransform.m31,
+						guy.drag.camera.weapon.flare.actTransform.m32,
+						this.trace.x, this.trace.y, this.trace.z, (2 + Math.random()) * this.seq);
+				//SCN.TargetBlock.transform.rotateY(KJS.orandom() * Math.PI);
+				if (tgt != null && tgt.s != null && tgt.s.killable) {
+					//tgt.killMe = true;
+					tgt.s.hit(delta * 2 + 4000 * (this.seq > 0.9));
+				}
+				var arr = SCN.TargetBlock.values();
+				for (var i = 0; i < arr.size(); i++) {
+					arr[i].applyTransform();
+				}
+				SCN.TargetBlock.transform.m30 = this.trace.x;
+				SCN.TargetBlock.transform.m31 = this.trace.y;
+				SCN.TargetBlock.transform.m32 = this.trace.z;
+				
+				guy.drag.camera.weapon.flare.transform.identity();
+				guy.drag.camera.weapon.flare.transform.translate(0, 12.3, 3.30367);
+				guy.drag.camera.weapon.flare.transform.scale(
+						(80 + Math.random() * 10) * this.seq,
+						(80 + Math.random() * 10) * this.seq,
+						(80 + Math.random() * 10) * this.seq);
+				guy.drag.camera.weapon.flare.transform.rotateX(Math.PI / 2);
+				
+				SCN.s.shake = 0.02 * this.seq * this.seq * this.seq * this.seq;
+				
+				this.seq = Math.max(0, this.seq - delta);
+				
+				
+				
+				if (this.seq == 0) {
+					SCN.TargetBlock.hideAll(true);
+				}
+				
+			} else {
+				
+				SCN.s.shake = 0.0;
+			}
+		}
+		
+	}
 	
 	guy.s = {
 		camera: guy.drag.camera,
@@ -218,6 +305,7 @@ var betterFps = function() {
 		ctrDn: KJS.i.getButtonIndex("down"),
 		ctrLf: KJS.i.getButtonIndex("left"),
 		ctrRt: KJS.i.getButtonIndex("right"),
+		ctrGr: KJS.i.getButtonIndex("grapple"),
 		p: 0,
 		y: 0,
 		mss: 0,
@@ -226,47 +314,29 @@ var betterFps = function() {
 		onground: false,
 		walkAngle: 0,
 		walkSpeed: 13,
+		health: 100,
 		walk: new Vector3f(),
+		killable: true,
 		bob: 0,
 		bobInfl: 0,
-		trace: new Vector3f(),
-		dir: new Vector3f(),
+		inspect: 0,
+		inspecting: false,
+		useButton: KJS.i.getButtonIndex("open"),
 		collide: function(kobj, normal) {
-			
-			this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
+			if (normal != null)
+				this.mss = Math.min(normal.dot(0, 1, 0), this.mss);
 			//print(this.mss);
 			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
 			
 		},
+		hit: function(dmg) {
+			SCN.s.blood += 0.5;
+			this.health = Math.max(0, this.health - dmg);
+		},
 		onupdateb: function() {
 			this.falling = this.mss > -0.6;
 			KJS.d.IAMFALLING = this.falling;
-			this.trace.set(0, 0, 0);
-			this.dir.set(0, 0, 0);
-			guy.drag.camera.dir(this.dir, 0, 0, -1, 1, false);
-			var tgt = KJS.raycast(this.trace, guy.drag.camera.weapon.actTransform.m30,
-					guy.drag.camera.weapon.actTransform.m31,
-					guy.drag.camera.weapon.actTransform.m32,
-					this.dir.x / 10,
-					this.dir.y / 10,
-					this.dir.z / 10, 1000, 1);
 			
-			KJS.d.spamwoot = this.trace;
-			SCN.TargetBlock.stretchSimple(
-					guy.drag.camera.weapon.actTransform.m30,
-					guy.drag.camera.weapon.actTransform.m31,
-					guy.drag.camera.weapon.actTransform.m32,
-					this.trace.x, this.trace.y, this.trace.z, 0.5);
-			if (tgt != null) {
-				tgt.killMe = true;
-			}
-			var arr = SCN.TargetBlock.values();
-			for (var i = 0; i < arr.size(); i++) {
-				arr[i].applyTransform();
-			}
-			SCN.TargetBlock.transform.m30 = this.trace.x;
-			SCN.TargetBlock.transform.m31 = this.trace.y;
-			SCN.TargetBlock.transform.m32 = this.trace.z;
 		},
 		onupdate: function() {
 			
@@ -276,11 +346,75 @@ var betterFps = function() {
 			if (this.on) {
 					
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('o'))) {
-					guy.drag.camera.weapon.transform.rotateY(delta);
+					guy.drag.camera.weapon.transform.rotateZ(delta);
 				}
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('l'))) {
 					this.walkSpeed -= 1;
 					print(this.walkSpeed)
+				}
+				
+				
+				
+				if (KJS.i.buttonTap(this.ctrGr) == 1) {
+					var t = this.ctrGr;
+					var p = this.obj;
+					SCN.GHook = new SKO_Cube();
+					SCN.GHook.transform.m30 = this.obj.transform.m30;
+					SCN.GHook.transform.m31 = this.obj.transform.m31;
+					SCN.GHook.transform.m32 = this.obj.transform.m32;
+					SCN.GHook.transform.scale(0.3, 0.3, 0.3);
+					this.obj.drag.camera.dir(SCN.GHook.velocity, 0, 0, -1, 100, false);
+					SCN.GHook.s = {
+						ctrGr: t,
+						player: p,
+						grab: false,
+						collide: function(kobj, normal) {
+							this.obj.gravityOverride = true;
+							this.obj.velocity.set(0, 0, 0);
+							this.grab = true;
+							this.obj.collideType = 32;
+							this.obj.collideMove = 32;
+							this.obj.collideCall = 32;
+						},
+						onupdate: function() {
+							
+							SCN.GRope.stretchSimple(
+									this.obj.transform.m30, this.obj.transform.m31, this.obj.transform.m32,
+									this.player.transform.m30, this.player.transform.m31, this.player.transform.m32, 0.02);
+							
+							if (!KJS.i.buttonIsDown(this.ctrGr)) {
+								this.obj.killMe = true;
+								SCN.GRope.killMe = true;
+								//print("KIIIIIIIILMEEEEEEEEEEEEEEEEEEEEEEEEEEEe")
+							}
+							
+							if (this.grab) {
+								this.player.shoot(this.obj.transform.m30, this.obj.transform.m31, this.obj.transform.m32, delta * 60, false);
+								//KJS.d.vel = this.player.velocity.x + " " + this.player.velocity.y + " " + this.player.velocity.z;
+								//print(KJS.d.vel);
+							}
+						}
+							
+					}
+					
+					SCN.GRope = new RKO_Board();
+					SCN.GRope.setMaterial(new Mat_FlatColor(0.2, 0.2, 0.2));
+					//SCN.GRope.gravityOverride = true;
+					//SCN.GRope.collideType = 32;
+					//SCN.GRope.collideMove = 32;
+					//SCN.GRope.collideCall = 32;
+					SCN.rescan();
+				}
+				
+				if (KJS.i.buttonTap(this.useButton) == 1) {
+					this.inspecting = !this.inspecting;
+				}
+				
+				if (this.inspecting) {
+					this.inspect = Math.min(1, this.inspect + delta);
+				} else {
+					
+					this.inspect = Math.max(0, this.inspect - delta);
 				}
 				
 				var moveForward = 0, moveRight = 0;
@@ -292,6 +426,10 @@ var betterFps = function() {
 					moveRight -= 1;
 				if (KJS.i.buttonIsDown(this.ctrRt))
 					moveRight += 1;
+				
+				if (KJS.i.mouseDown(0)) {
+					guy.drag.camera.weapon.s.fire();
+				}
 		
 				if (!this.falling) {
 					if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
@@ -329,13 +467,23 @@ var betterFps = function() {
 				
 				this.y = (this.y + (-KJS.i.getMouseDX() / 100)) % (Math.PI * 2);
 				this.p = Math.max(Math.min(Math.PI / 2, this.p + (-KJS.i.getMouseDY() / 100)), -Math.PI / 2);
-				guy.drag.camera.transform.setRotationYXZ(-Math.PI / 2, this.p, 0);
+				guy.drag.camera.transform.setRotationYXZ(-Math.PI / 2 + KJS.orandom() * SCN.s.shake, this.p + KJS.orandom() * SCN.s.shake, 0);
 				guy.drag.transform.setRotationYXZ(this.y, 0, 0);
 			}
+			
+			guy.drag.camera.weapon.transform.identity();
+			guy.drag.camera.weapon.transform.rotateX(Math.PI / 2);
+			guy.drag.camera.weapon.transform.rotateZ(Math.PI + Math.PI / 2 * this.inspect);
+			guy.drag.camera.weapon.transform.rotateY(-0.3 * this.inspect);
+			guy.drag.camera.weapon.transform.scale(0.05, 0.05, 0.05);
 			
 			guy.drag.camera.weapon.transform.m30 = 0.5 + Math.sin(this.bob * 2 * Math.PI) / 18 * this.bobInfl;
 			guy.drag.camera.weapon.transform.m31 = -0.2 - Math.cos(this.bob * 4 * Math.PI) / 28 * this.bobInfl;
 			guy.drag.camera.weapon.transform.m32 = -0.8;
+			
+			guy.drag.camera.weapon.transform.m30 += this.inspect * -0.5;
+			guy.drag.camera.weapon.transform.m31 += this.inspect * 0.2;
+			guy.drag.camera.weapon.transform.m32 += this.inspect * 0.1;
 			
 			this.mss = 0;
 			this.falling = true;
@@ -348,18 +496,203 @@ var betterFps = function() {
 	return guy;
 }
 
+var zombieCol = function(kobj, normal) {
+	if (normal != null) {
+		var mag = Math.sqrt(Math.pow(this.tgtX - this.obj.transform.m30, 2) + Math.pow(this.tgtY - this.obj.transform.m32, 2));
+		//print("normal: " + normal)
+		//print("dot: " + normal.dot((this.tgtX - this.obj.transform.m30) / mag, 0, (this.tgtY - this.obj.transform.m32) / mag));
+		if (normal.dot((this.tgtX - this.obj.transform.m30) / mag, 0, (this.tgtY - this.obj.transform.m32)) > 0.9) {
+			this.obj.velocity.y = 10;
+		}
+	}
+}
+
+var laserShot = {
+	onupdate: function() {
+		this.obj.velocity.x += this.obj.velocity.x * delta;
+		this.obj.velocity.y += this.obj.velocity.y * delta;
+		this.obj.velocity.z += this.obj.velocity.z * delta;
+		this.obj.transform.rotateZ(delta * 12);
+	},
+	collide: function(kobj, normal) {
+		if (kobj.collideType == 2 && kobj.s.killable) {
+			// is player
+			kobj.s.hit(Math.floor(1 + Math.random() * 6));
+		}
+		this.obj.killMe = true;
+	}
+}
+
+var tempv = new Vector3f();
+
+var zombieUpd = function() {
+	//this.obj.velocity.x += KJS.orandom() * delta * 30;
+	//this.obj.velocity.y += KJS.orandom() * delta * 30;
+	//this.obj.velocity.z += KJS.orandom() * delta * 30;
+	this.obj.base.head.fan.transform.rotateZ(delta * 20);
+	
+	if (KJS.currentTick() % 20 == this.firstTick) {
+		this.attack = false;
+		var dist = this.obj.distance(SCN.s.players[SCN.s.currentPlayer]);
+		if (dist < 50) {
+			this.dir.set(0, 0, 0);
+			this.obj.point(this.dir, SCN.s.players[SCN.s.currentPlayer]);
+			var tgt = KJS.raycast(this.trace, this.obj.actTransform.m30,
+				this.obj.actTransform.m31,
+				this.obj.actTransform.m32,
+				this.dir.x / 2,
+				this.dir.y / 2,
+				this.dir.z / 2,
+				50 * 2, 1 | 2);
+			if (tgt == SCN.s.players[SCN.s.currentPlayer]) {
+				//this.obj.sound.play();
+				this.attack = true;
+			}
+		}
+		//print("woot: " + dist);
+	}
+	
+	// am i in position
+	if (Math.abs(this.tgtX - this.obj.transform.m30) < 2
+		&& Math.abs(this.tgtY - this.obj.transform.m32) < 2) {
+		// yes, now chill...
+		if (Math.random() < 0.05) {
+			// 5% chance of stop chilling
+			this.tgtX = fun * 18 * KJS.orandom() - 9;
+			this.tgtY = fun * 18 * KJS.orandom() - 9;
+			
+		}
+		
+	} else {
+		
+		var mag = Math.sqrt(Math.pow(this.tgtX - this.obj.transform.m30, 2) + Math.pow(this.tgtY - this.obj.transform.m32, 2));
+		//this.obj.transform.m30 = this.tgtX;
+		//this.obj.transform.m32 = this.tgtY;
+		if (this.attack) {
+			// A_FaceTarget
+			this.angle = Math.atan2((SCN.s.players[SCN.s.currentPlayer].transform.m30 - this.obj.transform.m30) / mag, (SCN.s.players[SCN.s.currentPlayer].transform.m32 - this.obj.transform.m32) / mag) + Math.PI;
+			this.obj.accelerateTo((this.tgtX - this.obj.transform.m30) / mag * 0.2, 0, (this.tgtY - this.obj.transform.m32) / mag * 0.2, delta * 4, true, false, true);
+		} else {
+			this.angle = Math.atan2((this.tgtX - this.obj.transform.m30) / mag, (this.tgtY - this.obj.transform.m32) / mag) + Math.PI;
+			this.obj.accelerateTo((this.tgtX - this.obj.transform.m30) / mag * 5, 0, (this.tgtY - this.obj.transform.m32) / mag * 5, delta * 40, true, false, true);
+		}
+		//this.tgtX /= mag;
+		//this.tgtX /= mag;
+		
+		//this.angle += (Math.atan2((this.tgtY - this.obj.transform.m32) / mag, (this.tgtX - this.obj.transform.m30) / mag) - this.angle) / 20;
+		
+	}
+	
+	if (this.attack) {
+		if (this.seq == 1) {
+			this.obj.sound.change(KJS.aud("fan_beep"));
+			this.obj.sound.play();
+			this.obj.sound.pitch = 1;
+		}
+		this.seq = Math.max(0, this.seq - delta);
+		if (this.seq == 0) {
+			// shoot
+			this.obj.sound.change(KJS.aud("fan_shot"));
+			this.obj.sound.play();
+			this.obj.sound.pitch = 1;
+			this.seq = 0.4;
+			
+			var boolet = new SKO_Cube();
+			boolet.transform.m30 = this.obj.transform.m30;
+			boolet.transform.m31 = this.obj.transform.m31;
+			boolet.transform.m32 = this.obj.transform.m32;
+			
+			this.obj.base.dir(boolet.transform, this.shot ? 0.333 : -0.333, 0, 0, 1, false);
+			this.shot = !this.shot
+			//boolet.velocity.y += 10;
+			//boolet.anchor = false;
+			boolet.transform.rotateY(Math.PI / 2);
+			boolet.hidden = true;
+			boolet.transform.scale(0.1, 0.1, 0.1);
+			boolet.collideType = 16;
+			//boolet.collideMove = 1 | 2;
+			boolet.collideCall = 1 | 2;
+			boolet.applyTransform();
+			boolet.transform.rotateY(Math.PI / 2);
+			boolet.s = {
+				onupdate: laserShot.onupdate,
+				collide: laserShot.collide
+			};
+			var dist = boolet.distance(SCN.s.players[SCN.s.currentPlayer]);
+			boolet.shoot(
+					SCN.s.players[SCN.s.currentPlayer].transform.m30 + SCN.s.players[SCN.s.currentPlayer].velocity.x * (dist / 20),
+					SCN.s.players[SCN.s.currentPlayer].transform.m31 + SCN.s.players[SCN.s.currentPlayer].velocity.y * (dist / 20),
+					SCN.s.players[SCN.s.currentPlayer].transform.m32 + SCN.s.players[SCN.s.currentPlayer].velocity.z * (dist / 20), 10, true);
+			boolet.gravityOverride = true;
+			boolet.transform.scale(1, 1, 16);
+			boolet.setMaterial(new Mat_FlatColor(1.0, 0.0, 0.0))
+			boolet.model = new RKO_Obj(KJS.obj("fanbot_laser"), 2);
+			boolet.model.transform.scale(1, 1, 1 / 16);
+			boolet.model.setMaterial(new Mat_Monotexture("laser2"));
+			boolet.model.material.alphaBlend = 1;
+			SCN[SCN.nextName("laser")] = boolet;
+			SCN.rescan();
+		}
+	} else {
+		this.seq = 1;
+	}
+	
+	
+	this.obj.base.transform.identity();
+	this.obj.base.transform.translate(0, -1, 0);
+	this.obj.base.transform.rotateY(this.angle);
+	
+}
+
+var zombieHit = function(p) {
+	this.obj.sound.play();
+	this.health -= p * 200;
+	if (this.health <= 0) {
+		this.obj.sound.pitch = 0.6;
+		this.obj.sound.play();
+		this.obj.killMe = true;
+	}
+}
+
 var zombie = function() {
 	var zarm = new SKO_Cube();
+	var material = new Mat_Monotexture("fanbot");
+	zarm.collideType = 4;
+	zarm.hidden = true;
 	zarm.transform.scale(1, 2, 1);
-	zarm.sound = new NKO_Audio(KJS.aud("bang"));
-	zarm.sound.volume = 0.3;
+	zarm.sound = new NKO_Audio(KJS.aud("fan_beep"));
+	//zarm.sound.volume = 0.3;
+	zarm.base = new RKO_Obj(KJS.obj("fanbot_base"));
+	zarm.base.transferScale = false;
+	zarm.base.setMaterial(material);
+	zarm.base.transform.translate(0, -1, 0);
+	zarm.base.head = new RKO_Obj(KJS.obj("fanbot_head"));
+	zarm.base.head.setMaterial(material);
+	zarm.base.head.transform.translate(0, 1.1, 0.25);
+	zarm.base.head.fan = new RKO_Obj(KJS.obj("fanbot_fan"));
+	zarm.base.head.fan.setMaterial(material);
+	zarm.base.head.fan.transform.translate(0, 1.85961 - 1.1, 0.31 - 0.25);
 	//plane.drag.transform.translate(0.0, 0.2, 0);
 	//plane.drag.transform.scale(0.6, 0.05, 0.05);
 	
-	zarm.camera = camera;
-
+	//verybase.hidden = fal;
+	
+	
 	zarm.s = {
-			
+		dir: new Vector3f(),
+		trace: new Vector3f(),
+		attack: false,
+		shot: false,
+		seq: 0,
+		firstTick: KJS.currentTick() % 20,
+		killable: true,
+		health: 100,
+		tgtX: fun * 18 * KJS.orandom() - 9,
+		tgtY: fun * 18 * KJS.orandom() - 9,
+		angle: 0,
+		collide: zombieCol,
+		onupdate: zombieUpd,
+		hit: zombieHit
 	}
 	
 	return zarm;
@@ -408,12 +741,14 @@ var flyingThing = function() {
 		},
 		collide: function(kobj, normal) {
 			//this.obj.dir(this.up, 0, 1, 0, 1, false);
-			var doot = normal.dot(this.up);
-			//KJS.d.wheels = "(" + Math.floor(this.up.x * 100) + ", " + Math.floor(this.up.y * 100) + ", " + Math.floor(this.up.z * 100) + ")";
-			KJS.d.wheels = doot;
-			if (doot > -0.97)
-				this.speed *= Math.pow(0.004, delta) / 1.0;
-			//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
+			if (normal != null) {
+				var doot = normal.dot(this.up);
+				//KJS.d.wheels = "(" + Math.floor(this.up.x * 100) + ", " + Math.floor(this.up.y * 100) + ", " + Math.floor(this.up.z * 100) + ")";
+				KJS.d.wheels = doot;
+				if (doot > -0.97)
+					this.speed *= Math.pow(0.004, delta) / 1.0;
+				//print(Math.round(normal.dot(0, 1, 0) * 100) / 100);
+			}
 		},
 		onupdate: function() {
 			

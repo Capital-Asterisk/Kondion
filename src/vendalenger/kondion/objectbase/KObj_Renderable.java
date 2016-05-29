@@ -49,6 +49,15 @@ public abstract class KObj_Renderable extends KObj_Oriented {
 	public KMat_erial getMaterial() {
 		return material;
 	}
+	
+	public void hideAll(boolean b) {
+		hidden = b;
+		for (KObj_Node child : children) {
+			if (child instanceof KObj_Renderable) {
+				((KObj_Renderable) child).hideAll(b);
+			}
+		}
+	}
 
 	public void setMaterial(KMat_erial material) {
 		this.material = material;

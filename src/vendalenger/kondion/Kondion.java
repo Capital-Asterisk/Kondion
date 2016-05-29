@@ -184,7 +184,7 @@ public class Kondion {
 		if (world.fixFrame > 0) {
 			return 1.0f / (float) world.fixFrame;
 		} else
-			return delta;
+			return (float) Math.min(delta, 1.0f / 5);
 	}
 	
 	/**
@@ -361,8 +361,10 @@ public class Kondion {
 						for (int i = 0; i < node.getFieldList().size(); i++) {
 							array = node.getFieldList().get(i).getValue()
 									.getArrayNode();
-
-							KLoader.registerAudio("ol:" + array.get(0).getStringValue(), node.getFieldList().get(i).getName().getStringValue(), true);
+							if (array.get(0).getStringValue().startsWith("ol:"))
+								KLoader.registerAudio(array.get(0).getStringValue(), node.getFieldList().get(i).getName().getStringValue(), true);
+							else
+								KLoader.registerAudio(identifier + ":" + array.get(0).getStringValue(), node.getFieldList().get(i).getName().getStringValue(), true);
 							
 							//KLoader.registerObj(identifier + ":" + array.get(0).getStringValue(),
 							//		node.getFieldList().get(i).getName().getStringValue(),

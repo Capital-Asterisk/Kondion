@@ -66,7 +66,8 @@ public class SKO_Cube extends KObj_Solid {
 			// rotVelocity.z *= 0.992;
 			rotVelocity.normalize();
 			if (!anchor) {
-				velocity.y -= Kondion.getDelta() * 9.806;
+				if (!gravityOverride)
+					velocity.y -= Kondion.getDelta() * 9.806;
 				transform.m30 += velocity.x * Kondion.getDelta();
 				transform.m31 += velocity.y * Kondion.getDelta();
 				transform.m32 += velocity.z * Kondion.getDelta();
@@ -198,7 +199,7 @@ public class SKO_Cube extends KObj_Solid {
 					/*if (dirs[1] != 0) {
 						float targety = kobj.transform.m31 + temp2.y + temp1.y;
 						float multiplier = kobj.transform.m31 / targety;
-						System.out.println("fuk: " + multiplier);
+						System.out.println("fukb: " + multiplier);
 						transform.m30 = transform.m30 + temp3.x * multiplier;
 						transform.m31 = targety;
 						transform.m32 = transform.m32 + temp3.z * multiplier;
@@ -313,6 +314,7 @@ public class SKO_Cube extends KObj_Solid {
 				
 				if (((kobj.collideType & collideCall) == kobj.collideType) && s != null && s.containsKey("collide")) {
 					s.callMember("collide", kobj, temp3);
+					//System.out.println("COLLIDE " + collideType + " vs " + kobj.collideType);
 				}
 				
 			}

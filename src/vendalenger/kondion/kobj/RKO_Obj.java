@@ -79,7 +79,6 @@ public class RKO_Obj extends KObj_Renderable {
 
 	@Override
 	public void updateB() {
-		// TODO Auto-generated method stub
-		
+		defaultUpdateB();
 	}
 }

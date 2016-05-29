@@ -1,17 +1,21 @@
 package vendalenger.kondion.lwjgl.resource;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ShortBuffer;
 
 import javax.script.ScriptException;
 
 import org.lwjgl.BufferUtils;
 import org.lwjgl.openal.AL10;
-
-import com.sun.org.apache.xpath.internal.operations.Number;
+import org.lwjgl.stb.STBVorbis;
+import org.lwjgl.stb.STBVorbisInfo;
+import org.lwjgl.system.MemoryUtil;
 
 import jdk.nashorn.api.scripting.ScriptObjectMirror;
+import lwjgl.IOUtil;
 import vendalenger.kondion.Kondion;
-import vendalenger.kondion.lwjgl.Window;
 
 public class KAudio {
 
@@ -69,7 +73,7 @@ public class KAudio {
 				//for (int i = 0; i < f.length; i++) {
 				//	f[i] *= i / 1000;
 				//}
-				//new Random().nextBytes(f);
+				//n	ew Random().nextBytes(f);
 				//buffy.put(f);
 				buffy.flip();
 				AL10.alBufferData(bufferId, AL10.AL_FORMAT_MONO8, buffy, bufferFrequency);
@@ -84,6 +88,35 @@ public class KAudio {
 			} catch (ScriptException e) {
 				e.printStackTrace();
 			}
+		} else {
+			//STBVorbisAlloc.
+			try {
+				FileInputStream s = (FileInputStream) KLoader.get(source);
+				ByteBuffer b = IOUtil.inputStreamToByteBuffer(s, (int) s.getChannel().size());
+				STBVorbisInfo info = STBVorbisInfo.malloc();
+				int[] e = {0};
+				long d = STBVorbis.stb_vorbis_open_memory(b, e, null);
+				if (d == MemoryUtil.NULL) {
+					// woops
+					System.err.println("Error Loading " + source + " error: " + e[0]);
+				}
+				STBVorbis.stb_vorbis_get_info(d, info);
+				
+				ShortBuffer data = BufferUtils.createShortBuffer(STBVorbis.nstb_vorbis_stream_length_in_samples(d));
+				STBVorbis.stb_vorbis_get_samples_short_interleaved(d, info.channels(), data);
+				STBVorbis.stb_vorbis_close(d);
+				
+				bufferId = AL10.alGenBuffers();
+				AL10.alBufferData(bufferId, AL10.AL_FORMAT_MONO16, data, info.sample_rate());
+				
+				isLoaded = true;
+			} catch (IOException e) {
+				
+				e.printStackTrace();
+			}
+			
+			
+			
 		}
 	}
 	

@@ -164,4 +164,12 @@ public class KJS {
 	public int height() {
 		return Window.getHeight();
 	}
+	
+	public String repeat(String s, int times) {
+		return new String(new char[times]).replace("\0", s);
+	}
+	
+	public double orandom() {
+		return Math.random() * 2 - 1;
+	}
 }

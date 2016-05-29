@@ -203,10 +203,13 @@ public class GKO_RenderPass extends KObj_Node implements JSDrawable {
 				//glPopMatrix();
 				
 				for (int i = 0; i < items.size(); i++) {
-					//glDepthMask(false);
-					if (!items.get(i).killMe)
-						items.get(i).render(type, this);
-					else {
+					if (!items.get(i).killMe) {
+						if (!items.get(i).hidden) {
+							items.get(i).render(type, this);
+						}
+							
+					} else {
+						System.out.println("Remove: " + i);
 						items.remove(i);
 						i --;
 					}

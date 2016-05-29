@@ -24,7 +24,7 @@ public abstract class KObj_Oriented extends KObj_Node {
 	
 	//public static final int 
 	public boolean transferScale = true;
-	private final Vector3f temp0 = new Vector3f();
+	protected final Vector3f temp0 = new Vector3f();
 	public final Matrix4f transform = new Matrix4f();
 	public final Matrix4f actTransform = new Matrix4f();
 	
@@ -135,4 +135,17 @@ public abstract class KObj_Oriented extends KObj_Node {
 	public void setZ(float z) {
 		transform.m32 = z;
 	}
+	
+	public float distance(KObj_Oriented o) {
+		temp0.set(actTransform.m30, actTransform.m31, actTransform.m32);
+		temp0.sub(o.actTransform.m30, o.actTransform.m31, o.actTransform.m32);
+		return temp0.length();
+	}
+	
+	public void point(Vector3f dest, KObj_Oriented o) {
+		dest.set(o.actTransform.m30, o.actTransform.m31, o.actTransform.m32);
+		dest.sub(actTransform.m30, actTransform.m31, actTransform.m32);
+		dest.normalize();
+	}
+	
 }

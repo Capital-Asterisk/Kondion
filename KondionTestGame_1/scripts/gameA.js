@@ -1,5 +1,35 @@
+
+KJS.obj("coolthing").load();
+KJS.obj("fanbot_base").load();
+KJS.obj("fanbot_head").load();
+KJS.obj("fanbot_fan").load();
+KJS.obj("fanbot_laser").load();
+KJS.obj("deli_4l558").load();
+
+KJS.texture("fanbot").load();
+KJS.texture("noah").load();
+KJS.texture("generic").load();
+KJS.texture("human").load();
+KJS.texture("bird").load();
+KJS.texture("d4l558").load();
+KJS.texture("laser").load();
+KJS.texture("laser2").load();
+KJS.texture("flare").load();
+KJS.texture("blood").load();
+
+KJS.aud("sss").load();
+KJS.aud("viznut").load();
+KJS.aud("noice").load();
+KJS.aud("bang").load();
+KJS.aud("hicol").load();
+KJS.aud("fan_beep").load();
+KJS.aud("fan_shot").load();
+
 World.passes.add(new GKO_DeferredPass(1));
 World.passes.add(new GKO_RenderPass(2, KJS.DIFFUSE));
+//World.passes[1].width = KJS.width() / 4;
+//World.passes[1].height = KJS.height() / 4;
+//World.passes[1].sizeOverride = true;
 World.passes[1].depthMask = World.passes[0];
 /*World.passes[0].gui.add(new GUI_Button({
 	x: 500,
@@ -14,6 +44,7 @@ SCN.LightB = new RKO_DirectionalLight();
 SCN.LightB.color.set(1.0, 1.0, 1.0, 1.0);
 // Add ground and wall
 SCN.Floor = new SKO_InfinitePlane();
+SCN.Floor.setMaterial(new Mat_Monotexture("generic"));
 SCN.Floor.transform.rotateX(-Math.PI / 2);
 SCN.Floor.textureSize = 1;
 SCN.Floor.transform.translate(0, 0, -64);
@@ -37,7 +68,7 @@ for (var i = 0; i < sides; i++) {
 }
 
 //SCN.Wallz.transform.translate(0, 0, -40);
-//SCN.Wallz.textureSize = 50;
+//SCN.Wallz.textureSize = 				guy.drag.transform.setRotationYXZ(this.y, 0, 0);
 //SCN.Wallz.transform.rotateX(-Math.PI / 2);
 
 /*SCN.Platform = new SKO_Cube();
@@ -116,29 +147,12 @@ for (var i = 0; i < 0; i++) {
 	SCN["CUBE_" + i] = cube;
 }
 
-KJS.obj("coolthing").load();
-KJS.obj("fanbot_base").load();
-KJS.obj("fanbot_head").load();
-KJS.obj("fanbot_fan").load();
-KJS.obj("deli_4l558").load();
-
-KJS.texture("fanbot").load();
-KJS.texture("noah").load();
-KJS.texture("human").load();
-KJS.texture("bird").load();
-KJS.texture("d4l558").load();
-KJS.texture("laser").load();
-KJS.texture("flare").load();
-KJS.aud("sss").load();
-KJS.aud("viznut").load();
-KJS.aud("noice").load();
-KJS.aud("bang").load();
 
 World.fogIntensity = 0.0001;
 World.clearColor.set(0, 0, 0, 1);
 World.skyColor.set(0, 0, 0, 1);
 World.compMode = KJS.DEBUG;
-World.s = {fpav: 0};
+World.s = {fpav: 0, siav: 0, lines: 3};
 
 World.compositor = function(ctx, passes) {
 	//print(ctx);
@@ -160,28 +174,47 @@ World.compositor = function(ctx, passes) {
 	ctx.globalCompositeOperation = KJS.ADD;
 	ctx.drawImage(passes[1], 0, 0, passes[0].width, passes[0].height);
 	ctx.globalCompositeOperation = KJS.DEFAULT;
+	ctx.fillRgba(1.0, 1.0, 1.0, SCN.s.blood);
+	SCN.s.blood = Math.min(2, Math.max(0, SCN.s.blood - delta));
+	ctx.drawImage(KJS.texture("blood"), 0, 0, passes[0].width, passes[0].height);
 	//ctx.drawImage(passes[1], passes[0].width / 2, 0, passes[1].width / 6, passes[1].height / 6);
 	//ctx.deferredRender(passes[0], passes[2], passes[1],
 	//	0, 0, 0, 0, 0, 0,
 	//	passes[0].width, passes[0].height);
 	ctx.scale(0.5, 0.5);
 	ctx.fillRgba(0.0, 0.0, 0.0, 0.5);
-	ctx.fillRect(0, 0, 500, 68);
+	ctx.fillRect(0, 0, KJS.width() * 2, 68);
 	ctx.textAlign = "left";
 	ctx.fillRgba(1.0, 1.0, 1.0, 1.0);
 	ctx.fillText("Frame r8: " + Math.floor(this.s.fpav) + " + Tap: " + (KJS.i.buttonTap(0)), 10, 30);
+	ctx.fillText("Health: [" + KJS.repeat("I", SCN.s.players[SCN.s.currentPlayer].s.health) + KJS.repeat(" ", 100 - Math.floor(SCN.s.players[SCN.s.currentPlayer].s.health)) + "]", KJS.width() / 3, 30);
 	ctx.fillText("Speed: " + (Math.floor(SCN.s.players[SCN.s.currentPlayer].s.speed * 3.6 * 100) / 100) + " km/h", 10, 60);
-
+	
+	// Draw crosshair
+	ctx.identity();
+	ctx.translate(KJS.width() / 2, KJS.height() / 2);
+	var si = 40 + SCN.s.shake * 3000 + SCN.s.players[SCN.s.currentPlayer].velocity.length() * 5;
+	this.s.siav -= (this.s.siav - si) / 20;
+	var hei = 20;
+	for (var i = 0; i < this.s.lines; i++) {
+		ctx.rotate((Math.PI * 2) / this.s.lines);
+		ctx.fillRgba(0.0, 0.0, 0.0, 1.0);
+		ctx.fillRect(-2, -this.s.siav, 4, hei);
+		ctx.fillRgba(1.0, 1.0, 1.0, 1.0);
+		ctx.fillRect(-1, -this.s.siav + 1, 2, hei - 2);
+	}
+	
 	passes[0].renderGUI(ctx);
 
 	ctx.fillRgba(0.0, 1.0, 0.0, 1.0);
 	ctx.identity();
-	ctx.fillRect(KJS.i.getMouseX(), KJS.i.getMouseY(), 10, 10);
+	//ctx.fillRect(KJS.i.getMouseX(), KJS.i.getMouseY(), 10, 10);
 	
 }
 SCN.Camera = new OKO_Camera_();
 SCN.Camera.moveTo(0, 4, 0);
-
+SCN.s.shake = 0;
+SCN.s.blood = 0;
 SCN.s.onupdate = function() {
 	//SCN.eggs.transform.rotateZ(0.01);
 	//SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
@@ -195,6 +228,12 @@ SCN.s.onupdate = function() {
 		this.players[this.currentPlayer].s.on = true;
 		this.players[this.currentPlayer].s.onselect();
 	}
+	if (KJS.i.keyboardDown(KJS.i.toGLFWCode('i')) && KJS.currentTick() % 60 == 3) {
+		World.s.lines ++;
+	}
+	if (KJS.i.keyboardDown(KJS.i.toGLFWCode('o')) && KJS.currentTick() % 60 == 3) {
+		World.s.lines --;
+	}
 	if (KJS.i.keyboardDown(KJS.i.toGLFWCode('c')) && KJS.currentTick() % 60 == 3) {
 		World.compMode ++;
 		World.compMode %= 3;
@@ -202,6 +241,14 @@ SCN.s.onupdate = function() {
 	if (KJS.i.keyboardDown(KJS.i.toGLFWCode('p'))) {
 		KJS.s.clear();
 		KJS.s.load("ktg1:scenes/menu");
+	}
+	
+	if (Math.random() < 0.01) {
+		var z = zombie();
+	
+		SCN[SCN.nextName("zombie")] = z;
+		SCN.rescan();
+		
 	}
 }
 

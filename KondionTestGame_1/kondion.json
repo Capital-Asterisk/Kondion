@@ -24,23 +24,28 @@
 		"left": ["Left Button", "key", "a"],
 		"right": ["Right button", "key", "d"],
 		"open": ["Open a door", "key", "e"],
+		"grapple": ["SPIDER MAN", "key", "f"],
 		"select": ["Press buttons", "key", " "]
 	},
 	"Graphics": {
 		"titlepic": ["image/titlepic", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
-	
+		"blood": ["image/blood", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		
 		"select_l": ["image/selector/left", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"select_r": ["image/selector/right", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"select": ["image/selector/selector", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 	
 		"human": ["living/human", "GL_NEAREST", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"eggs": ["maps/noah", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"generic": ["maps/gfloor", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+
 		"neat": ["kaytrav", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"noah": ["maps/ktt", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"bird": ["maps/moreeggs", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"fanbot": ["models/fanbot/texture", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"d4l558": ["models/wepon/4l558/uv", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"laser": ["graphics/bullet/laser", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
+		"laser2": ["graphics/bullet/laser2", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"],
 		"flare": ["graphics/bullet/flare", "GL_LINEAR", "GL_LINEAR", "GL_REPEAT", "GL_REPEAT"]
 	},
 	"OBJ": {
@@ -50,14 +55,18 @@
 		"fanbot_base": ["models/fanbot/base", "neat"],
 		"fanbot_head": ["models/fanbot/head", "neat"],
 		"fanbot_fan": ["models/fanbot/fan", "neat"],
+		"fanbot_laser": ["models/fanbot/laser", "neat"],
 		"deli_4l558": ["models/wepon/4l558/D4L558", "neat"]
 		
 	},
 	"Audio": {
-		"sss": ["8000:16000:50:((t/2*(((t>>4|t)>>8)%11)&255)/4+(t*(((t>>5|t)>>8)%11)&100)/2)"],
-		"viznut": ["8000:16000:50:(t>>6|t|t>>(t>>16))*10+((t>>11)&7)"],
-		"noice": ["16000:16000:0.01:Math.random() * 255 - 127"],
-		"bang": ["8000:16000:0.1:(Math.random() * 255 - 127) / (t / 90) / 2"]
+		"sss": ["ol:8000:16000:50:((t/2*(((t>>4|t)>>8)%11)&255)/4+(t*(((t>>5|t)>>8)%11)&100)/2)"],
+		"viznut": ["ol:8000:16000:50:(t>>6|t|t>>(t>>16))*10+((t>>11)&7)"],
+		"noice": ["ol:16000:16000:0.01:Math.random() * 255 - 127"],
+		"bang": ["ol:8000:16000:2:(Math.random() * 255 - 127) * (1 / (t / 30 + 1))"],
+		"hicol": ["audio/4l558/hicol"],
+		"fan_beep": ["audio/fanbot/beep"],
+		"fan_shot": ["audio/fanbot/enshot"]
 	},
 	"SAudio": {
 		"monkeyR": ["random", "monkey0", "monkey1"]

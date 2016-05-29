@@ -80,5 +80,31 @@ public final class IOUtil {
 		buffer.flip();
 		return buffer;
 	}
+	
+	public static ByteBuffer inputStreamToByteBuffer(InputStream source, int bufferSize) throws IOException {
+		ByteBuffer buffer;
+		
+		buffer = createByteBuffer(bufferSize);
+
+		try {
+			ReadableByteChannel rbc = Channels.newChannel(source);
+			try {
+				while ( true ) {
+					int bytes = rbc.read(buffer);
+					if ( bytes == -1 )
+						break;
+					if ( buffer.remaining() == 0 )
+						buffer = resizeBuffer(buffer, buffer.capacity() * 2);
+				}
+			} finally {
+				rbc.close();
+			}
+		} finally {
+			source.close();
+		}
+
+		buffer.flip();
+		return buffer;
+	}
 
 }

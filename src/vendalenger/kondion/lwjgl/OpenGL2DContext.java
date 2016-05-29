@@ -15,6 +15,7 @@ import vendalenger.kondion.lwjgl.resource.KTexture;
 
 public class OpenGL2DContext extends JSContext2D {
 
+	public boolean colorImages = true;
 	private final Vector4f fillColor;
 	private final Vector4f strokeColor;
 	
@@ -62,6 +63,7 @@ public class OpenGL2DContext extends JSContext2D {
 	@Override
 	public void fillRect(float x, float y, float width, float height) {
 		KTexture.unBind();
+		blendModes();
 		applyFillColor();
 		glTranslatef(x + width / 2, y + height / 2, 0);
 		GLDrawing.renderQuad(width, height);
@@ -234,7 +236,10 @@ public class OpenGL2DContext extends JSContext2D {
 	public void drawImage(JSDrawable img, float x, float y, float width, float height) {
 		img.bind();
 		blendModes();
-		glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		if (!colorImages)
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+		else
+			applyFillColor();
 		glTranslatef(x + width / 2, y + height / 2, 0);
 		GLDrawing.renderQuad(width, height);
 		glTranslatef(-(x + width / 2), -(y + height / 2), 0);
@@ -296,7 +301,7 @@ public class OpenGL2DContext extends JSContext2D {
 		if (globalCompositeOperation != null) {
 			if (Integer.valueOf(globalCompositeOperation.toString()) == 1) {
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-				System.out.println("ADD");
+				//System.out.println("ADD");
 			} else {
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 			}

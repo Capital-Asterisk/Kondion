@@ -20,11 +20,15 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
+import vendalenger.kondion.lwjgl.TTT;
+
 public abstract class KObj_Solid extends KObj_Renderable {
 	
 	public boolean axisAlign = true;
 	public boolean collide = false;
 	public boolean anchor = false;
+	public boolean gravityOverride = false;
+	public float gravity = 0.0f;
 	public float mass = 1.0f;
 	public float divFriction = 1.1f;
 	public float staticFriction = 0.0f;
@@ -80,6 +84,17 @@ public abstract class KObj_Solid extends KObj_Renderable {
 		//if (Math.abs(velocity.z - z) < r8)
 		//	velocity.z = z;
 		
+	}
+	
+	public void shoot(float x, float y, float z, float amt, boolean rotate) {
+		temp0.set(x - actTransform.m30, y - actTransform.m31, z - actTransform.m32);
+		temp0.normalize();
+		if (rotate) {
+			transform.rotateY((float) Math.atan2(temp0.x, temp0.z));
+			transform.rotateX((float) Math.asin(temp0.y));
+		}
+		temp0.mul(amt);
+		velocity.add(temp0);
 	}
 
 	public abstract CollisionData collisionCheck(KObj_Solid kobj);

@@ -224,7 +224,8 @@ public class GKO_Scene extends KObj_Node {
 							&& (
 									// Are layers valid?
 									((currentB.collideType & currentA.collideCall) == currentB.collideType)
-									|| ((currentB.collideType & currentA.collideMove) == currentB.collideType))) {
+									|| ((currentB.collideType & currentA.collideMove) == currentB.collideType)
+									)) {
 							currentA.collisionCheck(currentB);
 							//currentA.pos.z += 0.001f;
 						}

@@ -80,9 +80,51 @@ public class NKO_Audio extends KObj_Node {
 		}
 	}
 	
+	public void stop() {
+		AL10.alSourceStop(src);
+	}
+	
+	public void change(KAudio f) {
+		if (f != sound) {
+			sound = f;
+			AL10.alSourcei(src, AL10.AL_BUFFER, sound.getId());
+		}
+	}
+	
 	@Override
 	public void delete() {
-		delSource();
+		if (AL10.alGetSourcei(src, AL10.AL_LOOPING) == AL10.AL_TRUE)
+			delSource();
+		else {
+			System.out.println("waiting...");
+			long left = (long) (1000 * (
+					(AL10.alGetBufferi(sound.getId(), AL10.AL_SIZE)
+					/ AL10.alGetBufferi(sound.getId(), AL10.AL_CHANNELS)
+					/ (AL10.alGetBufferi(sound.getId(), AL10.AL_BITS) / 8))
+					/ AL10.alGetBufferi(sound.getId(), AL10.AL_FREQUENCY)
+					/ pitch
+					- AL10.alGetSourcef(src, AL11.AL_SEC_OFFSET) / pitch));
+			
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						//System.out.println(
+						//		"Sound Size: " + 
+						//		((AL10.alGetBufferi(sound.getId(), AL10.AL_SIZE)
+						//		/ AL10.alGetBufferi(sound.getId(), AL10.AL_CHANNELS)
+						//		/ (AL10.alGetBufferi(sound.getId(), AL10.AL_BITS) / 8))
+						//		/ AL10.alGetBufferi(sound.getId(), AL10.AL_FREQUENCY)
+						//		/ pitch));
+						Thread.sleep(0);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					System.out.println("Deleted source");
+					AL10.alDeleteSources(src);
+				}
+			}).run();
+		}
 	}
 	
 	private void genSource() {
