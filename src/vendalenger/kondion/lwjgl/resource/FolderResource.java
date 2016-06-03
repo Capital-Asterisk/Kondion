@@ -58,10 +58,10 @@ public class FolderResource implements KResource {
 			String[] split = path.split(Pattern.quote(System.getProperty("file.separator")));
 			for (int i = 0; i < split.length; i++) {
 				File[] f = dir.listFiles();
-				//System.out.println("FILE: " + dir.getName() + " NEED: " + split[i]);
+				System.out.println("FILE: " + dir.getName() + " NEED: " + split[i]);
 				for (int j = 0; j < f.length; j++) {
 					if (f[j].getName().startsWith(split[i]) && (f[j].isDirectory() || split.length - 1 == i)) {
-						//System.out.println("ENTER: " + f[j].getName());
+						System.out.println("ENTER: " + f[j].getName());
 						dir = f[j];
 						j = f.length + 4;
 					}

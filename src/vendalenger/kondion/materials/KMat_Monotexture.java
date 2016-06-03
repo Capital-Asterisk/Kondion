@@ -29,7 +29,8 @@ public class KMat_Monotexture implements KMat_erial  {
 	private boolean alpha;
 	
 	public KMat_Monotexture() {
-		setColorf(0.4f, 1.0f, 0.0f);
+		setColorf(1.0f, 1.0f, 1.0f);
+		a = 1.0f;
 	}
 	
 	public KMat_Monotexture(String nom) {
@@ -108,7 +109,7 @@ public class KMat_Monotexture implements KMat_erial  {
 		glUniform4f(uni_color, r, g, b, a);
 		glUniform1f(uni_fog, Kondion.getWorld().fogIntensity);
 		glUniform1i(uni_type, type);
-		
+		//glColor4f(r, g, b, a);
 		switch (alphaBlend) {
 			case 1:
 				glBlendFunc(GL_SRC_ALPHA, GL_ONE);

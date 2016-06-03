@@ -148,6 +148,8 @@ public class KTexture implements JSDrawable {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		} else {
+			System.out.println("TEXTURE ALREADUY LOADED");
 		}
 	}
 	

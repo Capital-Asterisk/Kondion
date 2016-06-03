@@ -13,9 +13,9 @@ SCN.LightB.color.set(1.0, 1.0, 1.0, 1.0);
 // Add ground and wall
 SCN.Ocean = new SKO_InfinitePlane();
 SCN.Ocean.transform.rotateX(-Math.PI / 2);
-SCN.Ocean.textureSize = 2;
+SCN.Ocean.textureSize = 64;
 SCN.Ocean.transform.translate(0, 0, -64);
-SCN.Ocean.material = new Mat_Strange();//Mat_FlatColor(58 / 255, 189 / 255, 232 / 255);
+SCN.Ocean.material = new Mat_Monotexture("water");//Mat_FlatColor(58 / 255, 189 / 255, 232 / 255);
 
 //SCN.Wallz.transform.translate(0, 0, -40);
 //SCN.Wallz.textureSize = 50;
@@ -48,21 +48,24 @@ KJS.d["QE: YAW"] = 0;
 KJS.d["V: Do not press"] = 0;
 KJS.d["----------------------"] = 0;
 
-SCN.guy = betterFps();
 SCN.planeA = flyingThing();
-SCN.planeB = flyingThing();
-SCN.FanBot = fanbot();
-SCN.guy.transform.m30 = 40;
-SCN.FanBot.transform.m30 = 20;
-SCN.planeB.transform.m30 = 6211000;
-SCN.s.players = [SCN.guy, SCN.planeA, SCN.FanBot, SCN.planeB];
-SCN.guy.s.on = true;
+//SCN.planeB = flyingThing();
+//SCN.FanBot = fanbot();
+//SCN.FanBot.transform.m30 = 20;
+SCN.planeA.s.onselect();
+SCN.planeA.s.speed = 444;
+SCN.planeA.s.on = true;
+SCN.planeA.transform.m31 += 40;
+SCN.planeA.transform.rotateY(Math.PI / 2);
+SCN.s.players = [SCN.planeA];
+//SCN.guy.s.on = true;
 SCN.s.currentPlayer = 0;
 
-for (var i = 0; i < 20; i++) {
+for (var i = 0; i < 60; i++) {
 	var cube = new SKO_Cube();
+	cube.transform.scale(30, 30, 30);
 	cube.morecube = new SKO_Cube(0);
-	cube.transform.translate((i - 50) * 7, Math.random() * 20, Math.random() * 100);
+	cube.transform.translate(KJS.orandom() * 500, 0, KJS.orandom() * 500);
 	cube.s = {
 		onupdate: function() {
 			this.obj.velocity.z -= Math.random() / 7;
@@ -73,20 +76,6 @@ for (var i = 0; i < 20; i++) {
 	cube.morecube.transform.translate(0, 1, 0);
 	SCN["CUBE_" + i] = cube;
 }
-
-KJS.obj("coolthing").load();
-KJS.obj("fanbot_base").load();
-KJS.obj("fanbot_head").load();
-KJS.obj("fanbot_fan").load();
-
-KJS.texture("fanbot").load();
-KJS.texture("noah").load();
-KJS.texture("human").load();
-KJS.texture("bird").load();
-KJS.aud("sss").load();
-KJS.aud("viznut").load();
-KJS.aud("noice").load();
-KJS.aud("bang").load();
 
 World.fogIntensity = 0.0001;
 World.clearColor.set(0, 0, 0, 1);
@@ -136,6 +125,7 @@ SCN.s.onupdate = function() {
 	//SCN.eggs.transform.rotateZ(0.01);
 	//SCN.Wallz.transform.rotateX(Math.sin(KJS.currentTick() / 400) / 250);
 	World.camera = this.players[this.currentPlayer].s.camera;
+	
 	if (KJS.i.mouseDown(1)) {
 		KJS.i.setMouseLock(false);
 	}

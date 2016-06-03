@@ -76,18 +76,14 @@ World.passes[1].gui.add(buttonA);
 World.passes[1].gui.add(buttonB);
 World.passes[1].gui.add(buttonC);
 
-KJS.texture("titlepic").load();
-KJS.texture("select").load();
-KJS.texture("select_l").load();
-KJS.texture("select_r").load();
-KJS.obj("durian").load();
+
 
 var unLoad = function() {
-	KJS.texture("titlepic").unLoad();
-	KJS.texture("select").unLoad();
-	KJS.texture("select_l").unLoad();
-	KJS.texture("select_r").unLoad();
-	KJS.obj("durian").unLoad();
+	//KJS.texture("titlepic").unLoad();
+	//KJS.texture("select").unLoad();
+	//KJS.texture("select_l").unLoad();
+	//KJS.texture("select_r").unLoad();
+	//KJS.obj("durian").unLoad();
 }
 
 SCN.LightB = new RKO_DirectionalLight();

@@ -41,8 +41,8 @@ void main(){
 	   	//final = vec4(mix(vec3(1.0, 1.0, 1.0), vec3(final.xyz), clamp(1.0 / exp(exp(exp(texture2D(texture1, texCoord.st).x)) * fog), 0.0, 1.0)), final.w);
     }
 	
-	float v = 0;//(float(mod(coord.y * 80, 2) < 0.9)) * 0.2 + mod(coord.y * 80, 2) / 24;
-	v = pow(length(coord - vec2(0.5, 0.5)) * sqrt(2), 4) * 0.7;
+	//float v = 0;//(float(mod(coord.y * 80, 2) < 0.9)) * 0.2 + mod(coord.y * 80, 2) / 24;
+	//v = pow(length(coord - vec2(0.5, 0.5)) * sqrt(2), 4) * 0.7;
 	//v *= 60;
 	//v *= abs(coord.x - 0.5) / 4;
 	//v *= abs(coord.y - 0.5);

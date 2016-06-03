@@ -48,6 +48,7 @@ public class SceneLoader {
 		}
 		w.scene.clear();
 		w.scene.s.clear();
+		
 		w.passes.clear();
 		w.camera = null;
 		w.compositor = null;
