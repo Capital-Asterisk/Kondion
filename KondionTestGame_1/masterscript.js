@@ -319,7 +319,7 @@ var betterFps = function() {
 	}
 	
 	guy.s = {
-		camera: guy.drag.camera.third,
+		camera: guy.drag.camera,
 		ctrUp: KJS.i.getButtonIndex("up"),
 		ctrDn: KJS.i.getButtonIndex("down"),
 		ctrLf: KJS.i.getButtonIndex("left"),
@@ -813,7 +813,7 @@ var flyingThing = function() {
 	plane.sound = new NKO_Audio(KJS.aud("jet"));
 	plane.shoot = new NKO_Audio(KJS.aud("fan_shot"));
 	plane.sound.volume = 2.0;
-	plane.shoot.pitch = 2;
+	plane.shoot.pitch = 1;
 	plane.shoot.volume = 3.0;
 
 	plane.sound.play(false);
@@ -873,22 +873,24 @@ var flyingThing = function() {
 				
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('a'))) {
 					//plane.rotVelocity.rotateZ(0.2 * delta);
-					this.vr += 1.2 * delta * Math.min(1, this.speed / 277);
+					this.vr += 0.9 * delta * Math.min(1, this.speed / 277);
 				}
 
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('d'))) {
 					//plane.rotVelocity.rotateZ(-0.2 * delta);
-					this.vr -= 1.2 * delta * Math.min(1, this.speed / 277);
+					this.vr -= 0.9 * delta * Math.min(1, this.speed / 277);
 				}
 
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('s'))) {
 					//plane.rotVelocity.rotateX(0.2 * delta);
-					this.vp += 1.2 * delta * Math.min(1, this.speed / 277);
+					this.vp += 0.5 * delta * Math.min(1, this.speed / 277);
+					this.speed = Math.max(0, this.speed - delta * 40);
 				}
 
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('w'))) {
 					//plane.rotVelocity.rotateX(-0.2 * delta);
-					this.vp -= 1.2 * delta * Math.min(1, this.speed / 277);
+					this.vp -= 0.3 * delta * Math.min(1, this.speed / 277);
+					this.speed = Math.max(0, this.speed - delta * 40);
 				}
 
 				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('q'))) {
@@ -920,12 +922,12 @@ var flyingThing = function() {
 					this.bcam = Math.max(0, this.bcam - delta * 4)
 				}
 				
-				if (this.speed < 360) {
+				if (!KJS.i.keyboardDown(KJS.i.toGLFWCode('m')) && this.speed < 360) {
 					this.speed += delta * 70;
 				}
 
-				if (KJS.i.keyboardDown(KJS.i.toGLFWCode(' '))) {
-					this.speed += delta * 70;
+				if (KJS.i.keyboardDown(KJS.i.toGLFWCode('n'))) {
+					this.speed += delta * 20;
 				} else {
 					this.speed = Math.max(0, this.speed - delta * 10);
 				}
@@ -949,7 +951,7 @@ var flyingThing = function() {
 					KJS.d.yvel = Math.floor(this.obj.velocity.y * 10000) / 10000;
 				//}
 
-				this.vy -= this.heading.dot(this.up) * delta / Math.max(0.7, Math.min(60, this.speed / 30));
+				this.vy -= this.heading.dot(this.up) * delta / Math.max(0.7, Math.min(60, this.speed / 30)) * 2;
 				this.vp -= Math.min(0.1, this.up.y * delta * -this.obj.velocity.y / 10 / Math.max(0.01, this.speed / 30) / 5);
 
 				if (KJS.i.mouseDown(0) && this.deb >= 0.1) {
@@ -963,9 +965,19 @@ var flyingThing = function() {
 					eggs.transform.set(this.obj.transform);
 					eggs.s = {
 						collide: function(kobj, normal) {
+							if (kobj.s && kobj.s.boom) {
+								kobj.s.boom();
+							}
 							this.obj.killMe = true;
 						}
 					};
+					eggs.transform.scale(1, 1, 16);
+					eggs.setMaterial(new Mat_FlatColor(1.0, 0.0, 0.0))
+					eggs.model = new RKO_Obj(KJS.obj("fanbot_laser"), 2);
+					eggs.model.transform.scale(1, 1, 1 / 16);
+					eggs.model.setMaterial(new Mat_Monotexture("laser2"));
+					eggs.model.material.alphaBlend = 1;
+					eggs.model.material.setColorf(1, 1, 0);
 					SCN[SCN.nextName("bam")] = eggs;
 					SCN.rescan();
 					this.deb -= 0.1;

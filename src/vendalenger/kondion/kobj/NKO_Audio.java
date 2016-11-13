@@ -3,6 +3,7 @@ package vendalenger.kondion.kobj;
 import org.lwjgl.openal.AL10;
 import org.lwjgl.openal.AL11;
 
+import vendalenger.kondion.Kondion;
 import vendalenger.kondion.lwjgl.Window;
 import vendalenger.kondion.lwjgl.resource.KAudio;
 import vendalenger.kondion.objectbase.KObj_Node;
@@ -55,7 +56,7 @@ public class NKO_Audio extends KObj_Node {
 		}
 		//AL10.alSourcei(src, AL10.AL_SOURCE_RELATIVE, AL10.AL_TRUE);
 		//AL10.alSourcef(src, AL10.AL_ROLLOFF_FACTOR, 0.0f);
-		AL10.alSourcef(src, AL10.AL_PITCH, pitch);
+		AL10.alSourcef(src, AL10.AL_PITCH, pitch * Kondion.kjs.timescale);
 		//AL10.alSourcePlay(src);
 	}
 	
@@ -71,7 +72,7 @@ public class NKO_Audio extends KObj_Node {
 		if (!sourced) {
 			genSource();
 		}
-		AL10.alSourcef(src, AL10.AL_PITCH, pitch);
+		AL10.alSourcef(src, AL10.AL_PITCH, pitch * Kondion.kjs.timescale);
 		AL10.alSourcef(src, AL10.AL_GAIN, volume);
 		if (replace)
 			AL10.alSourcePlay(src);

@@ -51,12 +51,14 @@ SCN.Platform.s = {
 //SCN.PlatformB.setMaterial(new Mat_Monotexture("K_Cube"));
 
 KJS.d["------ Controls ------"] = 0;
-KJS.d["Z: Hold to switch camera / character"] = 0;
-KJS.d["C: Hold it"] = 0;
-KJS.d["WASD: Movement"] = 0;
-KJS.d["X: Look Behind"] = 0;
-KJS.d["QE: YAW"] = 0;
-KJS.d["V: Do not press"] = 0;
+KJS.d["WASD:"] = "Move";
+KJS.d["OL"] = "Change sensitivity";
+KJS.d["IK"] = "Change cursor";
+KJS.d["MOUSE1"] = "Fire laser";
+KJS.d["E"] = "Inspect weapon";
+KJS.d["F"] = "Grapple hook";
+KJS.d["Q"] = "Third person";
+KJS.d["V"] = "Slow motion";
 KJS.d["----------------------"] = 0;
 
 SCN.guy = betterFps();
@@ -111,7 +113,7 @@ for (var i = 0; i < sides; i++) {
 	
 }
 
-for (var i = 0; i < 20; i++) {
+for (var i = 0; i < 16; i++) {
 	var z = zombie();
 	z.transform.m30 = fun * 18 * KJS.orandom() - 9;
 	z.transform.m32 = fun * 18 * KJS.orandom() - 9;
@@ -138,8 +140,8 @@ for (var i = 0; i < 0; i++) {
 World.fogIntensity = 0.0001;
 World.clearColor.set(0, 0, 0, 1);
 World.skyColor.set(0, 0, 0, 1);
-World.compMode = KJS.DEBUG;
-World.s = {fpav: 0, siav: 0, lines: 3, sense: 1};
+World.compMode = KJS.COMPOSITE;
+World.s = {fpav: 0, siav: 0, lines: 3, sense: 3};
 
 World.compositor = function(ctx, passes) {
 	//print(ctx);
@@ -175,8 +177,8 @@ World.compositor = function(ctx, passes) {
 	ctx.fillRgba(1.0, 1.0, 1.0, 1.0);
 	ctx.fillText("Sense: " + this.s.sense + " Frame r8: " + Math.floor(this.s.fpav), 10, 30);
 	ctx.fillText("Structural Integrity: [" + KJS.repeat("I", SCN.s.players[SCN.s.currentPlayer].s.health) + KJS.repeat(" ", 100 - Math.floor(SCN.s.players[SCN.s.currentPlayer].s.health)) + "]", KJS.width() / 3, 30);
-	ctx.fillText("Speed: " + (Math.floor(SCN.s.players[SCN.s.currentPlayer].s.speed * 3.6 * 100) / 100) + " km/h", 10, 60);
-	ctx.fillText("Score: " + Math.floor(SCN.s.score), KJS.width() / 3, 60);
+	ctx.fillText("Timescale: " + Math.floor(KJS.timescale * 100) / 100, 10, 60);
+	ctx.fillText("HOLD [C] TO SEE DEBUG MODE / CONTROLS        Score: " + Math.floor(SCN.s.score), KJS.width() / 3, 60);
 	
 	// Draw crosshair
 	ctx.identity();
@@ -260,6 +262,11 @@ SCN.s.onupdate = function() {
 		World.compMode ++;
 		World.compMode %= 3;
 	}
+	
+	if (KJS.i.keyboardDown(KJS.i.toGLFWCode('v')))
+		KJS.timescale = Math.max(0.4, KJS.timescale - 0.05);
+	else 
+		KJS.timescale = Math.min(1.0, KJS.timescale + 0.02);
 	
 	this.hitmarker = Math.max(0, this.hitmarker - delta);
 	

@@ -115,6 +115,7 @@ public class OKO_Camera_ extends KObj_Oriented {
 	private void calculateCenter() {
 		center.set(0, 0, -1);
 		actTransform.transformPosition(center);
+		
 	}
 	
 	private void calculateUp() {

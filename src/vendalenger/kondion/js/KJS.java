@@ -73,6 +73,7 @@ public class KJS {
 			YZX = 3,
 			XYZ = 4,
 			XZY = 5;
+	public float timescale = 1.0f;
 	
 	public KJS() throws ScriptException {
 		System.out.println("KJS initialization");

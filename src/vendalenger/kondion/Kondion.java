@@ -67,7 +67,7 @@ import vendalenger.port.VD_FlConsole;
 
 public class Kondion {
 	
-	public static final String version = "0.0.2-ACACIA-DEV";
+	public static final String version = "0.0.3-ACACIA-FINAL";
 
 	private static OKO_Camera_ dummyCamera;
 	private static JFrame loadingScreen;
@@ -182,9 +182,9 @@ public class Kondion {
 
 	public static float getDelta() {
 		if (world.fixFrame > 0) {
-			return 1.0f / (float) world.fixFrame;
+			return 1.0f / (float) world.fixFrame * kjs.timescale;
 		} else
-			return (float) Math.min(delta, 1.0f / 5);
+			return (float) Math.min(delta, 1.0f / 5) * kjs.timescale;
 	}
 	
 	/**

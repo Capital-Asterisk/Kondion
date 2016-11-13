@@ -40,11 +40,11 @@ SCN.Platform.s = {
 //SCN.PlatformB.setMaterial(new Mat_Monotexture("K_Cube"));
 
 KJS.d["------ Controls ------"] = 0;
-KJS.d["Z: Hold to switch camera / character"] = 0;
-KJS.d["C: Hold it"] = 0;
-KJS.d["WASD: Movement"] = 0;
-KJS.d["X: Look Behind"] = 0;
-KJS.d["QE: YAW"] = 0;
+KJS.d["WASD:"] = "Pitch, Roll";
+KJS.d["QE"] = "Yaw";
+KJS.d["SPACE"] = "Accelerate";
+KJS.d["X"] = "Look behind";
+KJS.d["MOUSE1"] = "Fire weapon";
 KJS.d["V: Do not press"] = 0;
 KJS.d["----------------------"] = 0;
 
@@ -61,19 +61,48 @@ SCN.s.players = [SCN.planeA];
 //SCN.guy.s.on = true;
 SCN.s.currentPlayer = 0;
 
-for (var i = 0; i < 60; i++) {
+var material = new Mat_Monotexture("K_Cube");
+
+for (var i = 0; i < 100; i++) {
 	var cube = new SKO_Cube();
 	cube.transform.scale(30, 30, 30);
-	cube.morecube = new SKO_Cube(0);
+	//cube.morecube = new SKO_Cube(0);
 	cube.transform.translate(KJS.orandom() * 500, 0, KJS.orandom() * 500);
+	cube.setMaterial(material);
 	cube.s = {
+		scale: 30,
+		delay: 6,
+		boom: function() {
+			if (this.delay == 0) {
+				var f = this.scale;
+				for (var j = 0; j < 8; j++) {
+					var smol = new SKO_Cube();
+					smol.setMaterial(material);
+					smol.transform.scale(f / 2, f / 2, f / 2);
+					smol.moveTo(this.obj.transform);
+					smol.transform.translate(0, 0.1, 0);
+					smol.velocity.x = KJS.orandom() * f * 3;
+					smol.velocity.y = Math.random() * f * 3;
+					smol.velocity.z = KJS.orandom() * f * 3;
+					smol.s = {};
+					smol.s.scale = f / 2;
+					smol.s.delay = 6;
+					smol.s.boom = this.boom;
+					smol.s.onupdate = this.onupdate;
+					SCN[SCN.nextName("CUBE_SMOL_")] = smol;
+				}
+				SCN.rescan();
+				this.obj.killMe = true;
+			}
+		},
 		onupdate: function() {
+			this.delay = Math.max(0, this.delay - 1);
 			this.obj.velocity.z -= Math.random() / 7;
-			this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
+			//this.obj.morecube.transform.translate(0, Math.sin(KJS.currentTick() / 20) / 10, 0);
 			this.obj.rotVelocity.rotateY((Math.random() - 0.5) / 60);
 		}
 	}
-	cube.morecube.transform.translate(0, 1, 0);
+	//cube.morecube.transform.translate(0, 1, 0);
 	SCN["CUBE_" + i] = cube;
 }
 

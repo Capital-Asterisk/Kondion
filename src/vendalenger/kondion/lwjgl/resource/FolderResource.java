@@ -55,7 +55,7 @@ public class FolderResource implements KResource {
 			// String parsing
 			//System.out.println("NAV: " + path);
 			File dir = directory;
-			String[] split = path.split(Pattern.quote(System.getProperty("file.separator")));
+			String[] split = path.split("/");
 			for (int i = 0; i < split.length; i++) {
 				File[] f = dir.listFiles();
 				System.out.println("FILE: " + dir.getName() + " NEED: " + split[i]);
