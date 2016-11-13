@@ -67,6 +67,8 @@ Screenshots
 ![SS00](http://vendalenger.x10host.com/img/Kondion_Screen00.png)
 ![SS01](http://vendalenger.x10host.com/img/Kondion_Screen01.png)
 
+[Video (Volume warning) until I make a better one](https://www.youtube.com/watch?v=YGj1V-vn7fI)
+
 Lisenses
 ==================================
 
