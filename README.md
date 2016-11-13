@@ -61,6 +61,13 @@ See test game 1 for more info.
 K[name here] is only used in the source code and files to avoid conflict with KDE software.
 This entire engine is currently being rewritten in C++ with embedded Chrome V8.
 
+Get started fast! With downloads!
+==================================
+Actually, don't use this game engine for anything too serious or physic based. You do not need to compile from the source to make a game. Get [kondion-acacia.zip](https://drive.google.com/file/d/0B26hfcfczrQcbkg0bHRkcVdvclE/view?usp=sharing) and you're pretty much good to go. Run kondion-acacia through terminal/cmd to play the example game shown below. There is no documentaation, look at how the example game works if you want to actually do something.
+
+Tested on Linux.
+Windows tests were also on Linux, through wine. (it thinks it's Windows XP)
+
 Screenshots
 ==================================
 
